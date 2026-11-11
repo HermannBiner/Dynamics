@@ -21,12 +21,14 @@ dotnet run --project tools/ReferenceExport
 ```
 
 The first port keeps `Decimal` and the VB mixed Decimal/Double arithmetic so results match exactly.
+The exporter runs the VB code on .NET 10, the runtime of Dynamics: on .NET 8 (Simulator's runtime) the same VB code
+gives a slightly different trajectory for the shaken pendulum after some hundred steps (last digits, then chaotic divergence).
 Switching to `Double` is a separate step, because it changes chaotic trajectories.
 
 ## Port order
 
 1. Shared base classes + reference export ✔
-2. Pendulum (physics, then rendering and web UI)
+2. Pendulum: physics ✔, rendering and web UI open
 3. NumericMethods
 4. Julia/Mandelbrot, architecture review
 5. Remaining systems
@@ -56,3 +58,19 @@ Marked `VB-compatible` in the code; to be fixed in a separate step after the por
 - `NTuple(n)` has n + 1 components (`ReDim`).
 
 Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE).
+
+## Name mapping (PendulumClassLibrary → Dynamics.Core.Pendulum)
+
+| VB | C# |
+|---|---|
+| `IPendulum`, `ClsPendulumAbstract` | `IPendulum`, `PendulumBase` (shared Runge-Kutta step) |
+| `ClsDoublePendulum`, `ClsShakedPendulum`, `ClsCombinedPendulum` | `DoublePendulum`, `ShakedPendulum`, `CombinedPendulum` |
+| PictureBox/Bitmap/ListBox/Label properties, `PrepareDiagram`, `Draw*` | removed; the UI draws from `GetArms`, `GetTrackSegment`, `GetPhasePortraitPoints`, `GetPhasePortraitTangent`, `GetBackgroundCurve`, `GetProtocolLine` |
+| `SetAndDrawStartparameter1/2(Point)` | `SetStartparameter1/2(MathPoint)`; the UI converts pixels to mathematical coordinates |
+| `PhaseportraitIndex` | `PhasePortraitType` |
+| `ClsPendulumController` | not ported yet (web UI) |
+
+Pendulum quirks kept (`VB-compatible`):
+
+- `ShakedPendulum.G2Test` divides by A (constant 0) instead of l.
+- `CombinedPendulum.G1/G2` swallow arithmetic errors and continue with the partial value (VB showed a message box).

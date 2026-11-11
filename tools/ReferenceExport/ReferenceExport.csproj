@@ -3,12 +3,14 @@
   <!--
     Calls the original VB classes of Simulator and writes reference data for Dynamics.Tests.
     Simulator.dll is not referenced as a project, because Simulator's OutputPath is the Publish folder.
-    Build it first (tools/build-simulator.ps1), then run this project with dotnet run
+    Build it first (tools/build-simulator.ps1), then run this project with dotnet run.
+    Target is .NET 10 like Dynamics: the same VB code gives slightly different trajectories
+    on .NET 8 (shaken pendulum, after some hundred steps), so the comparison needs the same runtime.
   -->
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

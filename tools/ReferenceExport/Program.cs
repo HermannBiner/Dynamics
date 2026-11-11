@@ -117,3 +117,14 @@ foreach (var d in new[] { 0m, 0.5m, 0.1m, 0.3333333333m, 1.75m, 5m, 6.625m, 1023
 var path = Path.Combine(outDir, "general.json");
 File.WriteAllText(path, JsonSerializer.Serialize(general, new JsonSerializerOptions { WriteIndented = true }));
 Console.WriteLine($"Written {general.Values.Sum(r => r.Count)} rows to {path}");
+
+// Pendulums: the VB classes use WinForms controls, therefore on an STA thread.
+Dictionary<string, List<string[]>>? pendulum = null;
+var thread = new Thread(() => pendulum = PendulumExport.Run());
+thread.SetApartmentState(ApartmentState.STA);
+thread.Start();
+thread.Join();
+
+var pendulumPath = Path.Combine(outDir, "pendulum.json");
+File.WriteAllText(pendulumPath, JsonSerializer.Serialize(pendulum, new JsonSerializerOptions { WriteIndented = false }));
+Console.WriteLine($"Written {pendulum!.Count} pendulum scenarios to {pendulumPath}");
