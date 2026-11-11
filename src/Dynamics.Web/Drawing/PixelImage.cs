@@ -43,7 +43,7 @@ public sealed class PixelImage(int size)
     /// <summary>VB DrawCoordinateSystem: axes through 0 if 0 is inside the ranges (1 pixel, black).</summary>
     public void DrawAxes(CoordinateTransform transform)
     {
-        var (axisX, axisY) = transform.MathToPixel(0, 0);
+        var (axisX, axisY) = transform.MathToPixel(0m, 0m);
         if (transform.MathXInterval.IsNumberInInterval(0m))
         {
             var p = (int)Math.Round(axisX);
@@ -59,6 +59,33 @@ public sealed class PixelImage(int size)
             for (var p = 1; p <= size; p++)
             {
                 Set(p, q, Argb.Black);
+            }
+        }
+    }
+
+    /// <summary>
+    /// VB DrawPoint(MathPoint, Brush, wide): a filled circle of about "wide" pixels radius, only if the
+    /// point is inside the ranges (e.g. the roots of the Newton iteration).
+    /// </summary>
+    public void FillCircle(CoordinateTransform transform, MathPoint center, int radius, int argb)
+    {
+        if (!transform.IsInside(center))
+        {
+            return;
+        }
+
+        var (cx, cy) = transform.MathToPixel(center);
+        for (var y = (int)Math.Floor(cy - radius); y <= (int)Math.Ceiling(cy + radius); y++)
+        {
+            for (var x = (int)Math.Floor(cx - radius); x <= (int)Math.Ceiling(cx + radius); x++)
+            {
+                var dx = x + 0.5 - cx;
+                var dy = y + 0.5 - cy;
+                if (dx * dx + dy * dy <= radius * radius && x >= 0 && y >= 0 && x < size && y < size)
+                {
+                    Write((y * size + x) * 4, argb);
+                    MarkDirty(x, y);
+                }
             }
         }
     }

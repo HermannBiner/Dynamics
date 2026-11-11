@@ -782,7 +782,7 @@
     <comment>Lbl</comment>
   </data>
   <data name="ProtocolNewton" xml:space="preserve">
-    <value>Prokotoll Startpunkt, Endpunkt</value>
+    <value>Protokoll Startpunkt, Endpunkt</value>
     <comment>Lbl</comment>
   </data>
   <data name="QuadraticFunction" xml:space="preserve">
@@ -1736,5 +1736,8 @@
   </data>
   <data name="MandelbrotMapMouseHint" xml:space="preserve">
     <value>c mit der Maus auf der Mandelbrot Menge wählen; beim Loslassen wird die Julia Menge zu c erzeugt.</value>
+  </data>
+  <data name="SingleNewtonMouseHint" xml:space="preserve">
+    <value>Startpunkt anklicken; mit gedrückter Maustaste ziehen, um die ganze Iteration des Punktes unter der Maus zu sehen.</value>
   </data>
 </root>

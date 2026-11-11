@@ -140,7 +140,8 @@ html, body {
 
 .top-bar nav {
     display: flex;
-    gap: 1rem;
+    gap: 0.4rem 1rem;
+    flex-wrap: wrap;
     flex: 1;
 }
 
@@ -503,4 +504,16 @@ button:disabled {
     .map-page {
         grid-template-columns: minmax(0, 1fr);
     }
+}
+
+/* Newton iteration */
+
+.option-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+}
+
+.option-groups .check {
+    margin-top: 0.2rem;
 }

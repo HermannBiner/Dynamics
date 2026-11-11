@@ -33,6 +33,11 @@ public class CoordinateTransform
         1 + (double)((x - MathXInterval.A) * _cornerX / MathXInterval.IntervalWidth),
         1 + (double)((MathYInterval.B - y) * _cornerY / MathYInterval.IntervalWidth));
 
+    /// <summary>Mathematical point in Double (e.g. a complex number) to pixel coordinates.</summary>
+    public (double X, double Y) MathToPixel(double x, double y) => (
+        1 + (x - MathXInterval.DblA) * _cornerX / MathXInterval.DblIntervalWidth,
+        1 + (MathYInterval.DblB - y) * _cornerY / MathYInterval.DblIntervalWidth);
+
     /// <summary>Length in mathematical X units converted to pixels.</summary>
     public double LengthToPixel(decimal length) => (double)(length * _cornerX / MathXInterval.IntervalWidth);
 

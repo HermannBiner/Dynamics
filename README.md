@@ -31,7 +31,8 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 2. Pendulum: physics ✔, web UI ✔ (`/pendulum`)
 3. NumericMethods ✔ (`/numericmethods`)
 4. Julia/Mandelbrot ✔ (`/julia`, `/mandelbrotmap`), architecture review (see below)
-5. Remaining systems
+5. Remaining systems: Newton iteration ✔ (`/newton`, `/singlenewton`); next strange attractors, billiards,
+   universe, growth models, L-systems
 6. Switch from Decimal to Double (all systems at once, checked against the VB data with tolerance)
 
 ## Name mapping (GeneralClassLibrary → Dynamics.Core.General)
@@ -69,11 +70,13 @@ tests check the corrected behaviour mathematically instead.
 | `DiagramAreaSelector` | own conversion of the corners (x divided by the width instead of width − 1, y by 0.99 · height): the selected range differed from the drawn rectangle | corners are the points of the selected pixels; zooming puts them at the corners of the new picture |
 | `JuliaController` area selection | active only after a complete picture, not after Stop + Reset | possible whenever stopped |
 | `MandelbrotMapController` | both pictures shared the spiral variables and the status; the Julia set started while the Mandelbrot set was still drawn | own spiral per picture: Mandelbrot first, then Julia |
+| `NewtonController.SetA/SetB` | changing a or b called SetDefaultUserData, which set c back to 0.5 + i (and the ranges to the defaults): c could not be changed | c and the ranges keep the entered values |
+| `NewtonController.Start` | the roots were prepared before n, the ranges and c were set: the first picture of the polynomial missed the root c (its basin got the color of -1 or 1), a new c showed only at the second start | first picture equals the model with the actual c; roots at c |
 
 Deliberate VB behaviour that is kept (marked `VB-compatible`): `NTuple(n)` has n + 1 components (`ReDim`),
 `Vector.ToMathPoint` returns a shared instance, `ComplexNumber.Div` divides in Decimal.
 
-Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE).
+Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE), text typo "Prokotoll" (DE).
 
 ## Name mapping (PendulumClassLibrary → Dynamics.Core.Pendulum)
 
@@ -126,6 +129,24 @@ also for choosing c on the Mandelbrot map.
 
 Speed (Release, interpreted WebAssembly): a full 600 × 600 picture (Seahorse or Mandelbrot set) in about 1.9 s,
 drawn spirally while computing. AOT is therefore not needed now; a Web Worker neither (the loop yields every frame).
+
+## Name mapping (NewtonIterationClassLibrary → Dynamics.Core.Newton)
+
+| VB | C# |
+|---|---|
+| `INewton` (`EnColor`, `EnMixing`), `ClsNewtonAbstract` | `INewton` (`NewtonColor`, `NewtonMixing`), `NewtonBase`; `IterationStep(p, q)` returns `NewtonPixel` (ARGB color, protocol line) |
+| `ClsUnitRootCollection`, `ClsInversUnitRoots`, `ClsPolynom3C`, `ClsUnitRoot` | `UnitRootCollection`, `InversUnitRoots`, `Polynom3C` (all in `Polynomials.cs`), `UnitRoot` |
+| `DrawRoots`, `DrawCoordinateSystem` | `INewton.Roots`; the page draws axes and roots into the `PixelImage` |
+| `ClsNewtonIterationController` (+ `ShowBasin`, `GetR`) | `NewtonController`, `NewtonBasin` + `Pages/NewtonPage.razor` (`/newton`) |
+| `ClsSingleNewtonIterationController` | `SingleNewtonController` (the temporary drawing is the state `Orbit`, `ConvergedRoot`) + `Pages/SingleNewtonPage.razor` (`/singlenewton`) |
+
+The models keep the operations of `ClsComplexNumber` (including the Decimal division of `Div`); 16 VB pictures
+(every pixel, plus the protocol) match exactly. The spiral, the pixel image and the area selection are shared
+with the Julia sets. Speed (Release): unit roots n = 3 about 2.3 s, polynomial with three roots about 4–5 s; with
+rotation (many points that do not converge within 100 steps, each with a Decimal division) up to about 40 s.
+
+Web differences of the Newton pages: if c is not allowed, the iteration does not start (VB went on with the old c,
+or failed if there was none); the protocol keeps the newest 10'000 lines (one line per pixel).
 
 Web differences of the Julia pages: the computation time pauses while interrupted; on the Mandelbrot map, c can be
 chosen as soon as the Mandelbrot set is complete.

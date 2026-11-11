@@ -8,11 +8,12 @@
 //   3 x y size color         point (filled circle of radius size; tiny points as squares)
 //   4 dx                     shift the whole picture right by dx (chart recorder); the left strip is cleared
 //   5 x y w h color width    rectangle outline
+//   6 x y r color width      circle outline
 //
 // Pixel pictures (Julia and Mandelbrot sets) use a canvas set up with pixelExact = true:
 // one canvas pixel per logical pixel, filled with putImage.
 
-const palette = ['#ffffff', '#0000ff', '#ff0000', '#008000', '#7fffd4', '#9400d3', '#000000'];
+const palette = ['#ffffff', '#0000ff', '#ff0000', '#008000', '#7fffd4', '#9400d3', '#000000', '#ff00ff'];
 const layers = new Map();
 
 export function setup(id, size, pixelExact = false) {
@@ -82,6 +83,14 @@ export function draw(id, commands) {
                 ctx.lineWidth = commands[i + 6];
                 ctx.strokeRect(commands[i + 1], commands[i + 2], commands[i + 3], commands[i + 4]);
                 i += 7;
+                break;
+            case 6:
+                ctx.strokeStyle = palette[commands[i + 4]];
+                ctx.lineWidth = commands[i + 5];
+                ctx.beginPath();
+                ctx.arc(commands[i + 1], commands[i + 2], Math.max(commands[i + 3], 0.5), 0, 2 * Math.PI);
+                ctx.stroke();
+                i += 6;
                 break;
             default:
                 console.error('Unknown canvas command', commands[i]);

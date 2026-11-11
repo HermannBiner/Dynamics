@@ -1737,4 +1737,7 @@
   <data name="MandelbrotMapMouseHint" xml:space="preserve">
     <value>Choose c with the mouse on the Mandelbrot set; the Julia set for c is generated when the button is released.</value>
   </data>
+  <data name="SingleNewtonMouseHint" xml:space="preserve">
+    <value>Click a start point; drag with the mouse button pressed to see the whole iteration of the point under the mouse.</value>
+  </data>
 </root>

@@ -145,3 +145,14 @@ juliaThread.Join();
 var juliaPath = Path.Combine(outDir, "julia.json");
 File.WriteAllText(juliaPath, JsonSerializer.Serialize(julia));
 Console.WriteLine($"Written {julia!.Count} Julia/Mandelbrot scenarios to {juliaPath}");
+
+// Newton iteration: the VB classes draw into a picture box, therefore on an STA thread.
+Dictionary<string, List<string[]>>? newton = null;
+var newtonThread = new Thread(() => newton = NewtonExport.Run());
+newtonThread.SetApartmentState(ApartmentState.STA);
+newtonThread.Start();
+newtonThread.Join();
+
+var newtonPath = Path.Combine(outDir, "newton.json");
+File.WriteAllText(newtonPath, JsonSerializer.Serialize(newton));
+Console.WriteLine($"Written {newton!.Count} Newton scenarios to {newtonPath}");
