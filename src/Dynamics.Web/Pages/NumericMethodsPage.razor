@@ -1,0 +1,255 @@
+@page "/numericmethods"
+@using Dynamics.Core.General
+@using Dynamics.Core.NumericMethods
+@using Dynamics.Web.Drawing
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<PageTitle>@Text.Get("SpringPendulum") – Dynamics</PageTitle>
+
+<h1 class="page-title">@Text.Get("SpringPendulum")</h1>
+
+<div class="numeric-page">
+    <section class="diagram-column">
+        <div class="canvas-stack diagram" style="--size:@(DiagramSize)px">
+            <canvas id="numeric-diagram"></canvas>
+            <canvas id="numeric-overlay" class="@(IsEditable ? "settable-left" : "")"></canvas>
+        </div>
+        <p class="hint">@Text.Get("NumericMethodsMouseHint")</p>
+    </section>
+
+    <section class="control-column">
+        <div class="field">
+            <label for="method">@Text.Get("NumericMethods")</label>
+            <select id="method" disabled="@(!IsEditable)" @onchange="OnMethodChanged">
+                @for (var i = 0; i < _methodNames.Count; i++)
+                {
+                    <option value="@i" selected="@(i == _controller.SelectedIndex)">@_methodNames[i]</option>
+                }
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="stepwidth">@Text.Get("StepWidth"): @_controller.DisplayedStepWidth</label>
+            <input id="stepwidth" type="range" min="@NumericMethodController.StepWidthMin" max="@NumericMethodController.StepWidthMax"
+                   value="@_controller.StepWidthTrackBar" @oninput="OnStepWidthChanged" />
+        </div>
+
+        <label class="check">
+            <input type="checkbox" checked="@_controller.IsStretched" disabled="@(!IsEditable)" @onchange="OnStretchedChanged" />
+            @Text.Get("StretchedMode")
+        </label>
+
+        <div class="buttons">
+            <button type="button" class="primary" disabled="@(_controller.Status == IterationStatus.Running)" @onclick="StartAsync">
+                @(_controller.Status == IterationStatus.Stopped ? Text.Get("Start") : Text.Get("Continue"))
+            </button>
+            <button type="button" disabled="@(_controller.Status != IterationStatus.Running)" @onclick="Stop">@Text.Get("Stop")</button>
+            <button type="button" disabled="@(_controller.Status == IterationStatus.Running)" @onclick="ResetAsync">@Text.Get("ResetIteration")</button>
+            <button type="button" disabled="@(!IsEditable)" @onclick="DefaultAsync">@Text.Get("DefaultUserData")</button>
+        </div>
+
+        <p class="steps">@Text.Get("NumberOfSteps"): <strong>@_controller.N.ToString("N0")</strong></p>
+
+        <p class="caption">@Text.Get("Difference")</p>
+        <div class="protocol value-list" role="log">
+            @foreach (var line in _values.TakeLast(DisplayLines).Reverse())
+            {
+                <div>@line</div>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private const int DiagramSize = 600;
+    private const int DisplayLines = 200;
+    private const int MaxLines = 10000;
+    private const int ShiftsPerFrame = 2;
+    private const double FrameBudgetMs = 12;
+
+    private static readonly Interval MathInterval = new(-1m, 1m);
+
+    private readonly NumericMethodController _controller = new();
+    private readonly DrawBatch _diagram = new(new CoordinateTransform(DiagramSize, DiagramSize, MathInterval, MathInterval));
+    private readonly DrawBatch _overlay = new(new CoordinateTransform(DiagramSize, DiagramSize, MathInterval, MathInterval));
+    private readonly List<string> _values = [];
+
+    private IJSObjectReference? _module;
+    private DotNetObjectReference<NumericMethodsPage>? _selfReference;
+    private List<string> _methodNames = [];
+    private bool _disposed;
+
+    private bool IsEditable => _controller.Status == IterationStatus.Stopped;
+
+    protected override void OnInitialized() => _methodNames = _controller.MethodNames.ToList();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/canvas.js");
+        await _module.InvokeVoidAsync("setup", "numeric-diagram", DiagramSize);
+        await _module.InvokeVoidAsync("setup", "numeric-overlay", DiagramSize);
+        _selfReference = DotNetObjectReference.Create(this);
+        await _module.InvokeVoidAsync("attachPointer", "numeric-overlay", _selfReference);
+        await PrepareAsync();
+    }
+
+    /// <summary>VB: PrepareDiagram + DrawPicPendulums.</summary>
+    private async Task PrepareAsync()
+    {
+        _diagram.Clear();
+        _diagram.Line(new MathPoint(-1, 0), new MathPoint(1, 0), CanvasColor.Black, 1);
+        DrawPendulums();
+        await FlushAsync();
+    }
+
+    private void DrawPendulums()
+    {
+        var (a, b) = _controller.Positions;
+        _overlay.Clear();
+        _overlay.Line(a, new MathPoint(a.X, 1), CanvasColor.Green, 2);
+        _overlay.Point(a, CanvasColor.Green, 5);
+        _overlay.Line(b, new MathPoint(b.X, 1), CanvasColor.Red, 2);
+        _overlay.Point(b, CanvasColor.Red, 5);
+    }
+
+    private async Task FlushAsync()
+    {
+        if (_module is null)
+        {
+            return;
+        }
+
+        if (!_diagram.IsEmpty)
+        {
+            await _module.InvokeVoidAsync("draw", "numeric-diagram", _diagram.Take());
+        }
+        if (!_overlay.IsEmpty)
+        {
+            await _module.InvokeVoidAsync("draw", "numeric-overlay", _overlay.Take());
+        }
+    }
+
+    private async Task OnMethodChanged(ChangeEventArgs e)
+    {
+        _controller.SelectMethod(int.Parse(e.Value!.ToString()!));
+        _values.Clear();
+        await PrepareAsync();
+    }
+
+    private void OnStepWidthChanged(ChangeEventArgs e) => _controller.SetStepWidth(int.Parse(e.Value!.ToString()!));
+
+    private async Task OnStretchedChanged(ChangeEventArgs e)
+    {
+        _controller.SetStretched(e.Value is true);
+        _values.Clear();
+        await PrepareAsync();
+    }
+
+    private async Task ResetAsync()
+    {
+        _controller.ResetIteration();
+        _values.Clear();
+        await PrepareAsync();
+    }
+
+    private async Task DefaultAsync()
+    {
+        _controller.ResetIteration();
+        _controller.SetDefaultUserData();
+        _values.Clear();
+        await PrepareAsync();
+    }
+
+    private void Stop() => _controller.Stop();
+
+    private async Task StartAsync()
+    {
+        if (!_controller.Start())
+        {
+            return;
+        }
+
+        var watch = new System.Diagnostics.Stopwatch();
+        while (_controller.Status == IterationStatus.Running && !_disposed)
+        {
+            // About ShiftsPerFrame pixels of chart feed per frame, like the pace of Simulator.
+            var steps = ShiftsPerFrame * _controller.NumberOfStepsUntilShift;
+            watch.Restart();
+            for (var i = 0; i < steps && watch.Elapsed.TotalMilliseconds < FrameBudgetMs; i++)
+            {
+                var step = _controller.Step();
+                _diagram.Line(step.TraceA, step.NextTraceA, CanvasColor.Green, 1);
+                _diagram.Line(step.TraceB, step.NextTraceB, CanvasColor.Red, 1);
+                if (step.IsShift)
+                {
+                    _diagram.ShiftRight(1);
+                    _diagram.Line(new MathPoint(-1, 0), new MathPoint(-0.9m, 0), CanvasColor.Black, 1);
+                }
+                _values.Add(step.ValueLine);
+            }
+
+            if (_values.Count > MaxLines)
+            {
+                _values.RemoveRange(0, _values.Count - MaxLines);
+            }
+
+            DrawPendulums();
+            await FlushAsync();
+            StateHasChanged();
+
+            if (_module is not null)
+            {
+                await _module.InvokeVoidAsync("nextFrame");
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async Task OnPointer(string kind, double x, double y)
+    {
+        var position = _diagram.Transform.PixelToMathPoint((int)Math.Round(x), (int)Math.Round(y));
+        switch (kind)
+        {
+            case "down":
+                if (_controller.MouseDown(position))
+                {
+                    await PrepareAsync();
+                }
+                break;
+            case "move":
+                if (_controller.MouseMove(position))
+                {
+                    await PrepareAsync();
+                }
+                break;
+            default:
+                _controller.MouseUp();
+                break;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _disposed = true;
+        _controller.Stop();
+        _selfReference?.Dispose();
+        if (_module is not null)
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+}

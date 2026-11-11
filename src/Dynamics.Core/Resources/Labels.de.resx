@@ -1707,4 +1707,13 @@
   <data name="HomeIntro" xml:space="preserve">
     <value>Simulation dynamischer Systeme – Web-Version des Simulators.</value>
   </data>
+  <data name="NumericMethods" xml:space="preserve">
+    <value>Numerische Methode</value>
+  </data>
+  <data name="ClsRungeKutta4Pendulum" xml:space="preserve">
+    <value>Runge-Kutta 4</value>
+  </data>
+  <data name="NumericMethodsMouseHint" xml:space="preserve">
+    <value>Startposition: im linken Bereich mit der Maus nach oben oder unten ziehen. Grün: reales Federpendel, rot: numerische Methode.</value>
+  </data>
 </root>

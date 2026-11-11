@@ -128,3 +128,9 @@ thread.Join();
 var pendulumPath = Path.Combine(outDir, "pendulum.json");
 File.WriteAllText(pendulumPath, JsonSerializer.Serialize(pendulum, new JsonSerializerOptions { WriteIndented = false }));
 Console.WriteLine($"Written {pendulum!.Count} pendulum scenarios to {pendulumPath}");
+
+// Numeric methods (no UI dependencies)
+var numeric = NumericMethodExport.Run();
+var numericPath = Path.Combine(outDir, "numericmethods.json");
+File.WriteAllText(numericPath, JsonSerializer.Serialize(numeric));
+Console.WriteLine($"Written {numeric.Count} numeric-method scenarios to {numericPath}");

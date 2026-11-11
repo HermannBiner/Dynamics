@@ -29,9 +29,10 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 
 1. Shared base classes + reference export ✔
 2. Pendulum: physics ✔, web UI ✔ (`/pendulum`)
-3. NumericMethods
+3. NumericMethods ✔ (`/numericmethods`)
 4. Julia/Mandelbrot, architecture review
 5. Remaining systems
+6. Switch from Decimal to Double (all systems at once, checked against the VB data with tolerance)
 
 ## Name mapping (GeneralClassLibrary → Dynamics.Core.General)
 
@@ -85,5 +86,24 @@ dotnet test
 
 Language: German (de-CH) by default, English via the switch in the header (stored in the browser, reloads the app).
 
-Known: in the interpreted WebAssembly runtime the Decimal arithmetic is slow (about 500 steps/s for the double
-pendulum with shadow, 2500 steps/s for the shaken pendulum). Options for later: AOT compilation, switch to Double.
+Speed (double pendulum with shadow, Decimal, interpreted WebAssembly): about 500 steps/s with `dotnet run` (Debug),
+about 7400 steps/s in the Release build (`dotnet publish -c Release`). AOT and Double are evaluated in step 4.
+
+## Name mapping (NumericMethodsClassLibrary → Dynamics.Core.NumericMethods)
+
+| VB | C# |
+|---|---|
+| `INumericMethod`, `ClsNumericMethodAbstract` | `INumericMethod`, `NumericMethodBase` (shared loop and `t mod 2π`) |
+| `ClsRealSpringPendulum`, `ClsForwardEuler`, `ClsBackwardEuler`, `ClsMidpointImplicit`, `ClsRungeKutta4Pendulum`, `ClsRealThreadPendulum` | same names without `Cls` |
+| `ClsNumericMethodController` | `NumericMethodController` (UI-free) + `Pages/NumericMethodsPage.razor`; the shifting bitmap is canvas command 4 |
+
+
+
+Corrected in Dynamics (differs from Simulator on purpose):
+
+- `RealThreadPendulum`: VB used `k[2] / 2` instead of `k[2]` in the fourth Runge-Kutta step, which reduced the
+  method to order 1 (energy drift 4.5e-3 instead of 1e-10 for h = 0.02 up to t = 10). Its VB reference scenarios are
+  therefore not compared; tests check energy conservation and order 4 instead.
+
+Web differences: the chart feed runs at about 120 pixels per second (VB: as fast as the machine allowed);
+the value and protocol lists show the newest entry first.

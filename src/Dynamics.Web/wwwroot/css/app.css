@@ -352,3 +352,32 @@ button:disabled {
     padding: 0.3rem 0.5rem;
     white-space: nowrap;
 }
+
+/* Numeric methods page */
+
+.page-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 0.8rem;
+}
+
+.numeric-page {
+    display: grid;
+    grid-template-columns: minmax(0, 600px) minmax(16rem, 22rem);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@media (max-width: 760px) {
+    .numeric-page {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.canvas-stack canvas.settable-left {
+    cursor: ns-resize;
+}
+
+.value-list {
+    height: 22rem;
+}

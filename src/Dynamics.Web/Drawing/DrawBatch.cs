@@ -59,6 +59,9 @@ public sealed class DrawBatch(CoordinateTransform transform)
         _commands.AddRange([3, x, y, size, (int)color]);
     }
 
+    /// <summary>Shifts the whole picture right by dx pixels (chart recorder).</summary>
+    public void ShiftRight(int dx) => _commands.AddRange([4, dx]);
+
     public double[] Take()
     {
         var result = _commands.ToArray();

@@ -1707,4 +1707,13 @@
   <data name="HomeIntro" xml:space="preserve">
     <value>Simulation of dynamical systems – web version of Simulator.</value>
   </data>
+  <data name="NumericMethods" xml:space="preserve">
+    <value>Numerical method</value>
+  </data>
+  <data name="ClsRungeKutta4Pendulum" xml:space="preserve">
+    <value>Runge-Kutta 4</value>
+  </data>
+  <data name="NumericMethodsMouseHint" xml:space="preserve">
+    <value>Start position: drag up or down in the left area. Green: real spring pendulum, red: numerical method.</value>
+  </data>
 </root>

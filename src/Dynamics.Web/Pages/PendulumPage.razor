@@ -96,7 +96,7 @@
         </label>
         <p class="caption">@_controller.MainDS.LabelProtocol</p>
         <div class="protocol" role="log">
-            @foreach (var line in _protocol.TakeLast(ProtocolDisplayLines))
+            @foreach (var line in _protocol.TakeLast(ProtocolDisplayLines).Reverse())
             {
                 <div>@line</div>
             }

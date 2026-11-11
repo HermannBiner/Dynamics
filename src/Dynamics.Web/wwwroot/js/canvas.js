@@ -5,7 +5,8 @@
 //   0                        clear (white)
 //   1 x1 y1 x2 y2 color w    line
 //   2 x y r color            filled circle
-//   3 x y size color         point (filled square of 2*size, like a small FillEllipse)
+//   3 x y size color         point (filled circle of radius size; tiny points as squares)
+//   4 dx                     shift the whole picture right by dx (chart recorder); the left strip is cleared
 
 const palette = ['#ffffff', '#0000ff', '#ff0000', '#008000', '#7fffd4', '#9400d3', '#000000'];
 const layers = new Map();
@@ -51,8 +52,25 @@ export function draw(id, commands) {
             case 3: {
                 const s = commands[i + 3];
                 ctx.fillStyle = palette[commands[i + 4]];
-                ctx.fillRect(commands[i + 1] - s, commands[i + 2] - s, 2 * s, 2 * s);
+                if (s < 2) {
+                    ctx.fillRect(commands[i + 1] - s, commands[i + 2] - s, 2 * s, 2 * s);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(commands[i + 1], commands[i + 2], s, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
                 i += 5;
+                break;
+            }
+            case 4: {
+                const dx = commands[i + 1];
+                const copy = layer.copy ??= document.createElement('canvas');
+                copy.width = layer.canvas.width;
+                copy.height = layer.canvas.height;
+                copy.getContext('2d').drawImage(layer.canvas, 0, 0);
+                ctx.clearRect(0, 0, size, size);
+                ctx.drawImage(copy, dx, 0, size, size);
+                i += 2;
                 break;
             }
             default:
