@@ -32,7 +32,7 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 3. NumericMethods ✔ (`/numericmethods`)
 4. Julia/Mandelbrot ✔ (`/julia`, `/mandelbrotmap`), architecture review (see below)
 5. Remaining systems: Newton iteration ✔ (`/newton`, `/singlenewton`), strange attractors ✔ (`/strangeattractor`,
-   `/bifurcation`), billiards ✔ (`/billiard`, `/cdiagram`); next universe, growth models, L-systems
+   `/bifurcation`), billiards ✔ (`/billiard`, `/cdiagram`), universe ✔ (`/universe`); next growth models, L-systems
 6. Switch from Decimal to Double (all systems at once, checked against the VB data with tolerance)
 
 ## Name mapping (GeneralClassLibrary → Dynamics.Core.General)
@@ -78,6 +78,9 @@ tests check the corrected behaviour mathematically instead.
 | `StadiumBilliardBall.IsBallInside` | the half circles were checked around (0, 0) instead of (∓a, 0): in the curves the moving ball jumped to the end of the segment | every drawing step moves the same part of the segment |
 | `BilliardTableController` (track bar c) | parentheses missing: the track bar started at 0.76 while c = 0.8 | the track bar shows c |
 | `OvalBilliardBall.SetUserEndposition` | the end position used the angle of the mouse seen from (0, 0), not from the center of the oval: it was not under the mouse | end position in the direction of the mouse seen from the center |
+| `UniverseBase.IterationStep` (Runge-Kutta of the stars) | every star was stepped on its own with the accelerations of the actual positions in all four stages: the velocity was advanced as with Euler, order 1 (energy drift 51 % instead of 1.7e-6 for two stars, h = 1, 500 steps) | all stars together with the stage positions; order 4, energy conservation, circular orbit |
+| `UniverseController` (velocity track bar) | the track bar was set to −8 for the original velocity, but turned −8 into 20 % of it | the original velocity is 0, the inverse of the factor 1 + 0.1 · value |
+| `UniverseController` (user data) | vx was checked twice, vy never | vy is checked |
 
 Deliberate VB behaviour that is kept (marked `VB-compatible`): `NTuple(n)` has n + 1 components (`ReDim`),
 `Vector.ToMathPoint` returns a shared instance, `ComplexNumber.Div` divides in Decimal.
@@ -189,6 +192,25 @@ mouse per table) and 3 C-diagram columns (581 pairs each) match exactly. Speed (
 Web differences of the billiard pages: the protocol of the oval and the stadium ball works (in VB the language manager
 of these balls was never set, so switching the protocol on stopped the program); the mouse position is exact (VB moved it
 by (+2, −25) for its hand cursor); the C-diagram is computed column by column.
+
+## Name mapping (UniverseClassLibrary → Dynamics.Core.Universe)
+
+| VB | C# |
+|---|---|
+| `IStar`, `ClsStarAbstract` | `StarBase` (Runge-Kutta in Decimal; `IterationStep` returns the phase portrait point, `MoveActualPosition` the track) |
+| `ClsNewtonStar`, `ClsNormedStar` | `NewtonStar`, `NormedStar` (`DrawOrbit` → `GetOrbit` returns the points of the Kepler orbit) |
+| `IUniverse`, `ClsUniverseAbstract`, `ClsNewtonUniverse`, `ClsNormedUniverse` | `UniverseBase`, `NewtonUniverse`, `NormedUniverse` (all in `Universes.cs`) |
+| `ClsStarConstellation`, brushes | `StarConstellation`, `StarColors` (ARGB with the key of the name) |
+| `ClsUniverseController` | `UniverseController` (conservation laws as `ConservationBar`) + `Pages/UniversePage.razor` |
+
+All 18 constellations (11 Newton, 7 normed) match VB exactly in the start state: positions after moving the centre of gravity to 0,
+zoom, step width through the track bar, masses and velocities. Before the Runge-Kutta step was corrected, 300 loops
+of all stars matched VB exactly as well; now the trajectories are checked mathematically. Speed (Release): about 5'000 loops per second
+with 8 stars, 13'000 with 3 stars at maximum (speed slider).
+
+Web differences of the universe page: a speed slider (default maximum, as VB); the time runs on after Continue (VB stopped
+the watch at Stop and did not start it again); the mouse position is exact; an orbit whose square root would be negative
+is not drawn (VB stopped).
 
 Web differences of the Julia pages: the computation time pauses while interrupted; on the Mandelbrot map, c can be
 chosen as soon as the Mandelbrot set is complete.

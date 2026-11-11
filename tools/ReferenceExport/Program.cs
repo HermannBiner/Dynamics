@@ -173,3 +173,14 @@ billiardThread.Join();
 var billiardPath = Path.Combine(outDir, "billiard.json");
 File.WriteAllText(billiardPath, JsonSerializer.Serialize(billiard));
 Console.WriteLine($"Written {billiard!.Count} billiard scenarios to {billiardPath}");
+
+// Universes: the VB universes and stars draw into picture boxes, therefore on an STA thread.
+Dictionary<string, List<string[]>>? universe = null;
+var universeThread = new Thread(() => universe = UniverseExport.Run());
+universeThread.SetApartmentState(ApartmentState.STA);
+universeThread.Start();
+universeThread.Join();
+
+var universePath = Path.Combine(outDir, "universe.json");
+File.WriteAllText(universePath, JsonSerializer.Serialize(universe));
+Console.WriteLine($"Written {universe!.Count} universe scenarios to {universePath}");

@@ -1749,4 +1749,7 @@
   <data name="BilliardMouseHint" xml:space="preserve">
     <value>Neue Kugel: mit der Maus ziehen, um den Startpunkt auf dem Rand zu setzen, dann nochmals ziehen für die erste Richtung. Oder t und Alfa eingeben und übernehmen.</value>
   </data>
+  <data name="UniverseMouseHint" xml:space="preserve">
+    <value>Konstellation setzen und Start drücken. Neuer Stern: Vorgabe wählen, Neuer Stern drücken, mit der Maus ziehen, Masse und Geschwindigkeit einstellen, dann speichern.</value>
+  </data>
 </root>

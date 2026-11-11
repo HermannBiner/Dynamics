@@ -1749,4 +1749,7 @@
   <data name="BilliardMouseHint" xml:space="preserve">
     <value>New ball: drag with the mouse to set the start point on the border, then drag again to set the first direction. Or enter t and alfa and take them over.</value>
   </data>
+  <data name="UniverseMouseHint" xml:space="preserve">
+    <value>Take over a constellation and press Start. New star: choose a default star, press New star, drag it with the mouse, set mass and velocity, then save it.</value>
+  </data>
 </root>

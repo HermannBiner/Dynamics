@@ -578,3 +578,17 @@ input.short {
     border: 1px solid var(--border);
     border-radius: 4px;
 }
+
+/* Universe */
+
+.canvas-stack.space {
+    background: #000000;
+}
+
+.check.inline {
+    margin-top: 0;
+}
+
+.conservation .caption {
+    margin-bottom: 0.2rem;
+}
