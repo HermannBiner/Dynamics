@@ -134,3 +134,14 @@ var numeric = NumericMethodExport.Run();
 var numericPath = Path.Combine(outDir, "numericmethods.json");
 File.WriteAllText(numericPath, JsonSerializer.Serialize(numeric));
 Console.WriteLine($"Written {numeric.Count} numeric-method scenarios to {numericPath}");
+
+// Julia and Mandelbrot sets: the VB classes draw into a picture box, therefore on an STA thread.
+Dictionary<string, List<string[]>>? julia = null;
+var juliaThread = new Thread(() => julia = JuliaExport.Run());
+juliaThread.SetApartmentState(ApartmentState.STA);
+juliaThread.Start();
+juliaThread.Join();
+
+var juliaPath = Path.Combine(outDir, "julia.json");
+File.WriteAllText(juliaPath, JsonSerializer.Serialize(julia));
+Console.WriteLine($"Written {julia!.Count} Julia/Mandelbrot scenarios to {juliaPath}");

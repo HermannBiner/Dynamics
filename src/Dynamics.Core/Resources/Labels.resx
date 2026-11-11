@@ -1731,4 +1731,10 @@
   <data name="PixelsPerSecond" xml:space="preserve">
     <value>pixels/s</value>
   </data>
+  <data name="JuliaMouseHint" xml:space="preserve">
+    <value>Choose a range: drag a rectangle with the mouse (while stopped), then press Start.</value>
+  </data>
+  <data name="MandelbrotMapMouseHint" xml:space="preserve">
+    <value>Choose c with the mouse on the Mandelbrot set; the Julia set for c is generated when the button is released.</value>
+  </data>
 </root>

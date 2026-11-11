@@ -387,3 +387,120 @@ button:disabled {
     font-size: 0.9rem;
     margin: 0.4rem 0;
 }
+
+/* Julia and Mandelbrot pages */
+
+.julia-page {
+    display: grid;
+    grid-template-columns: minmax(0, 600px) minmax(16rem, 22rem);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@media (max-width: 760px) {
+    .julia-page {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.canvas-stack canvas.pixel-image {
+    image-rendering: pixelated;
+}
+
+.canvas-stack canvas.selectable,
+.canvas-stack canvas.selectable-point {
+    cursor: crosshair;
+}
+
+.field-row {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.field-row .grow {
+    flex: 1;
+    min-width: 0;
+}
+
+.ranges {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 0.35rem 0.5rem;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.ranges label, .complex-input label {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.ranges input, .complex-input input {
+    min-width: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.ranges .delta {
+    grid-column: 2 / -1;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+}
+
+.complex-input {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.color-sliders {
+    margin-top: 0.4rem;
+    display: grid;
+    gap: 0.2rem;
+}
+
+.color-sliders .red { accent-color: #d33; }
+.color-sliders .green { accent-color: #2a2; }
+.color-sliders .blue { accent-color: #33d; }
+
+.swatches {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+}
+
+.swatches span {
+    width: 2.5rem;
+    height: 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+}
+
+.julia-protocol {
+    height: 10rem;
+}
+
+.map-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.map-toolbar .complex-input {
+    width: min(36rem, 100%);
+}
+
+.map-page {
+    display: grid;
+    grid-template-columns: minmax(0, 600px) minmax(0, 563px);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@media (max-width: 1000px) {
+    .map-page {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

@@ -7,14 +7,18 @@
 //   2 x y r color            filled circle
 //   3 x y size color         point (filled circle of radius size; tiny points as squares)
 //   4 dx                     shift the whole picture right by dx (chart recorder); the left strip is cleared
+//   5 x y w h color width    rectangle outline
+//
+// Pixel pictures (Julia and Mandelbrot sets) use a canvas set up with pixelExact = true:
+// one canvas pixel per logical pixel, filled with putImage.
 
 const palette = ['#ffffff', '#0000ff', '#ff0000', '#008000', '#7fffd4', '#9400d3', '#000000'];
 const layers = new Map();
 
-export function setup(id, size) {
+export function setup(id, size, pixelExact = false) {
     const canvas = document.getElementById(id);
     if (!canvas) return;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = pixelExact ? 1 : (window.devicePixelRatio || 1);
     canvas.width = Math.round(size * dpr);
     canvas.height = Math.round(size * dpr);
     const ctx = canvas.getContext('2d');
@@ -73,11 +77,25 @@ export function draw(id, commands) {
                 i += 2;
                 break;
             }
+            case 5:
+                ctx.strokeStyle = palette[commands[i + 5]];
+                ctx.lineWidth = commands[i + 6];
+                ctx.strokeRect(commands[i + 1], commands[i + 2], commands[i + 3], commands[i + 4]);
+                i += 7;
+                break;
             default:
                 console.error('Unknown canvas command', commands[i]);
                 return;
         }
     }
+}
+
+// Copies RGBA bytes (w * h * 4) to the rectangle at (x, y) of a pixel-exact canvas.
+export function putImage(id, x, y, w, h, bytes) {
+    const layer = layers.get(id);
+    if (!layer || w <= 0 || h <= 0) return;
+    const data = new Uint8ClampedArray(bytes.buffer, bytes.byteOffset, w * h * 4);
+    layer.ctx.putImageData(new ImageData(data, w, h), x, y);
 }
 
 // Pointer events in logical pixel coordinates of the canvas (CSS may scale it).

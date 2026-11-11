@@ -1731,4 +1731,10 @@
   <data name="PixelsPerSecond" xml:space="preserve">
     <value>Pixel/s</value>
   </data>
+  <data name="JuliaMouseHint" xml:space="preserve">
+    <value>Bereich wählen: mit der Maus ein Rechteck aufziehen (wenn gestoppt), dann Start drücken.</value>
+  </data>
+  <data name="MandelbrotMapMouseHint" xml:space="preserve">
+    <value>c mit der Maus auf der Mandelbrot Menge wählen; beim Loslassen wird die Julia Menge zu c erzeugt.</value>
+  </data>
 </root>

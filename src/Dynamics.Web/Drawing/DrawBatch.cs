@@ -62,6 +62,10 @@ public sealed class DrawBatch(CoordinateTransform transform)
     /// <summary>Shifts the whole picture right by dx pixels (chart recorder).</summary>
     public void ShiftRight(int dx) => _commands.AddRange([4, dx]);
 
+    /// <summary>Rectangle outline in pixel coordinates (e.g. the selection of an area).</summary>
+    public void PixelRectangle(double x, double y, double width, double height, CanvasColor color, int lineWidth) =>
+        _commands.AddRange([5, x, y, width, height, (int)color, lineWidth]);
+
     public double[] Take()
     {
         var result = _commands.ToArray();
