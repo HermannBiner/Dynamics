@@ -203,39 +203,22 @@ public class CombinedPendulum : PendulumBase
         return eKin + ePot + eSpring;
     }
 
-    // VB-compatible: on an arithmetic error VB showed a message box and continued with the partial value.
+    // Corrected: VB caught arithmetic errors, showed a message box and went on with a partial value.
+    // Here an overflow propagates; the UI stops the iteration and shows a message.
     protected override decimal G1(NTuple x)
     {
-        decimal temp = 0;
-        try
-        {
-            temp = x[0] * (decimal)Math.Pow((double)x[3], 2);
-            temp += (decimal)(-Math.Pow((double)Omega, 2) * (double)(x[0] - L0) + (double)g * Math.Cos((double)x[2]));
-        }
-        catch (ArithmeticException)
-        {
-        }
-
+        var temp = x[0] * (decimal)Math.Pow((double)x[3], 2);
+        temp += (decimal)(-Math.Pow((double)Omega, 2) * (double)(x[0] - L0) + (double)g * Math.Cos((double)x[2]));
         return temp;
     }
 
-    protected override decimal G2(NTuple x)
-    {
-        decimal temp = 0;
-        try
-        {
-            // (-2*v2*v1 - g*sin(u2)) / u1, with u1 = l > 0
-            temp = (-2 * x[3] * x[1] - g * (decimal)Math.Sin((double)x[2])) / x[0];
-        }
-        catch (ArithmeticException)
-        {
-        }
+    // (-2*v2*v1 - g*sin(u2)) / u1, with u1 = l > 0
+    protected override decimal G2(NTuple x) =>
+        (-2 * x[3] * x[1] - g * (decimal)Math.Sin((double)x[2])) / x[0];
 
-        return temp;
-    }
+    // Test mode: u1 = l oscillates as a simple spring pendulum around L0, u2 = Phi as a simple thread pendulum
+    // of length L0. Corrected: VB applied the thread equation to l and the spring equation to Phi.
+    protected override decimal G1Test(NTuple x) => -(x[0] - L0) * (decimal)Math.Pow((double)Omega, 2);
 
-    // Test mode: simple thread pendulum and simple spring pendulum.
-    protected override decimal G1Test(NTuple x) => -g * (decimal)Math.Sin((double)x[0]) / L0;
-
-    protected override decimal G2Test(NTuple x) => -x[2] * (decimal)Math.Pow((double)Omega, 2);
+    protected override decimal G2Test(NTuple x) => -g * (decimal)Math.Sin((double)x[2]) / L0;
 }

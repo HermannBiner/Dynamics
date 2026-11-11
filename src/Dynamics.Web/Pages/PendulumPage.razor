@@ -18,6 +18,10 @@
             <div class="energy-bar @EnergyClass" style="width:@(EnergyPercent)%"></div>
         </div>
         <p class="hint">@Hint</p>
+        @if (_errorMessage is not null)
+        {
+            <p class="error" role="alert">@_errorMessage</p>
+        }
     </section>
 
     <section class="control-column">
@@ -122,6 +126,7 @@
     private EnergyState _energyState;
     private double _energyFraction;
     private bool _disposed;
+    private string? _errorMessage;
 
     private bool IsEditable => _controller.IsEditable;
 
@@ -173,6 +178,7 @@
     /// <summary>Clears all diagrams and draws axes and pendulums (VB: ResetIteration + PrepareDiagram).</summary>
     private async Task PrepareAsync()
     {
+        _errorMessage = null;
         _protocol.Clear();
         _energyFraction = 0;
         _energyState = EnergyState.Ok;
@@ -301,25 +307,37 @@
         while (_controller.Status == IterationStatus.Running && !_disposed)
         {
             watch.Restart();
-            do
+            try
             {
-                if (_controller.IsProtocol)
+                do
                 {
-                    // VB protocols the values before each step.
-                    _protocol.Add(_controller.MainDS.GetProtocolLine());
-                }
+                    if (_controller.IsProtocol)
+                    {
+                        // VB protocols the values before each step.
+                        _protocol.Add(_controller.MainDS.GetProtocolLine());
+                    }
 
-                _controller.Step();
-                _renderer.DrawStep(_controller);
+                    _controller.Step();
+                    _renderer.DrawStep(_controller);
+                }
+                while (watch.Elapsed.TotalMilliseconds < FrameBudgetMs);
             }
-            while (watch.Elapsed.TotalMilliseconds < FrameBudgetMs);
+            catch (ArithmeticException)
+            {
+                // The pendulum became numerically unstable (e.g. decimal overflow).
+                _controller.Stop();
+                _errorMessage = Text.Get("NumericOverflow");
+            }
 
             if (_protocol.Count > ProtocolMaxLines)
             {
                 _protocol.RemoveRange(0, _protocol.Count - ProtocolMaxLines);
             }
 
-            (_energyState, _energyFraction) = _controller.GetEnergyBar();
+            if (_errorMessage is null)
+            {
+                (_energyState, _energyFraction) = _controller.GetEnergyBar();
+            }
             _renderer.DrawPendulums(_controller);
             await FlushAsync();
             StateHasChanged();

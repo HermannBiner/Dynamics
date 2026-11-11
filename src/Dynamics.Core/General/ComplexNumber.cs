@@ -58,35 +58,25 @@ public class ComplexNumber
     public ComplexNumber Power2 => new(X * X - Y * Y, 2 * X * Y);
 
     /// <summary>
-    /// n-th power by repeated multiplication.
-    /// VB-compatible: n = 0 returns 0 instead of 1. Simulator never calls it with 0.
+    /// n-th power by repeated multiplication; z^(-n) = 1 / z^n.
+    /// Corrected: VB returned 0 for n = 0 and Invers · z^(n-1) for negative n.
+    /// For n ≥ 1 and n = -1 the result is unchanged.
     /// </summary>
     public ComplexNumber Power(int n)
     {
+        if (n == 0)
+        {
+            return new ComplexNumber(1, 0);
+        }
+
         var u = new ComplexNumber(X, Y);
-        ComplexNumber result;
-
-        if (n < 0)
-        {
-            result = u.Invers;
-            n = -n;
-        }
-        else if (n == 0)
-        {
-            return new ComplexNumber(0, 0);
-        }
-        else
-        {
-            result = u;
-        }
-
-        // VB-compatible: for n < 0 this multiplies Invers by u (not by Invers), as in the original.
-        for (var k = 1; k < n; k++)
+        var result = u;
+        for (var k = 1; k < Math.Abs(n); k++)
         {
             result = result.Mult(u);
         }
 
-        return result;
+        return n < 0 ? result.Invers : result;
     }
 
     /// <summary>Copies the value of w (VB: Equal).</summary>

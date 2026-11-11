@@ -29,14 +29,13 @@ public class Interval
         DblB = dblB;
     }
 
-    /// <summary>
-    /// Copy constructor.
-    /// VB-compatible: the original copies only A and B; DblA and DblB stay 0.
-    /// </summary>
+    /// <summary>Copy constructor. Corrected: VB copied only A and B, DblA and DblB stayed 0.</summary>
     public Interval(Interval other)
     {
         A = other.A;
         B = other.B;
+        DblA = other.DblA;
+        DblB = other.DblB;
     }
 
     public decimal A { get; }

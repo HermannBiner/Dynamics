@@ -1716,4 +1716,7 @@
   <data name="NumericMethodsMouseHint" xml:space="preserve">
     <value>Start position: drag up or down in the left area. Green: real spring pendulum, red: numerical method.</value>
   </data>
+  <data name="NumericOverflow" xml:space="preserve">
+    <value>Numeric overflow: the pendulum became numerically unstable and the iteration was stopped. Please reset and choose a smaller step width.</value>
+  </data>
 </root>

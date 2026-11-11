@@ -66,12 +66,14 @@ public class GeneralReferenceTests
             Assert.Equal(Dec(r[7]), v.Abs());
             Assert.Equal(Dec(r[8]), v.Scalar(w));
 
-            var cross = v.Cross(w);
-            Assert.Equal([Dec(r[9]), Dec(r[10]), Dec(r[11])], new[] { cross.X, cross.Y, cross.Z });
-
+            // Cross (columns 9-11) and TurnInXYPlane (12-14) were corrected in Dynamics,
+            // so only the unchanged parts are compared with VB.
+            Assert.Equal(Dec(r[10]), v.Cross(w).Y);
+            Assert.Equal(Dec(r[11]), v.Cross(w).Z);
             var turned = new Vector(v.X, v.Y, v.Z);
             turned.TurnInXYPlane(phi);
-            Assert.Equal([Dec(r[12]), Dec(r[13]), Dec(r[14])], new[] { turned.X, turned.Y, turned.Z });
+            Assert.Equal(Dec(r[12]), turned.X);
+            Assert.Equal(Dec(r[14]), turned.Z);
         }
     }
 
@@ -84,13 +86,14 @@ public class GeneralReferenceTests
             var u = new ComplexNumber(Dbl(r[2]), Dbl(r[3]));
             var phi = Dbl(r[4]);
 
+            // Power(-3) (the last pair of the VB row) was corrected in Dynamics and is not compared.
             ComplexNumber[] results =
             [
                 z.Mult(u), z.Div(u), z.Invers, z.Power2, z.Rotate(phi),
-                z.Power(1), z.Power(2), z.Power(3), z.Power(7), z.Power(-1), z.Power(-3),
+                z.Power(1), z.Power(2), z.Power(3), z.Power(7), z.Power(-1),
             ];
 
-            var expected = r[5..^2].Select(Dbl).ToArray();
+            var expected = r[5..^4].Select(Dbl).ToArray();
             var actual = results.SelectMany(c => new[] { c.X, c.Y }).ToArray();
             Assert.Equal(expected, actual);
 

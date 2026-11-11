@@ -1716,4 +1716,7 @@
   <data name="NumericMethodsMouseHint" xml:space="preserve">
     <value>Startposition: im linken Bereich mit der Maus nach oben oder unten ziehen. Grün: reales Federpendel, rot: numerische Methode.</value>
   </data>
+  <data name="NumericOverflow" xml:space="preserve">
+    <value>Numerischer Überlauf: Das Pendel ist numerisch instabil geworden, die Iteration wurde angehalten. Bitte zurücksetzen und eine kleinere Schrittweite wählen.</value>
+  </data>
 </root>

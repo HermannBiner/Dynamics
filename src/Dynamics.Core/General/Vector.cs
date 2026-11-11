@@ -58,25 +58,24 @@ public class Vector
 
     public decimal Scalar(Vector other) => X * other.X + Y * other.Y + Z * other.Z;
 
-    /// <summary>
-    /// VB-compatible: the original formula is not the cross product
-    /// (X uses Z*X instead of Z*Y). Unused in Simulator; kept as is for now.
-    /// </summary>
+    /// <summary>Cross product. Corrected: VB used Z*X instead of Z*Y in the X component.</summary>
     public Vector Cross(Vector other) => new()
     {
-        X = Y * other.Z - Z * other.X,
+        X = Y * other.Z - Z * other.Y,
         Y = Z * other.X - X * other.Z,
         Z = X * other.Y - Y * other.X,
     };
 
     /// <summary>
     /// Rotates the projection on the x-y plane by phi; Z is unchanged.
-    /// VB-compatible: Y is computed with the already rotated X. Unused in Simulator.
+    /// Corrected: VB computed Y with the already rotated X.
     /// </summary>
     public void TurnInXYPlane(decimal phi)
     {
-        X = (decimal)((double)X * Math.Cos((double)phi) - (double)Y * Math.Sin((double)phi));
-        Y = (decimal)((double)X * Math.Sin((double)phi) + (double)Y * Math.Cos((double)phi));
+        var x = (double)X;
+        var y = (double)Y;
+        X = (decimal)(x * Math.Cos((double)phi) - y * Math.Sin((double)phi));
+        Y = (decimal)(x * Math.Sin((double)phi) + y * Math.Cos((double)phi));
     }
 
     public decimal Abs() => (decimal)Math.Sqrt((double)(X * X + Y * Y + Z * Z));

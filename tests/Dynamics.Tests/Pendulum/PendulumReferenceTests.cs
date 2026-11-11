@@ -12,11 +12,15 @@ namespace Dynamics.Tests.Pendulum;
 /// </summary>
 public class PendulumReferenceTests
 {
+    /// <summary>
+    /// The test modes of the shaken and the combined pendulum are excluded: their VB errors were corrected
+    /// in Dynamics, they are checked by <see cref="PendulumTestModeTests"/> instead.
+    /// </summary>
     public static TheoryData<string> Scenarios()
     {
         var path = Path.Combine(AppContext.BaseDirectory, "ReferenceData", "pendulum.json");
         var data = JsonSerializer.Deserialize<Dictionary<string, string[][]>>(File.ReadAllText(path))!;
-        return new TheoryData<string>(data.Keys);
+        return new TheoryData<string>(data.Keys.Where(k => k is not ("Shaked_TestMode" or "Combined_TestMode")));
     }
 
     [Theory]

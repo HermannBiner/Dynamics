@@ -381,3 +381,9 @@ button:disabled {
 .value-list {
     height: 22rem;
 }
+
+.error {
+    color: var(--too-high);
+    font-size: 0.9rem;
+    margin: 0.4rem 0;
+}

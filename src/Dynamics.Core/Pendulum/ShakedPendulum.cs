@@ -244,6 +244,6 @@ public class ShakedPendulum : PendulumBase
         return temp;
     }
 
-    // Test mode: simple thread pendulum. VB-compatible: divides by A (constant 0), not by l.
-    protected override decimal G2Test(NTuple x) => -g * (decimal)(Math.Sin((double)x[2]) / (double)C[0]);
+    // Test mode: simple thread pendulum of length l. Corrected: VB divided by A (constant 0) instead of l.
+    protected override decimal G2Test(NTuple x) => -g * (decimal)(Math.Sin((double)x[2]) / (double)C[1]);
 }

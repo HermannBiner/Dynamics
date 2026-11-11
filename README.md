@@ -48,15 +48,24 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 | `IRungeKuttaFunctions` | `IRungeKuttaFunctions` |
 | `ClsGraphicTool`, `ClsSystemBrushes`, `ClsDiagramAreaSelector`, `ClsCheck*` | not in Core; replaced by the web UI |
 
-## VB quirks kept on purpose
+## Errors of Simulator corrected in Dynamics
 
-Marked `VB-compatible` in the code; to be fixed in a separate step after the port:
+Simulator stays unchanged. The affected values are excluded from the exact VB comparison;
+tests check the corrected behaviour mathematically instead.
 
-- `Vector.Cross` is not the cross product (X uses `Z*X`). Unused.
-- `Vector.TurnInXYPlane` computes Y with the already rotated X. Unused.
-- `Interval(Interval)` copies only A and B; `DblA`/`DblB` stay 0.
-- `ComplexNumber.Power(0)` returns 0; `Power(-n)` returns `Invers · zⁿ⁻¹`.
-- `NTuple(n)` has n + 1 components (`ReDim`).
+| Where | VB error | Check in Dynamics.Tests |
+|---|---|---|
+| `Vector.Cross` | X component used `Z*X` instead of `Z*Y` (unused in Simulator) | unit vectors, orthogonality, anticommutativity |
+| `Vector.TurnInXYPlane` | Y computed with the already rotated X (unused) | rotation by π/2, length preserved |
+| `Interval(Interval)` | copied only A and B; `DblA`/`DblB` stayed 0 | copy keeps the double borders |
+| `ComplexNumber.Power` | `Power(0)` returned 0; `Power(-n)` returned `Invers · zⁿ⁻¹` | `zⁿ · z⁻ⁿ = 1`, `z⁰ = 1` |
+| `RealThreadPendulum` | 4th Runge-Kutta step used `k[2] / 2` instead of `k[2]`: order 1 instead of 4 (energy drift 4.5e-3 instead of 1e-10 for h = 0.02 up to t = 10) | energy conservation, convergence order 4 |
+| `ShakedPendulum.G2Test` | test mode divided by A instead of l | energy of the thread pendulum of length l |
+| `CombinedPendulum.G1Test/G2Test` | test mode applied the thread equation to the length l and the spring equation to the angle | spring energy loss = (Ωh)⁶/72 per step (exact RK4 value), thread energy conserved |
+| `CombinedPendulum.G1/G2` | arithmetic errors were caught, a message box shown and the partial value used | overflow propagates; the pendulum page stops and shows a message |
+
+Deliberate VB behaviour that is kept (marked `VB-compatible`): `NTuple(n)` has n + 1 components (`ReDim`),
+`Vector.ToMathPoint` returns a shared instance, `ComplexNumber.Div` divides in Decimal.
 
 Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE).
 
@@ -71,11 +80,6 @@ Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`
 | `PhaseportraitIndex` | `PhasePortraitType` |
 | `ClsPendulumController` | `PendulumController` (UI-free logic) + `Pages/PendulumPage.razor` |
 | `ClsGraphicTool` (pendulum part) | `CoordinateTransform` (Core), `Drawing/DrawBatch` + `Drawing/PendulumRenderer` + `wwwroot/js/canvas.js` (Web) |
-
-Pendulum quirks kept (`VB-compatible`):
-
-- `ShakedPendulum.G2Test` divides by A (constant 0) instead of l.
-- `CombinedPendulum.G1/G2` swallow arithmetic errors and continue with the partial value (VB showed a message box).
 
 ## Run
 
@@ -96,14 +100,6 @@ about 7400 steps/s in the Release build (`dotnet publish -c Release`). AOT and D
 | `INumericMethod`, `ClsNumericMethodAbstract` | `INumericMethod`, `NumericMethodBase` (shared loop and `t mod 2π`) |
 | `ClsRealSpringPendulum`, `ClsForwardEuler`, `ClsBackwardEuler`, `ClsMidpointImplicit`, `ClsRungeKutta4Pendulum`, `ClsRealThreadPendulum` | same names without `Cls` |
 | `ClsNumericMethodController` | `NumericMethodController` (UI-free) + `Pages/NumericMethodsPage.razor`; the shifting bitmap is canvas command 4 |
-
-
-
-Corrected in Dynamics (differs from Simulator on purpose):
-
-- `RealThreadPendulum`: VB used `k[2] / 2` instead of `k[2]` in the fourth Runge-Kutta step, which reduced the
-  method to order 1 (energy drift 4.5e-3 instead of 1e-10 for h = 0.02 up to t = 10). Its VB reference scenarios are
-  therefore not compared; tests check energy conservation and order 4 instead.
 
 Web differences: the chart feed runs at about 120 pixels per second (VB: as fast as the machine allowed);
 the value and protocol lists show the newest entry first.
