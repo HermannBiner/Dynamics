@@ -101,5 +101,7 @@ about 7400 steps/s in the Release build (`dotnet publish -c Release`). AOT and D
 | `ClsRealSpringPendulum`, `ClsForwardEuler`, `ClsBackwardEuler`, `ClsMidpointImplicit`, `ClsRungeKutta4Pendulum`, `ClsRealThreadPendulum` | same names without `Cls` |
 | `ClsNumericMethodController` | `NumericMethodController` (UI-free) + `Pages/NumericMethodsPage.razor`; the shifting bitmap is canvas command 4 |
 
-Web differences: the chart feed runs at about 120 pixels per second (VB: as fast as the machine allowed);
+Web differences: both pages have a speed slider (VB ran as fast as the machine allowed). Pendulum: factor of real time
+(lengths in metres, g = 9.81 m/s², so 1/d steps per second is real time), default 1×. Numeric methods: chart feed in
+pixels per second, default 30. "maximum" runs as fast as possible. Pacing: `Drawing/StepPacer`. Also,
 the value and protocol lists show the newest entry first.

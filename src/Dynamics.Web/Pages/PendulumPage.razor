@@ -47,6 +47,12 @@
                    @oninput="OnStepWidthChanged" />
         </div>
 
+        <div class="field">
+            <label for="speed">@Text.Get("AnimationSpeed"): @SpeedLabel</label>
+            <input id="speed" type="range" min="0" max="@(SpeedFactors.Length - 1)" value="@_speedIndex"
+                   @oninput="e => _speedIndex = int.Parse(e.Value!.ToString()!)" />
+        </div>
+
         <fieldset disabled="@(!IsEditable)">
             <legend>@Text.Get("StartParameter")</legend>
             <div class="parameters">
@@ -112,6 +118,25 @@
     private const int ProtocolDisplayLines = 200;
     private const int ProtocolMaxLines = 10000;
     private const double FrameBudgetMs = 12;
+
+    /// <summary>
+    /// Speed relative to real time: lengths are in metres and g = 9.81 m/s², so the step width d is in seconds
+    /// and 1/d steps per second is real time. The last entry is "as fast as possible".
+    /// </summary>
+    private static readonly double[] SpeedFactors = [0.1, 0.25, 0.5, 1, 2, 5, 10, 25, double.PositiveInfinity];
+    private const int RealTimeIndex = 3;
+
+    private readonly StepPacer _pacer = new();
+    private int _speedIndex = RealTimeIndex;
+
+    private string SpeedLabel => SpeedFactors[_speedIndex] switch
+    {
+        double.PositiveInfinity => Text.Get("SpeedMax"),
+        1 => $"1× ({Text.Get("RealTime")})",
+        var factor => $"{factor}×",
+    };
+
+    private double StepsPerSecond => SpeedFactors[_speedIndex] / (double)_controller.MainDS.StepWidthValue;
 
     private readonly PendulumController _controller = new();
     private readonly PendulumRenderer _renderer = new();
@@ -304,12 +329,15 @@
     private async Task RunLoopAsync()
     {
         var watch = new Stopwatch();
+        _pacer.Restart();
         while (_controller.Status == IterationStatus.Running && !_disposed)
         {
+            // The steps due at the chosen speed, but at most what fits into the frame budget.
+            var steps = _pacer.NextSteps(StepsPerSecond);
             watch.Restart();
             try
             {
-                do
+                for (var i = 0; i < steps && watch.Elapsed.TotalMilliseconds < FrameBudgetMs; i++)
                 {
                     if (_controller.IsProtocol)
                     {
@@ -320,7 +348,6 @@
                     _controller.Step();
                     _renderer.DrawStep(_controller);
                 }
-                while (watch.Elapsed.TotalMilliseconds < FrameBudgetMs);
             }
             catch (ArithmeticException)
             {

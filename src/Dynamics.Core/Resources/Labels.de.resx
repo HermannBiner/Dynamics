@@ -1719,4 +1719,16 @@
   <data name="NumericOverflow" xml:space="preserve">
     <value>Numerischer Überlauf: Das Pendel ist numerisch instabil geworden, die Iteration wurde angehalten. Bitte zurücksetzen und eine kleinere Schrittweite wählen.</value>
   </data>
+  <data name="AnimationSpeed" xml:space="preserve">
+    <value>Geschwindigkeit</value>
+  </data>
+  <data name="RealTime" xml:space="preserve">
+    <value>Echtzeit</value>
+  </data>
+  <data name="SpeedMax" xml:space="preserve">
+    <value>maximal</value>
+  </data>
+  <data name="PixelsPerSecond" xml:space="preserve">
+    <value>Pixel/s</value>
+  </data>
 </root>

@@ -1719,4 +1719,16 @@
   <data name="NumericOverflow" xml:space="preserve">
     <value>Numeric overflow: the pendulum became numerically unstable and the iteration was stopped. Please reset and choose a smaller step width.</value>
   </data>
+  <data name="AnimationSpeed" xml:space="preserve">
+    <value>Speed</value>
+  </data>
+  <data name="RealTime" xml:space="preserve">
+    <value>real time</value>
+  </data>
+  <data name="SpeedMax" xml:space="preserve">
+    <value>maximum</value>
+  </data>
+  <data name="PixelsPerSecond" xml:space="preserve">
+    <value>pixels/s</value>
+  </data>
 </root>

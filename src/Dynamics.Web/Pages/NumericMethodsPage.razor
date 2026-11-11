@@ -35,6 +35,12 @@
                    value="@_controller.StepWidthTrackBar" @oninput="OnStepWidthChanged" />
         </div>
 
+        <div class="field">
+            <label for="speed">@Text.Get("AnimationSpeed"): @SpeedLabel</label>
+            <input id="speed" type="range" min="0" max="@(PixelsPerSecond.Length - 1)" value="@_speedIndex"
+                   @oninput="e => _speedIndex = int.Parse(e.Value!.ToString()!)" />
+        </div>
+
         <label class="check">
             <input type="checkbox" checked="@_controller.IsStretched" disabled="@(!IsEditable)" @onchange="OnStretchedChanged" />
             @Text.Get("StretchedMode")
@@ -65,8 +71,18 @@
     private const int DiagramSize = 600;
     private const int DisplayLines = 200;
     private const int MaxLines = 10000;
-    private const int ShiftsPerFrame = 2;
     private const double FrameBudgetMs = 12;
+
+    /// <summary>Chart feed in pixels per second; one pixel = NumberOfStepsUntilShift steps. Last entry: as fast as possible.</summary>
+    private static readonly double[] PixelsPerSecond = [5, 10, 15, 30, 60, 120, 240, double.PositiveInfinity];
+    private const int DefaultSpeedIndex = 3;
+
+    private readonly Dynamics.Web.Drawing.StepPacer _pacer = new();
+    private int _speedIndex = DefaultSpeedIndex;
+
+    private string SpeedLabel => double.IsPositiveInfinity(PixelsPerSecond[_speedIndex])
+        ? Text.Get("SpeedMax")
+        : $"{PixelsPerSecond[_speedIndex]} {Text.Get("PixelsPerSecond")}";
 
     private static readonly Interval MathInterval = new(-1m, 1m);
 
@@ -176,10 +192,11 @@
         }
 
         var watch = new System.Diagnostics.Stopwatch();
+        _pacer.Restart();
         while (_controller.Status == IterationStatus.Running && !_disposed)
         {
-            // About ShiftsPerFrame pixels of chart feed per frame, like the pace of Simulator.
-            var steps = ShiftsPerFrame * _controller.NumberOfStepsUntilShift;
+            // The steps due at the chosen chart feed, but at most what fits into the frame budget.
+            var steps = _pacer.NextSteps(PixelsPerSecond[_speedIndex] * _controller.NumberOfStepsUntilShift);
             watch.Restart();
             for (var i = 0; i < steps && watch.Elapsed.TotalMilliseconds < FrameBudgetMs; i++)
             {
