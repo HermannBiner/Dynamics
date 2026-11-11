@@ -50,7 +50,7 @@ public class PendulumStateTests
 
         var torus = Create<ShakedPendulum>(PhasePortraitType.TorusOrCylinder);
         torus.IterationStep(false);
-        Assert.True(Assert.Single(torus.GetPhasePortraitPoints()).IsPersistent);
+        Assert.Single(torus.GetPhasePortraitPoints());
         Assert.NotNull(torus.GetPhasePortraitTangent());
         Assert.Equal(-1m, torus.UInterval.A);
     }

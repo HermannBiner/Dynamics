@@ -28,8 +28,8 @@ public enum DrawRole
 /// <summary>A pendulum arm from a suspension point to a bob.</summary>
 public readonly record struct PendulumArm(MathPoint From, MathPoint To, decimal BobRadius, DrawRole Role);
 
-/// <summary>A point of the phase portrait. Persistent points stay (VB: bitmap), others are redrawn each step (VB: picture box).</summary>
-public readonly record struct PhasePoint(MathPoint Point, DrawRole Role, int Size, bool IsPersistent);
+/// <summary>A point of the phase portrait; points accumulate until the iteration is reset.</summary>
+public readonly record struct PhasePoint(MathPoint Point, DrawRole Role, int Size);
 
 /// <summary>
 /// A pendulum knows all rules of its movement. Unlike Simulator's IPendulum it does not draw:

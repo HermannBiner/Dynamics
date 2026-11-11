@@ -76,7 +76,7 @@ public class CombinedPendulum : PendulumBase
 
     public override IReadOnlyList<PhasePoint> GetPhasePortraitPoints() =>
         MyPhasePortraitType == PhasePortraitType.PoincareSection
-            ? MyIsSignumChanged ? [new PhasePoint(new MathPoint(u1, v1), DrawRole.PendulumColor, 2, false)] : []
+            ? MyIsSignumChanged ? [new PhasePoint(new MathPoint(u1, v1), DrawRole.PendulumColor, 2)] : []
             : base.GetPhasePortraitPoints();
 
     protected override void SetPosition()

@@ -1,3 +1,36 @@
 ﻿@inherits LayoutComponentBase
+@using System.Globalization
+@using Dynamics.Core.General
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
 
-@Body
+<header class="top-bar">
+    <a class="brand" href="">Dynamics</a>
+    <nav>
+        <NavLink href="pendulum">@Text.Get("Pendulum")</NavLink>
+    </nav>
+    <div class="language" role="group" aria-label="Language">
+        <button type="button" class="@(IsGerman ? "active" : "")" @onclick='() => SetLanguageAsync("de-CH")'>DE</button>
+        <button type="button" class="@(IsGerman ? "" : "active")" @onclick='() => SetLanguageAsync("en-US")'>EN</button>
+    </div>
+</header>
+
+<main>
+    @Body
+</main>
+
+@code {
+    private static bool IsGerman => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "de";
+
+    /// <summary>The culture is set at startup (Program.cs), so changing it reloads the app.</summary>
+    private async Task SetLanguageAsync(string culture)
+    {
+        if (CultureInfo.CurrentUICulture.Name == culture)
+        {
+            return;
+        }
+
+        await JS.InvokeVoidAsync("localStorage.setItem", "dynamics.culture", culture);
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+}

@@ -28,7 +28,7 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 ## Port order
 
 1. Shared base classes + reference export ✔
-2. Pendulum: physics ✔, rendering and web UI open
+2. Pendulum: physics ✔, web UI ✔ (`/pendulum`)
 3. NumericMethods
 4. Julia/Mandelbrot, architecture review
 5. Remaining systems
@@ -68,9 +68,22 @@ Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`
 | PictureBox/Bitmap/ListBox/Label properties, `PrepareDiagram`, `Draw*` | removed; the UI draws from `GetArms`, `GetTrackSegment`, `GetPhasePortraitPoints`, `GetPhasePortraitTangent`, `GetBackgroundCurve`, `GetProtocolLine` |
 | `SetAndDrawStartparameter1/2(Point)` | `SetStartparameter1/2(MathPoint)`; the UI converts pixels to mathematical coordinates |
 | `PhaseportraitIndex` | `PhasePortraitType` |
-| `ClsPendulumController` | not ported yet (web UI) |
+| `ClsPendulumController` | `PendulumController` (UI-free logic) + `Pages/PendulumPage.razor` |
+| `ClsGraphicTool` (pendulum part) | `CoordinateTransform` (Core), `Drawing/DrawBatch` + `Drawing/PendulumRenderer` + `wwwroot/js/canvas.js` (Web) |
 
 Pendulum quirks kept (`VB-compatible`):
 
 - `ShakedPendulum.G2Test` divides by A (constant 0) instead of l.
 - `CombinedPendulum.G1/G2` swallow arithmetic errors and continue with the partial value (VB showed a message box).
+
+## Run
+
+```powershell
+dotnet run --project src/Dynamics.Web    # http://localhost:5257
+dotnet test
+```
+
+Language: German (de-CH) by default, English via the switch in the header (stored in the browser, reloads the app).
+
+Known: in the interpreted WebAssembly runtime the Decimal arithmetic is slow (about 500 steps/s for the double
+pendulum with shadow, 2500 steps/s for the shaken pendulum). Options for later: AOT compilation, switch to Double.

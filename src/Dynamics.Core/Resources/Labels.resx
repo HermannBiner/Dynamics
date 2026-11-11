@@ -1701,4 +1701,10 @@
     <value>Satellite</value>
     <comment>Lbl</comment>
   </data>
+  <data name="PendulumMouseHint" xml:space="preserve">
+    <value>Set the start position with the mouse: drag for the first parameter, release, then drag for the second.</value>
+  </data>
+  <data name="HomeIntro" xml:space="preserve">
+    <value>Simulation of dynamical systems – web version of Simulator.</value>
+  </data>
 </root>

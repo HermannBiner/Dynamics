@@ -174,14 +174,14 @@ public abstract class PendulumBase : IPendulum
 
     public virtual IReadOnlyList<PhasePoint> GetPhasePortraitPoints() => MyPhasePortraitType switch
     {
-        PhasePortraitType.TorusOrCylinder => [new PhasePoint(new MathPoint(u1, u2), DrawRole.PendulumColor, 1, true)],
+        PhasePortraitType.TorusOrCylinder => [new PhasePoint(new MathPoint(u1, u2), DrawRole.PendulumColor, 1)],
         PhasePortraitType.PoincareSection => MyIsSignumChanged
-            ? [new PhasePoint(new MathPoint(u2, v2), DrawRole.PendulumColor, 2, false)]
+            ? [new PhasePoint(new MathPoint(u2, v2), DrawRole.PendulumColor, 2)]
             : [],
         _ =>
         [
-            new PhasePoint(new MathPoint(u1, v1), DrawRole.Primary, 1, false),
-            new PhasePoint(new MathPoint(u2, v2), DrawRole.PendulumColor, 1, false),
+            new PhasePoint(new MathPoint(u1, v1), DrawRole.Primary, 1),
+            new PhasePoint(new MathPoint(u2, v2), DrawRole.PendulumColor, 1),
         ],
     };
 
