@@ -202,7 +202,7 @@
     <comment>Cls</comment>
   </data>
   <data name="ClsEllipseBilliardTable" xml:space="preserve">
-    <value>Elliptischer Billiardtisch</value>
+    <value>Elliptischer Billardtisch</value>
     <comment>Lbl</comment>
   </data>
   <data name="ClsForwardEuler" xml:space="preserve">
@@ -238,7 +238,7 @@
     <comment>Cls</comment>
   </data>
   <data name="ClsOvalBilliardTable" xml:space="preserve">
-    <value>Ovaler Billiardtisch</value>
+    <value>Ovaler Billardtisch</value>
     <comment>Lbl</comment>
   </data>
   <data name="ClsParabola" xml:space="preserve">
@@ -1745,5 +1745,8 @@
   </data>
   <data name="StepsPerSecond" xml:space="preserve">
     <value>Schritte/s</value>
+  </data>
+  <data name="BilliardMouseHint" xml:space="preserve">
+    <value>Neue Kugel: mit der Maus ziehen, um den Startpunkt auf dem Rand zu setzen, dann nochmals ziehen für die erste Richtung. Oder t und Alfa eingeben und übernehmen.</value>
   </data>
 </root>

@@ -10,12 +10,16 @@
 //   5 x y w h color width    rectangle outline
 //   6 x y r color width      circle outline
 //   7 x y size argb          point like 3, but with any color (ARGB as in System.Drawing.Color.ToArgb)
+//   8 x y rx ry start sweep argb width   arc of an ellipse; start and sweep in degrees, clockwise on the screen (GDI DrawArc)
+//   9 x1 y1 x2 y2 argb w     line with any color
 //
 // Pixel pictures (Julia and Mandelbrot sets) use a canvas set up with pixelExact = true:
 // one canvas pixel per logical pixel, filled with putImage.
 
 const palette = ['#ffffff', '#0000ff', '#ff0000', '#008000', '#7fffd4', '#9400d3', '#000000', '#ff00ff'];
 const layers = new Map();
+
+const argbToCss = argb => `rgb(${(argb >> 16) & 255},${(argb >> 8) & 255},${argb & 255})`;
 
 export function setup(id, size, pixelExact = false) {
     const canvas = document.getElementById(id);
@@ -107,6 +111,26 @@ export function draw(id, commands) {
                 i += 5;
                 break;
             }
+            case 8: {
+                const toRad = Math.PI / 180;
+                ctx.strokeStyle = argbToCss(commands[i + 7]);
+                ctx.lineWidth = commands[i + 8];
+                ctx.beginPath();
+                ctx.ellipse(commands[i + 1], commands[i + 2], Math.abs(commands[i + 3]), Math.abs(commands[i + 4]), 0,
+                    commands[i + 5] * toRad, (commands[i + 5] + commands[i + 6]) * toRad);
+                ctx.stroke();
+                i += 9;
+                break;
+            }
+            case 9:
+                ctx.strokeStyle = argbToCss(commands[i + 5]);
+                ctx.lineWidth = commands[i + 6];
+                ctx.beginPath();
+                ctx.moveTo(commands[i + 1], commands[i + 2]);
+                ctx.lineTo(commands[i + 3], commands[i + 4]);
+                ctx.stroke();
+                i += 7;
+                break;
             default:
                 console.error('Unknown canvas command', commands[i]);
                 return;

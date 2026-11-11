@@ -72,6 +72,21 @@ public sealed class DrawBatch(CoordinateTransform transform)
         _commands.AddRange([7, x, y, size, argb]);
     }
 
+    /// <summary>Line with any ARGB color.</summary>
+    public void Line(MathPoint a, MathPoint b, int argb, int width)
+    {
+        var (x1, y1) = Transform.MathToPixel(a);
+        var (x2, y2) = Transform.MathToPixel(b);
+        _commands.AddRange([9, x1, y1, x2, y2, argb, width]);
+    }
+
+    /// <summary>Arc of an ellipse; angles in degrees, clockwise on the screen (as GDI DrawArc).</summary>
+    public void Arc(MathPoint center, decimal radiusX, decimal radiusY, int startAngle, int sweep, int argb, int width)
+    {
+        var (x, y) = Transform.MathToPixel(center);
+        _commands.AddRange([8, x, y, Transform.LengthToPixel(radiusX), Transform.LengthToPixel(radiusY), startAngle, sweep, argb, width]);
+    }
+
     /// <summary>VB DrawVerticalLine: a line over the whole height at x, if x is inside.</summary>
     public void VerticalLine(decimal x, CanvasColor color, int width)
     {

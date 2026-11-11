@@ -32,7 +32,7 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 3. NumericMethods ✔ (`/numericmethods`)
 4. Julia/Mandelbrot ✔ (`/julia`, `/mandelbrotmap`), architecture review (see below)
 5. Remaining systems: Newton iteration ✔ (`/newton`, `/singlenewton`), strange attractors ✔ (`/strangeattractor`,
-   `/bifurcation`); next billiards, universe, growth models, L-systems
+   `/bifurcation`), billiards ✔ (`/billiard`, `/cdiagram`); next universe, growth models, L-systems
 6. Switch from Decimal to Double (all systems at once, checked against the VB data with tolerance)
 
 ## Name mapping (GeneralClassLibrary → Dynamics.Core.General)
@@ -75,11 +75,14 @@ tests check the corrected behaviour mathematically instead.
 | `Linear.IterationStep` | Y was computed with the already new X: in the complex case (ρ > 10) the map was no rotation with stretching (determinant a²·cos²φ instead of a²) | each step turns by φ = h·π and stretches by a |
 | `BifurcationController` (linear map) | no step width and no SetIterationParameters: the matrix stayed 0 and the diagram showed only zeros | default step width 0.005, parameters set for every column; values equal the iterates of the map |
 | `StrangeAttractorController.MouseMove` | the mouse position was moved by (+2, −25) for the hand cursor of WinForms | the angles follow the pointer exactly |
+| `StadiumBilliardBall.IsBallInside` | the half circles were checked around (0, 0) instead of (∓a, 0): in the curves the moving ball jumped to the end of the segment | every drawing step moves the same part of the segment |
+| `BilliardTableController` (track bar c) | parentheses missing: the track bar started at 0.76 while c = 0.8 | the track bar shows c |
+| `OvalBilliardBall.SetUserEndposition` | the end position used the angle of the mouse seen from (0, 0), not from the center of the oval: it was not under the mouse | end position in the direction of the mouse seen from the center |
 
 Deliberate VB behaviour that is kept (marked `VB-compatible`): `NTuple(n)` has n + 1 components (`ReDim`),
 `Vector.ToMathPoint` returns a shared instance, `ComplexNumber.Div` divides in Decimal.
 
-Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE), text typos "Prokotoll" and "Startpunt" (DE).
+Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE), text typos "Prokotoll", "Startpunt" and "Billiardtisch" (DE).
 
 ## Name mapping (PendulumClassLibrary → Dynamics.Core.Pendulum)
 
@@ -168,6 +171,24 @@ bifurcation diagram about 130 s (natively, like VB, about 14 s), drawn column by
 Web differences of the strange attractor pages: the start point is checked when it is taken over (VB converted it
 without a check and stopped on invalid input); the bifurcation diagram is computed column by column, so the page stays
 usable (VB blocked the window until the end); a speed slider for the attractor.
+
+## Name mapping (BilliardClassLibrary → Dynamics.Core.Billiard)
+
+| VB | C# |
+|---|---|
+| `IBilliardball`, `ClsBilliardBallAbstract` + the identical parts of the three balls | `IBilliardBall`, `BilliardBallBase` (iteration step, value pairs, reflection, positions on a segment) |
+| `IBilliardTable`, `ClsBilliardTableAbstract` | `IBilliardTable`, `BilliardTableBase`; `DrawBilliardtable` returns `TableShape`s |
+| `ClsEllipse…`, `ClsOval…`, `ClsStadiumBilliardTable` / `…ball` | `EllipseBilliardTable` / `-Ball`, `OvalBilliardTable` / `-Ball`, `StadiumBilliardTable` / `-Ball` (all in `Tables.cs`) |
+| `MoveOnSegment` (draws while moving) | `BilliardStep.Positions`; the page animates them (300 drawing steps per second) |
+| `ClsBilliardTableController` | `BilliardTableController`: what VB drew is a list of `BilliardDrawing`s the page draws + `Pages/BilliardPage.razor` |
+| `ClsCDiagramController` | `CDiagramController` (one column per call, `ComputeColumn`) + `Pages/CDiagramPage.razor` |
+
+10 VB scenarios (60 iteration steps with phase portrait and protocol, 200 value pairs, 4 start positions set with the
+mouse per table) and 3 C-diagram columns (581 pairs each) match exactly. Speed (Release): C-diagram about 18 s.
+
+Web differences of the billiard pages: the protocol of the oval and the stadium ball works (in VB the language manager
+of these balls was never set, so switching the protocol on stopped the program); the mouse position is exact (VB moved it
+by (+2, −25) for its hand cursor); the C-diagram is computed column by column.
 
 Web differences of the Julia pages: the computation time pauses while interrupted; on the Mandelbrot map, c can be
 chosen as soon as the Mandelbrot set is complete.

@@ -162,3 +162,14 @@ var attractors = StrangeAttractorExport.Run();
 var attractorPath = Path.Combine(outDir, "strangeattractor.json");
 File.WriteAllText(attractorPath, JsonSerializer.Serialize(attractors));
 Console.WriteLine($"Written {attractors.Count} strange-attractor scenarios to {attractorPath}");
+
+// Billiards: the VB tables and balls draw into picture boxes, therefore on an STA thread.
+Dictionary<string, List<string[]>>? billiard = null;
+var billiardThread = new Thread(() => billiard = BilliardExport.Run());
+billiardThread.SetApartmentState(ApartmentState.STA);
+billiardThread.Start();
+billiardThread.Join();
+
+var billiardPath = Path.Combine(outDir, "billiard.json");
+File.WriteAllText(billiardPath, JsonSerializer.Serialize(billiard));
+Console.WriteLine($"Written {billiard!.Count} billiard scenarios to {billiardPath}");

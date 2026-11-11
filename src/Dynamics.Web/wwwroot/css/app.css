@@ -533,3 +533,48 @@ button:disabled {
 .canvas-stack canvas.rotatable {
     cursor: grab;
 }
+
+/* Billiard */
+
+.billiard-page {
+    display: grid;
+    grid-template-columns: minmax(0, 600px) minmax(16rem, 20rem) minmax(0, 320px);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@media (max-width: 1350px) {
+    .billiard-page {
+        grid-template-columns: minmax(0, 600px) minmax(16rem, 22rem);
+    }
+}
+
+@media (max-width: 760px) {
+    .billiard-page {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.phase-column .caption:first-child {
+    margin-top: 0;
+}
+
+.billiard-protocol {
+    height: 14rem;
+}
+
+input.short {
+    width: 5rem;
+}
+
+.top-gap {
+    margin-top: 0.6rem;
+}
+
+.swatch {
+    width: 2rem;
+    height: 2rem;
+    align-self: end;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}

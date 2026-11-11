@@ -1746,4 +1746,7 @@
   <data name="StepsPerSecond" xml:space="preserve">
     <value>steps/s</value>
   </data>
+  <data name="BilliardMouseHint" xml:space="preserve">
+    <value>New ball: drag with the mouse to set the start point on the border, then drag again to set the first direction. Or enter t and alfa and take them over.</value>
+  </data>
 </root>
