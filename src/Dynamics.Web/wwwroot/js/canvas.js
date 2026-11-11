@@ -9,6 +9,7 @@
 //   4 dx                     shift the whole picture right by dx (chart recorder); the left strip is cleared
 //   5 x y w h color width    rectangle outline
 //   6 x y r color width      circle outline
+//   7 x y size argb          point like 3, but with any color (ARGB as in System.Drawing.Color.ToArgb)
 //
 // Pixel pictures (Julia and Mandelbrot sets) use a canvas set up with pixelExact = true:
 // one canvas pixel per logical pixel, filled with putImage.
@@ -92,6 +93,20 @@ export function draw(id, commands) {
                 ctx.stroke();
                 i += 6;
                 break;
+            case 7: {
+                const s = commands[i + 3];
+                const argb = commands[i + 4];
+                ctx.fillStyle = `rgb(${(argb >> 16) & 255},${(argb >> 8) & 255},${argb & 255})`;
+                if (s < 2) {
+                    ctx.fillRect(commands[i + 1] - s, commands[i + 2] - s, 2 * s, 2 * s);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(commands[i + 1], commands[i + 2], s, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+                i += 5;
+                break;
+            }
             default:
                 console.error('Unknown canvas command', commands[i]);
                 return;

@@ -31,8 +31,8 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 2. Pendulum: physics ✔, web UI ✔ (`/pendulum`)
 3. NumericMethods ✔ (`/numericmethods`)
 4. Julia/Mandelbrot ✔ (`/julia`, `/mandelbrotmap`), architecture review (see below)
-5. Remaining systems: Newton iteration ✔ (`/newton`, `/singlenewton`); next strange attractors, billiards,
-   universe, growth models, L-systems
+5. Remaining systems: Newton iteration ✔ (`/newton`, `/singlenewton`), strange attractors ✔ (`/strangeattractor`,
+   `/bifurcation`); next billiards, universe, growth models, L-systems
 6. Switch from Decimal to Double (all systems at once, checked against the VB data with tolerance)
 
 ## Name mapping (GeneralClassLibrary → Dynamics.Core.General)
@@ -72,11 +72,14 @@ tests check the corrected behaviour mathematically instead.
 | `MandelbrotMapController` | both pictures shared the spiral variables and the status; the Julia set started while the Mandelbrot set was still drawn | own spiral per picture: Mandelbrot first, then Julia |
 | `NewtonController.SetA/SetB` | changing a or b called SetDefaultUserData, which set c back to 0.5 + i (and the ranges to the defaults): c could not be changed | c and the ranges keep the entered values |
 | `NewtonController.Start` | the roots were prepared before n, the ranges and c were set: the first picture of the polynomial missed the root c (its basin got the color of -1 or 1), a new c showed only at the second start | first picture equals the model with the actual c; roots at c |
+| `Linear.IterationStep` | Y was computed with the already new X: in the complex case (ρ > 10) the map was no rotation with stretching (determinant a²·cos²φ instead of a²) | each step turns by φ = h·π and stretches by a |
+| `BifurcationController` (linear map) | no step width and no SetIterationParameters: the matrix stayed 0 and the diagram showed only zeros | default step width 0.005, parameters set for every column; values equal the iterates of the map |
+| `StrangeAttractorController.MouseMove` | the mouse position was moved by (+2, −25) for the hand cursor of WinForms | the angles follow the pointer exactly |
 
 Deliberate VB behaviour that is kept (marked `VB-compatible`): `NTuple(n)` has n + 1 components (`ReDim`),
 `Vector.ToMathPoint` returns a shared instance, `ComplexNumber.Div` divides in Decimal.
 
-Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE), text typo "Prokotoll" (DE).
+Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE), text typos "Prokotoll" and "Startpunt" (DE).
 
 ## Name mapping (PendulumClassLibrary → Dynamics.Core.Pendulum)
 
@@ -147,6 +150,24 @@ rotation (many points that do not converge within 100 steps, each with a Decimal
 
 Web differences of the Newton pages: if c is not allowed, the iteration does not start (VB went on with the old c,
 or failed if there was none); the protocol keeps the newest 10'000 lines (one line per pixel).
+
+## Name mapping (StrangeAttractorClassLibrary → Dynamics.Core.StrangeAttractor)
+
+| VB | C# |
+|---|---|
+| `IStrangeAttractor`, `ClsStrangeAttractorAbstract`, `ClsRungeKuttaAttractorAbstract` | `IStrangeAttractor`, `StrangeAttractorBase`, `RungeKuttaAttractorBase` (Runge-Kutta in Decimal) |
+| `ClsLinear`, `ClsLorenz`, `ClsRoessler`, `ClsThomas` | `Linear`, `Lorenz`, `Roessler`, `Thomas` (all in `Attractors.cs`) |
+| `ClsPointSet`, `ClsIterationPoint` (brushes) | `PointSet`, `IterationPoint` (ARGB colors, `AttractorColors`) |
+| `ClsStrangeAttractorController` | `StrangeAttractorController` (projections, cube, mouse rotation) + `Pages/StrangeAttractorPage.razor` |
+| `ClsBifurcationController` | `BifurcationController` (one column per call, `Compute`) + `Pages/BifurcationPage.razor` |
+
+10 VB trajectories (3000 steps) and 15 bifurcation columns (each 2 × 5061 Runge-Kutta steps) match exactly.
+Speed (Release, interpreted WebAssembly, Decimal): attractor about 25'000 steps/s at maximum (slider default 10'000/s);
+bifurcation diagram about 130 s (natively, like VB, about 14 s), drawn column by column.
+
+Web differences of the strange attractor pages: the start point is checked when it is taken over (VB converted it
+without a check and stopped on invalid input); the bifurcation diagram is computed column by column, so the page stays
+usable (VB blocked the window until the end); a speed slider for the attractor.
 
 Web differences of the Julia pages: the computation time pauses while interrupted; on the Mandelbrot map, c can be
 chosen as soon as the Mandelbrot set is complete.

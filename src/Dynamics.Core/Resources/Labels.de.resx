@@ -1346,7 +1346,7 @@
     <comment>Lbl</comment>
   </data>
   <data name="StartPointCoordinates" xml:space="preserve">
-    <value>Startpunt Koordinaten</value>
+    <value>Startpunkt Koordinaten</value>
     <comment>Lbl</comment>
   </data>
   <data name="StartConstellations" xml:space="preserve">
@@ -1739,5 +1739,11 @@
   </data>
   <data name="SingleNewtonMouseHint" xml:space="preserve">
     <value>Startpunkt anklicken; mit gedrückter Maustaste ziehen, um die ganze Iteration des Punktes unter der Maus zu sehen.</value>
+  </data>
+  <data name="StrangeAttractorMouseHint" xml:space="preserve">
+    <value>Startpunktmenge wählen und übernehmen, dann Start drücken. 3D-Ansicht: mit der Maus ziehen (wenn gestoppt), um die Ansicht zu drehen.</value>
+  </data>
+  <data name="StepsPerSecond" xml:space="preserve">
+    <value>Schritte/s</value>
   </data>
 </root>

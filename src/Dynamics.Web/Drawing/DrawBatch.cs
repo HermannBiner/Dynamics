@@ -60,6 +60,29 @@ public sealed class DrawBatch(CoordinateTransform transform)
         _commands.AddRange([3, x, y, size, (int)color]);
     }
 
+    /// <summary>Point with any ARGB color (VB brushes); like VB only if it is inside.</summary>
+    public void Point(MathPoint point, int argb, int size)
+    {
+        if (!Transform.IsInside(point))
+        {
+            return;
+        }
+
+        var (x, y) = Transform.MathToPixel(point);
+        _commands.AddRange([7, x, y, size, argb]);
+    }
+
+    /// <summary>VB DrawVerticalLine: a line over the whole height at x, if x is inside.</summary>
+    public void VerticalLine(decimal x, CanvasColor color, int width)
+    {
+        if (!Transform.MathXInterval.IsNumberInInterval(x))
+        {
+            return;
+        }
+
+        Line(new MathPoint(x, Transform.MathYInterval.A), new MathPoint(x, Transform.MathYInterval.B), color, width);
+    }
+
     /// <summary>Shifts the whole picture right by dx pixels (chart recorder).</summary>
     public void ShiftRight(int dx) => _commands.AddRange([4, dx]);
 

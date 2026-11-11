@@ -156,3 +156,9 @@ newtonThread.Join();
 var newtonPath = Path.Combine(outDir, "newton.json");
 File.WriteAllText(newtonPath, JsonSerializer.Serialize(newton));
 Console.WriteLine($"Written {newton!.Count} Newton scenarios to {newtonPath}");
+
+// Strange attractors and bifurcation columns (no UI dependencies)
+var attractors = StrangeAttractorExport.Run();
+var attractorPath = Path.Combine(outDir, "strangeattractor.json");
+File.WriteAllText(attractorPath, JsonSerializer.Serialize(attractors));
+Console.WriteLine($"Written {attractors.Count} strange-attractor scenarios to {attractorPath}");

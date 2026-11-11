@@ -13,6 +13,8 @@
         <NavLink href="mandelbrotmap">@Text.Get("MnuMandelbrotMap")</NavLink>
         <NavLink href="newton">@Text.Get("NewtonIteration")</NavLink>
         <NavLink href="singlenewton">@Text.Get("SingleNewtonIteration")</NavLink>
+        <NavLink href="strangeattractor">@Text.Get("MnuStrangeAttractors")</NavLink>
+        <NavLink href="bifurcation">@Text.Get("MnuBifurcation")</NavLink>
     </nav>
     <div class="language" role="group" aria-label="Language">
         <button type="button" class="@(IsGerman ? "active" : "")" @onclick='() => SetLanguageAsync("de-CH")'>DE</button>

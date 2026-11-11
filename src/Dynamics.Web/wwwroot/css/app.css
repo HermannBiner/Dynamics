@@ -517,3 +517,19 @@ button:disabled {
 .option-groups .check {
     margin-top: 0.2rem;
 }
+
+/* Strange attractors */
+
+.radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1rem;
+}
+
+.radio-row .check {
+    margin-top: 0;
+}
+
+.canvas-stack canvas.rotatable {
+    cursor: grab;
+}
