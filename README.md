@@ -33,7 +33,7 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 4. Julia/Mandelbrot ✔ (`/julia`, `/mandelbrotmap`), architecture review (see below)
 5. Remaining systems: Newton iteration ✔ (`/newton`, `/singlenewton`), strange attractors ✔ (`/strangeattractor`,
    `/bifurcation`), billiards ✔ (`/billiard`, `/cdiagram`), universe ✔ (`/universe`), growth models ✔ (`/population`, `/iteration`, `/sensitivity`,
-   `/histogram`, `/twodimensions`, `/feigenbaum`); next L-systems
+   `/histogram`, `/twodimensions`, `/feigenbaum`), L-systems ✔ (`/lsystems`)
 6. Switch from Decimal to Double (all systems at once, checked against the VB data with tolerance)
 
 ## Name mapping (GeneralClassLibrary → Dynamics.Core.General)
@@ -88,6 +88,11 @@ tests check the corrected behaviour mathematically instead.
 | `SensitivityController.IterationLoop` | the next point of the second orbit was FN(x1): orbit 2 jumped to orbit 1 and the difference fell to 0 after every step | both orbits and the difference are continuous lines |
 | `TwoDimensionsController` (cells) | the cell under the mouse was Fix(x / DeltaX) · DeltaX without the left border of the range: for the parabola (from −1) the cells were not those of the raster and negative coordinates went to the wrong cell; the mouse was moved by (−2, −7) for the hand cursor | cells lie on the raster and contain the pointer |
 | `TwoDimensionsController` (start circle, experiment) | the circle around the start point had radius 5 in mathematical units (far outside the picture); a new experiment before the first start iterated with a = 0 | circle of 5 pixels; a is read for every new experiment |
+| `ClsLTurtle` (color codes) | a color code at the end of the itinerary made the turtle fail (index out of range); of two codes in a row the second was ignored | `F(2)(5)F(7)` draws in 5, ends in 7 |
+| `ClsLTurtle.Reset` | the stack of an interrupted generation was kept | the stack is cleared |
+| `ClsLSyntaxChecker` | the start length was checked with the value of the scale factor; a rule was demanded for G and g (they only move); the name was checked for uniqueness only for a new system; the start position was not checked (non-numeric input made SaveSystem fail) | checks of start length, G, renaming and start position |
+| `ClsLSystemsController` (editing) | rules were changed and deleted directly in the stored system, so Cancel kept them; Cancel after "Add system" kept the new empty system as actual system; changing a rule to an existing source first removed the old rule; a source of more than one character was accepted but never applied | the system is edited as a copy; Cancel shows the selected system again; the old rule stays; a source is one character |
+| `ClsLSystemsController.RestoreCopy` | the backup was copied, but the restored systems appeared only after reopening the window | the restored systems are shown at once |
 
 Deliberate VB behaviour that is kept (marked `VB-compatible`): `NTuple(n)` has n + 1 components (`ReDim`),
 `Vector.ToMathPoint` returns a shared instance, `ComplexNumber.Div` divides in Decimal.
@@ -251,3 +256,22 @@ possible); the sensitivity diagram is square (600 × 600 instead of 643 × 554);
 on its own layer, so moving the mouse no longer wipes the orbits; the default start point of two dimensions is computed
 in Decimal (VB showed −0.17200000000000004 for the parabola); the histogram is redrawn every frame instead of every
 1000 steps; the newest list entries are shown first.
+
+## Name mapping (FractalClassLibrary → Dynamics.Core.LSystem)
+
+| VB | C# |
+|---|---|
+| `ClsLSystem` (`EnLSystemType`), `ClsLSystemsController.EnScaling` | `LSystemDefinition` (`LSystemType`, `LSystemScaling`); same JSON as `LSystemsEN.json` / `LSystemsDE.json` |
+| `ClsColorList`, `ClsLSystemExpander` | `LSystemColors` (ARGB), `LSystemExpander` (all in `LSystemDefinition.cs`) |
+| `ClsLTurtle`, `ClsLTurtleState` | `Turtle`, `TurtleState`; the drawing is returned as `TurtleMove`s and buds, at most n characters per call |
+| `ClsLSyntaxChecker` | `LSyntaxChecker` (returns the messages) with the input fields `LSystemForm` |
+| `ClsLSystemsController` | `LSystemsController` + `Pages/LSystemsPage.razor` |
+| `%AppData%\Simulator\LSystemsXX.json` (+ `.bak`) | `ILSystemStore`: in the browser `localStorage` (`dynamics.lsystems.LSystemsDE.json`, `….bak`); the default systems are embedded in Dynamics.Core |
+| `LstDebug` (every move) | protocol of the newest 200 moves |
+
+All 11 default systems and the extended dragon curve match VB exactly over up to 7 generations (itinerary, position, angle,
+step length and color of every turtle, number of moves, first and last move). The Tree draws its 5th generation
+(about 70'000 characters) in about 1.5 s with `dotnet run`.
+
+Web differences of the L-system page: the picture is square (600 × 600 instead of 607 × 605); the generation is drawn
+frame by frame with the progress in percent; questions (delete, default systems) are browser dialogs.

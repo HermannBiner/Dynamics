@@ -1755,4 +1755,19 @@
   <data name="TwoDimensionsMouseHint" xml:space="preserve">
     <value>Mark a start cell with the mouse (in transitivity mode then a target cell); the start point is the middle of the cell, adapted for the target. Reset clears the cells.</value>
   </data>
+  <data name="ScaleFactorMissing" xml:space="preserve">
+    <value>Missing scale factor.</value>
+  </data>
+  <data name="StartPositionIn0to13" xml:space="preserve">
+    <value>The start position has to be in [0,13] x [0,13].</value>
+  </data>
+  <data name="SourceOneCharacter" xml:space="preserve">
+    <value>The source of a rule has to be exactly one character.</value>
+  </data>
+  <data name="LSystemsHint" xml:space="preserve">
+    <value>Start draws the next generation; Stop interrupts it, Start continues. Your own systems are stored in this browser.</value>
+  </data>
+  <data name="Generation" xml:space="preserve">
+    <value>Generation</value>
+  </data>
 </root>

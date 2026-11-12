@@ -1755,4 +1755,19 @@
   <data name="TwoDimensionsMouseHint" xml:space="preserve">
     <value>Mit der Maus eine Startzelle markieren (bei Transitivität danach eine Zielzelle); der Startpunkt ist die Zellmitte, für das Ziel angepasst. Zurücksetzen löscht die Zellen.</value>
   </data>
+  <data name="ScaleFactorMissing" xml:space="preserve">
+    <value>Es muss ein Skalierfaktor angegeben werden.</value>
+  </data>
+  <data name="StartPositionIn0to13" xml:space="preserve">
+    <value>Die Startposition muss in [0,13] x [0,13] liegen.</value>
+  </data>
+  <data name="SourceOneCharacter" xml:space="preserve">
+    <value>Die Quelle einer Regel muss genau ein Zeichen sein.</value>
+  </data>
+  <data name="LSystemsHint" xml:space="preserve">
+    <value>Start zeichnet die nächste Generation; Stop unterbricht, Start setzt fort. Eigene Systeme werden in diesem Browser gespeichert.</value>
+  </data>
+  <data name="Generation" xml:space="preserve">
+    <value>Generation</value>
+  </data>
 </root>

@@ -1,0 +1,390 @@
+@page "/lsystems"
+@using System.Globalization
+@using Dynamics.Core.General
+@using Dynamics.Core.LSystem
+@using Dynamics.Web.Drawing
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<PageTitle>@Text.Get("LSystems") – Dynamics</PageTitle>
+
+<h1 class="page-title">@Text.Get("LSystems")</h1>
+
+<div class="growth-page">
+    <section class="diagram-column">
+        <div class="canvas-stack diagram" style="--size:@(DiagramSize)px">
+            <canvas id="lsystem-diagram"></canvas>
+        </div>
+        <p class="hint">@Text.Get("LSystemsHint")</p>
+    </section>
+
+    <section class="control-column">
+        <div class="field">
+            <label for="system">@Text.Get("LSystems")</label>
+            <select id="system" disabled="@(_controller.IsEditing || _controller.IsRunning)" @onchange="OnSystemChangedAsync">
+                @for (var i = 0; i < _controller.Systems.Count; i++)
+                {
+                    <option value="@i" selected="@(i == _controller.SelectedIndex)">@_controller.Systems[i].Name</option>
+                }
+            </select>
+        </div>
+
+        <fieldset>
+            <legend>@Text.Get("Iteration")</legend>
+            <div class="buttons">
+                <button type="button" class="primary" disabled="@(_controller.IsEditing || _controller.IsRunning)" @onclick="StartAsync">
+                    @(_controller.Status == IterationStatus.Interrupted ? Text.Get("Continue") : Text.Get("Start"))
+                </button>
+                <button type="button" disabled="@(!_controller.IsRunning)" @onclick="_controller.Stop">@Text.Get("Stop")</button>
+                <button type="button" disabled="@(_controller.IsEditing || _controller.IsRunning)" @onclick="ResetAsync">@Text.Get("Reset")</button>
+            </div>
+            <p class="steps">
+                @Text.Get("Generation"): <strong>@_controller.Generation</strong>
+                &nbsp; @(_controller.ProgressTotal == 0 ? 0 : 100 * _controller.Progress / _controller.ProgressTotal) %
+                &nbsp; @Text.Get("Time"): <strong>@_watch.Elapsed.TotalSeconds.ToString("F1") s</strong>
+            </p>
+        </fieldset>
+
+        <fieldset disabled="@(!_controller.IsEditing)">
+            <legend>@Text.Get("SystemParameters")</legend>
+            <div class="field">
+                <label for="name">@Text.Get("Name")</label>
+                <input id="name" value="@Form.Name" @onchange="e => Form.Name = Value(e)" />
+            </div>
+            <div class="field">
+                <label for="axiom">@Text.Get("Axiom")</label>
+                <input id="axiom" value="@Form.Axiom" @onchange="e => Form.Axiom = Value(e)" />
+            </div>
+            <div class="field-row">
+                <div class="field grow">
+                    <label for="left">@Text.Get("AngleLeft")</label>
+                    <input id="left" inputmode="numeric" value="@Form.AngleLeft" @onchange="e => Form.AngleLeft = Value(e)" />
+                </div>
+                <div class="field grow">
+                    <label for="right">@Text.Get("AngleRight")</label>
+                    <input id="right" inputmode="numeric" value="@Form.AngleRight" @onchange="e => Form.AngleRight = Value(e)" />
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field grow">
+                    <label for="scalefactor">@Text.Get("ScaleFactor")</label>
+                    <input id="scalefactor" inputmode="decimal" value="@Form.ScaleFactor" @onchange="e => Form.ScaleFactor = Value(e)" />
+                </div>
+                <div class="field grow">
+                    <label for="startlength">@Text.Get("StartLength")</label>
+                    <input id="startlength" inputmode="decimal" value="@Form.StartLength" @onchange="e => Form.StartLength = Value(e)" />
+                </div>
+            </div>
+            <div class="field">
+                <label for="color">@Text.Get("Color")</label>
+                <div class="field-row">
+                    <select id="color" class="grow" @onchange="e => Form.Color = int.Parse(Value(e), CultureInfo.InvariantCulture)">
+                        @for (var i = 0; i < LSystemColors.Colors.Count; i++)
+                        {
+                            <option value="@i" selected="@(i == Form.Color)">@i @LSystemColors.Colors[i].Name</option>
+                        }
+                    </select>
+                    <span class="swatch" style="background:@Css(LSystemColors.Colors[Math.Clamp(Form.Color, 0, LSystemColors.MaxCode)].Argb)"></span>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field grow">
+                    <label for="scaling">@Text.Get("Scaling")</label>
+                    <select id="scaling" @onchange="e => Form.Scaling = Enum.Parse<LSystemScaling>(Value(e))">
+                        @foreach (var scaling in Enum.GetValues<LSystemScaling>())
+                        {
+                            <option value="@scaling" selected="@(scaling == Form.Scaling)">@Text.Get(scaling.ToString())</option>
+                        }
+                    </select>
+                </div>
+                <div class="field grow">
+                    <label for="type">@Text.Get("Type")</label>
+                    <select id="type" @onchange="e => _controller.SetType(Enum.Parse<LSystemType>(Value(e)))">
+                        @foreach (var type in Enum.GetValues<LSystemType>())
+                        {
+                            <option value="@type" selected="@(type == Form.Type)">@Text.Get(type.ToString())</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            @if (Form.Type != LSystemType.Standard)
+            {
+                <label class="check">
+                    <input type="checkbox" checked="@Form.IsOptionChecked" @onchange="e => Form.IsOptionChecked = (bool)e.Value!" />
+                    @Text.Get(Form.Type == LSystemType.Tree ? "Budding" : "Extended")
+                </label>
+            }
+            <p class="caption">@Text.Get("StartPosition") (X/Y) in [0,13] x [0,13]</p>
+            <div class="field-row">
+                <div class="field grow">
+                    <input aria-label="X" inputmode="decimal" value="@Form.X" @onchange="e => Form.X = Value(e)" />
+                </div>
+                <div class="field grow">
+                    <input aria-label="Y" inputmode="decimal" value="@Form.Y" @onchange="e => Form.Y = Value(e)" />
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="buttons">
+            <button type="button" disabled="@(_controller.IsEditing || _controller.IsRunning)" @onclick="AddSystem">@Text.Get("AddSystem")</button>
+            <button type="button" disabled="@(_controller.IsEditing || _controller.IsRunning)" @onclick="EditSystem">@Text.Get("Edit")</button>
+            <button type="button" disabled="@(_controller.IsEditing || _controller.IsRunning)" @onclick="DeleteSystemAsync">@Text.Get("Delete")</button>
+            <button type="button" class="primary" disabled="@(!_controller.IsEditing)" @onclick="SaveSystemAsync">@Text.Get("SaveSystem")</button>
+            <button type="button" disabled="@(!_controller.IsEditing)" @onclick="CancelAsync">@Text.Get("Cancel")</button>
+        </div>
+        <div class="buttons">
+            <button type="button" disabled="@(_controller.IsEditing || _controller.IsRunning)" @onclick="DefaultSystemsAsync">@Text.Get("GetDefaultSystems")</button>
+            <button type="button" disabled="@(_controller.IsEditing || _controller.IsRunning)" @onclick="RestoreCopyAsync">@Text.Get("RestoreCopy")</button>
+        </div>
+
+        @if (_messages.Count > 0)
+        {
+            <div class="error" role="alert">
+                @foreach (var message in _messages)
+                {
+                    <div>@message</div>
+                }
+            </div>
+        }
+    </section>
+
+    <section>
+        <fieldset>
+            <legend>@Text.Get("Rules")</legend>
+            <div class="field">
+                <select aria-label="@Text.Get("Rules")" size="5" @onchange="e => _controller.SelectRule(int.Parse(Value(e), CultureInfo.InvariantCulture))">
+                    @for (var i = 0; i < _controller.RuleLines.Count; i++)
+                    {
+                        <option value="@i" selected="@(i == _controller.SelectedRule)">@_controller.RuleLines[i]</option>
+                    }
+                </select>
+            </div>
+            <div class="field-row">
+                <div class="field source-field">
+                    <label for="source">@Text.Get("Source")</label>
+                    <input id="source" class="short" value="@_controller.Source" disabled="@(!_controller.IsEditing)" @onchange="e => _controller.Source = Value(e)" />
+                </div>
+                <div class="field grow">
+                    <label for="target">@Text.Get("Target")</label>
+                    <input id="target" value="@_controller.Target" disabled="@(!_controller.IsEditing)" @onchange="e => _controller.Target = Value(e)" />
+                </div>
+            </div>
+            <div class="buttons">
+                <button type="button" disabled="@(!_controller.IsEditing)" @onclick="_controller.AddRule">@Text.Get("AddRule")</button>
+                <button type="button" disabled="@(!_controller.IsEditing)" @onclick="SaveRule">@Text.Get("SaveRule")</button>
+                <button type="button" disabled="@(!_controller.IsEditing)" @onclick="_controller.DeleteRule">@Text.Get("Delete")</button>
+            </div>
+        </fieldset>
+
+        <p class="caption">@Text.Get("Protocol")</p>
+        <div class="protocol value-list" role="log">
+            @for (var i = _log.Count - 1; i >= 0; i--)
+            {
+                var move = _log[i];
+                <div>C: @N2(move.From.X)/@N2(move.From.Y) → N: @N2(move.To.X)/@N2(move.To.Y)</div>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    // VB: FrmLSystems.Designer, PicDiagram 607 x 605; square here
+    private const int DiagramSize = 600;
+    private const int ChunkCharacters = 2000;
+    private const double FrameBudgetMs = 12;
+    private const int LogLines = 200;
+
+    private readonly System.Diagnostics.Stopwatch _watch = new();
+    private readonly List<TurtleMove> _log = [];
+    private LSystemsController _controller = null!;
+    private IJSObjectReference? _module;
+    private List<string> _messages = [];
+    private bool _disposed;
+
+    private LSystemForm Form => _controller.Form;
+
+    private static string Value(ChangeEventArgs e) => e.Value?.ToString() ?? "";
+
+    private static string N2(decimal value) => value.ToString("N2", CultureInfo.CurrentCulture);
+
+    private static string Css(int argb) => $"rgb({(argb >> 16) & 255},{(argb >> 8) & 255},{argb & 255})";
+
+    /// <summary>The user's systems are kept in the local storage of the browser (VB: %AppData%\Simulator).</summary>
+    private sealed class BrowserStore(IJSInProcessRuntime js) : ILSystemStore
+    {
+        public string? Read(string key) => js.Invoke<string?>("localStorage.getItem", key);
+
+        public void Write(string key, string value) => js.InvokeVoid("localStorage.setItem", key, value);
+    }
+
+    protected override void OnInitialized() => _controller = new LSystemsController(new BrowserStore((IJSInProcessRuntime)JS));
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/canvas.js");
+        await _module.InvokeVoidAsync("setup", "lsystem-diagram", DiagramSize);
+    }
+
+    private bool Confirm(string key) => ((IJSInProcessRuntime)JS).Invoke<bool>("confirm", Text.Get(key));
+
+    private async Task ClearAsync()
+    {
+        _log.Clear();
+        _watch.Reset();
+        if (_module is not null)
+        {
+            await _module.InvokeVoidAsync("draw", "lsystem-diagram", new double[] { 0 });
+        }
+    }
+
+    private async Task OnSystemChangedAsync(ChangeEventArgs e)
+    {
+        _messages = [];
+        _controller.SelectSystem(int.Parse(Value(e), CultureInfo.InvariantCulture));
+        await ClearAsync();
+    }
+
+    private async Task ResetAsync()
+    {
+        _messages = [];
+        _controller.ResetIteration();
+        await ClearAsync();
+    }
+
+    private void AddSystem()
+    {
+        _messages = [];
+        _controller.AddSystem();
+    }
+
+    private void EditSystem()
+    {
+        _messages = [];
+        _controller.EditSystem();
+    }
+
+    private async Task DeleteSystemAsync()
+    {
+        _messages = [];
+        if (Confirm("DeleteLSystem"))
+        {
+            _messages = _controller.DeleteSystem() is { } message ? [message] : [];
+            await ClearAsync();
+        }
+    }
+
+    private async Task SaveSystemAsync()
+    {
+        _messages = _controller.SaveSystem().ToList();
+        if (_messages.Count == 0)
+        {
+            await ClearAsync();
+        }
+    }
+
+    private async Task CancelAsync()
+    {
+        _messages = [];
+        _controller.Cancel();
+        await ClearAsync();
+    }
+
+    private void SaveRule() => _messages = _controller.SaveRule() is { } message ? [message] : [];
+
+    private async Task DefaultSystemsAsync()
+    {
+        _messages = [];
+        if (Confirm("GetOriginalSystem"))
+        {
+            _controller.GetDefaultSystems();
+            await ClearAsync();
+        }
+    }
+
+    private async Task RestoreCopyAsync()
+    {
+        _messages = _controller.RestoreCopy() is { } message ? [message] : [];
+        await ClearAsync();
+    }
+
+    /// <summary>VB: StartIteration, the next generation (or the rest of an interrupted one), drawn frame by frame.</summary>
+    private async Task StartAsync()
+    {
+        _messages = [];
+        _controller.Start();
+        if (_controller.ClearPicture)
+        {
+            await ClearAsync();
+        }
+
+        var transform = new CoordinateTransform(DiagramSize, DiagramSize, Turtle.MathInterval, Turtle.MathInterval);
+        var batch = new DrawBatch(transform);
+        var frame = new System.Diagnostics.Stopwatch();
+        _watch.Start();
+        try
+        {
+            while (_controller.IsRunning && !_disposed)
+            {
+                frame.Restart();
+                while (_controller.IsRunning && frame.Elapsed.TotalMilliseconds < FrameBudgetMs)
+                {
+                    _controller.Draw(ChunkCharacters, move =>
+                    {
+                        if (move.IsDrawn)
+                        {
+                            batch.Line(move.From, move.To, ColorOf(move.Color), move.Width);
+                        }
+
+                        _log.Add(move);
+                    }, (position, color) => batch.Point(position, ColorOf(color), 3));
+                }
+
+                if (_log.Count > LogLines)
+                {
+                    _log.RemoveRange(0, _log.Count - LogLines);
+                }
+
+                if (_module is not null && !batch.IsEmpty)
+                {
+                    await _module.InvokeVoidAsync("draw", "lsystem-diagram", batch.Take());
+                }
+
+                StateHasChanged();
+                if (_module is not null)
+                {
+                    await _module.InvokeVoidAsync("nextFrame");
+                }
+            }
+        }
+        catch (FormatException exception)
+        {
+            _messages = [Text.Get("ColorCodeInvalid") + " (" + exception.Message + ")"];
+            _controller.ResetIteration();
+        }
+
+        _watch.Stop();
+        StateHasChanged();
+    }
+
+    private static int ColorOf(int code) => LSystemColors.Colors[Math.Clamp(code, 0, LSystemColors.MaxCode)].Argb;
+
+    public async ValueTask DisposeAsync()
+    {
+        _disposed = true;
+        if (_module is not null)
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+}

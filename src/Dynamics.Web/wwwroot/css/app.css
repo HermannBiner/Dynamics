@@ -627,3 +627,23 @@ input.short {
 .growth-page .lists.protocol-lists {
     grid-template-columns: minmax(0, 1fr) 3rem;
 }
+
+.growth-page fieldset {
+    min-width: 0;
+}
+
+.growth-page .field-row .field input,
+.growth-page .field-row select {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.growth-page select[size] {
+    width: 100%;
+    font: 0.8rem/1.4 ui-monospace, Consolas, monospace;
+}
+
+.growth-page .field-row .source-field {
+    flex: 0 0 4rem;
+}

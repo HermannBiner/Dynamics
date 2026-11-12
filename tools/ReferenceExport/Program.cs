@@ -190,3 +190,24 @@ var growth = GrowthModelExport.Run();
 var growthPath = Path.Combine(outDir, "growthmodel.json");
 File.WriteAllText(growthPath, JsonSerializer.Serialize(growth));
 Console.WriteLine($"Written {growth.Count} growth-model scenarios to {growthPath}");
+
+// L-systems: the VB turtles draw into a picture box and log into a list box, therefore on an STA thread.
+// The move log uses N2, so the culture is fixed.
+Dictionary<string, List<string[]>>? lsystems = null;
+var lsystemThread = new Thread(() =>
+{
+    Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
+    // Creating the controls would install the WinForms synchronization context; the await of the VB turtle
+    // would then wait for this blocked thread.
+    System.Windows.Forms.WindowsFormsSynchronizationContext.AutoInstall = false;
+    var dataFile = Path.GetFullPath(Path.Combine(outDir, "..", "..", "..", "..", "Simulator", "Simulator", "Data", "LSystemsEN.json"));
+    lsystems = LSystemExport.Run(dataFile);
+});
+lsystemThread.SetApartmentState(ApartmentState.STA);
+lsystemThread.Start();
+lsystemThread.Join();
+
+var lsystemPath = Path.Combine(outDir, "lsystem.json");
+File.WriteAllText(lsystemPath, JsonSerializer.Serialize(lsystems));
+Console.WriteLine($"Written {lsystems!.Count} L-system scenarios to {lsystemPath}");

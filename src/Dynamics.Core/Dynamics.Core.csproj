@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Default L-systems of Simulator (Data/LSystemsEN.json, LSystemsDE.json) -->
+    <EmbeddedResource Include="LSystem/Data/*.json" LogicalName="Dynamics.Core.LSystem.%(Filename).json" />
+  </ItemGroup>
+
 </Project>
