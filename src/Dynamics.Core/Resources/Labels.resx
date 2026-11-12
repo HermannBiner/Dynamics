@@ -1752,4 +1752,7 @@
   <data name="UniverseMouseHint" xml:space="preserve">
     <value>Take over a constellation and press Start. New star: choose a default star, press New star, drag it with the mouse, set mass and velocity, then save it.</value>
   </data>
+  <data name="TwoDimensionsMouseHint" xml:space="preserve">
+    <value>Mark a start cell with the mouse (in transitivity mode then a target cell); the start point is the middle of the cell, adapted for the target. Reset clears the cells.</value>
+  </data>
 </root>

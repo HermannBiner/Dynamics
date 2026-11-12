@@ -12,6 +12,7 @@
 //   7 x y size argb          point like 3, but with any color (ARGB as in System.Drawing.Color.ToArgb)
 //   8 x y rx ry start sweep argb width   arc of an ellipse; start and sweep in degrees, clockwise on the screen (GDI DrawArc)
 //   9 x1 y1 x2 y2 argb w     line with any color
+//  10 x y w h argb           filled rectangle with any color
 //
 // Pixel pictures (Julia and Mandelbrot sets) use a canvas set up with pixelExact = true:
 // one canvas pixel per logical pixel, filled with putImage.
@@ -130,6 +131,11 @@ export function draw(id, commands) {
                 ctx.lineTo(commands[i + 3], commands[i + 4]);
                 ctx.stroke();
                 i += 7;
+                break;
+            case 10:
+                ctx.fillStyle = argbToCss(commands[i + 5]);
+                ctx.fillRect(commands[i + 1], commands[i + 2], commands[i + 3], commands[i + 4]);
+                i += 6;
                 break;
             default:
                 console.error('Unknown canvas command', commands[i]);

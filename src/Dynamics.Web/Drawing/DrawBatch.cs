@@ -105,6 +105,38 @@ public sealed class DrawBatch(CoordinateTransform transform)
     public void PixelRectangle(double x, double y, double width, double height, CanvasColor color, int lineWidth) =>
         _commands.AddRange([5, x, y, width, height, (int)color, lineWidth]);
 
+    /// <summary>Filled rectangle in pixel coordinates with any ARGB color.</summary>
+    public void FillPixelRectangle(double x, double y, double width, double height, int argb) =>
+        _commands.AddRange([10, x, y, width, height, argb]);
+
+    /// <summary>
+    /// Filled rectangle between two mathematical corners (VB FillRectangle with the lower left corner a and the
+    /// upper right corner c); like VB only if both corners are inside.
+    /// </summary>
+    public void FillRectangle(MathPoint a, MathPoint c, int argb)
+    {
+        if (!Transform.IsInside(a) || !Transform.IsInside(c))
+        {
+            return;
+        }
+
+        var (x1, y1) = Transform.MathToPixel(a);
+        var (x2, y2) = Transform.MathToPixel(c);
+        FillPixelRectangle(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x2 - x1), Math.Abs(y2 - y1), argb);
+    }
+
+    /// <summary>Circle outline with radius in pixels (e.g. around a start point); only if the centre is inside.</summary>
+    public void PixelCircle(MathPoint center, double radius, int argb, int width)
+    {
+        if (!Transform.IsInside(center))
+        {
+            return;
+        }
+
+        var (x, y) = Transform.MathToPixel(center);
+        _commands.AddRange([8, x, y, radius, radius, 0, 360, argb, width]);
+    }
+
     /// <summary>Circle outline with radius in mathematical units; like VB only if the centre is inside.</summary>
     public void Circle(MathPoint center, decimal radius, CanvasColor color, int width)
     {

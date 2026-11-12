@@ -1752,4 +1752,7 @@
   <data name="UniverseMouseHint" xml:space="preserve">
     <value>Konstellation setzen und Start drücken. Neuer Stern: Vorgabe wählen, Neuer Stern drücken, mit der Maus ziehen, Masse und Geschwindigkeit einstellen, dann speichern.</value>
   </data>
+  <data name="TwoDimensionsMouseHint" xml:space="preserve">
+    <value>Mit der Maus eine Startzelle markieren (bei Transitivität danach eine Zielzelle); der Startpunkt ist die Zellmitte, für das Ziel angepasst. Zurücksetzen löscht die Zellen.</value>
+  </data>
 </root>

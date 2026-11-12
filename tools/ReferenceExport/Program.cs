@@ -184,3 +184,9 @@ universeThread.Join();
 var universePath = Path.Combine(outDir, "universe.json");
 File.WriteAllText(universePath, JsonSerializer.Serialize(universe));
 Console.WriteLine($"Written {universe!.Count} universe scenarios to {universePath}");
+
+// Growth models (no UI dependencies)
+var growth = GrowthModelExport.Run();
+var growthPath = Path.Combine(outDir, "growthmodel.json");
+File.WriteAllText(growthPath, JsonSerializer.Serialize(growth));
+Console.WriteLine($"Written {growth.Count} growth-model scenarios to {growthPath}");

@@ -7,6 +7,12 @@
 <header class="top-bar">
     <a class="brand" href="">Dynamics</a>
     <nav>
+        <NavLink href="population">@Nav("MnuPopulationDensity")</NavLink>
+        <NavLink href="iteration">@Text.Get("GrowthModels")</NavLink>
+        <NavLink href="sensitivity">@Nav("MnuSensitivity")</NavLink>
+        <NavLink href="histogram">@Nav("MnuHistogram")</NavLink>
+        <NavLink href="twodimensions">@Nav("MnuTwoDimensions")</NavLink>
+        <NavLink href="feigenbaum">@Nav("MnuFeigenbaum")</NavLink>
         <NavLink href="pendulum">@Text.Get("Pendulum")</NavLink>
         <NavLink href="numericmethods">@Text.Get("MnuNumericMethods")</NavLink>
         <NavLink href="julia">@Text.Get("JuliaMandelbrot")</NavLink>
@@ -30,6 +36,9 @@
 </main>
 
 @code {
+    /// <summary>Menu texts of VB contain the &amp; of the access key.</summary>
+    private static string Nav(string key) => Text.Get(key).Replace("&", "");
+
     private static bool IsGerman => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "de";
 
     /// <summary>The culture is set at startup (Program.cs), so changing it reloads the app.</summary>

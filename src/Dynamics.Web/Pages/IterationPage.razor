@@ -1,0 +1,317 @@
+@page "/iteration"
+@using System.Globalization
+@using Dynamics.Core.General
+@using Dynamics.Core.GrowthModel
+@using Dynamics.Web.Drawing
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<PageTitle>@Text.Get("GrowthModels") – Dynamics</PageTitle>
+
+<h1 class="page-title">@Text.Get("GrowthModels")</h1>
+
+<div class="growth-page">
+    <section class="diagram-column">
+        <div class="canvas-stack diagram" style="--size:@(DiagramSize)px">
+            <canvas id="iteration-diagram"></canvas>
+        </div>
+    </section>
+
+    <section class="control-column">
+        <div class="field-row">
+            <div class="field grow">
+                <label for="function">@Text.Get("Function")</label>
+                <select id="function" @onchange="OnSystemChangedAsync">
+                    @for (var i = 0; i < _names.Count; i++)
+                    {
+                        <option value="@i" selected="@(i == _controller.SelectedIndex)">@_names[i]</option>
+                    }
+                </select>
+            </div>
+            <div class="field">
+                <label for="depth">@Text.Get("IterationDepth")</label>
+                <select id="depth" @onchange="OnPowerChangedAsync">
+                    @for (var power = 1; power <= 8; power++)
+                    {
+                        <option value="@power" selected="@(power == _controller.Power)">@power</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="trackbar">@Text.Get("Parameter") a</label>
+            <input id="trackbar" type="range" min="1" max="1000" value="@_controller.TrackBar" @oninput="OnTrackBarAsync" />
+        </div>
+
+        <div class="field-row">
+            <div class="field grow">
+                <label for="parameter">a =</label>
+                <input id="parameter" inputmode="decimal" value="@_controller.ParameterA" @onchange="OnParameterAsync" />
+            </div>
+            <div class="field grow">
+                <label for="start">@Text.Get("StartValue")</label>
+                <input id="start" inputmode="decimal" value="@_controller.StartValue" @onchange="OnStartValueAsync" />
+            </div>
+        </div>
+
+        <fieldset>
+            <legend>@Text.Get("Presentation")</legend>
+            <div class="radio-row">
+                <label class="check">
+                    <input type="radio" name="presentation" checked="@(_controller.Presentation == IterationPresentation.FunctionGraph)"
+                           @onchange="() => OnPresentationAsync(IterationPresentation.FunctionGraph)" />
+                    @Text.Get("FunctionGraph")
+                </label>
+                <label class="check">
+                    <input type="radio" name="presentation" checked="@(_controller.Presentation == IterationPresentation.TimeAxis)"
+                           @onchange="() => OnPresentationAsync(IterationPresentation.TimeAxis)" />
+                    @Text.Get("TimeAxis")
+                </label>
+            </div>
+            @if (_controller.Presentation == IterationPresentation.TimeAxis)
+            {
+                <div class="field">
+                    <label for="stretching">@Text.Get("xStretching"), @Text.Get("DinStretching")</label>
+                    <input id="stretching" class="short" inputmode="decimal" value="@_controller.XStretching" @onchange="OnStretchingAsync" />
+                </div>
+            }
+        </fieldset>
+
+        <fieldset>
+            <legend>@Text.Get("Iteration")</legend>
+            <div class="buttons">
+                @if (_controller.Presentation == IterationPresentation.FunctionGraph)
+                {
+                    <button type="button" class="primary" @onclick="() => IterateAsync(1)">@Text.Get("NextStep")</button>
+                    <button type="button" @onclick="() => IterateAsync(10)">@Text.Get("Next10Steps")</button>
+                }
+                else
+                {
+                    <button type="button" class="primary" @onclick="() => IterateAsync(10)">@Text.Get("NextDiagram")</button>
+                }
+                <button type="button" @onclick="ResetAsync">@Text.Get("ResetIteration")</button>
+                <button type="button" @onclick="DefaultAsync">@Text.Get("DefaultUserData")</button>
+            </div>
+            <p class="steps">@Text.Get("NumberOfSteps"): <strong>@_controller.N.ToString("N0")</strong></p>
+        </fieldset>
+
+        <fieldset>
+            <legend>@Text.Get("TargetProtocol")</legend>
+            <div class="field">
+                <input aria-label="@Text.Get("TargetProtocol")" value="@_controller.TargetProtocol" @onchange="e => _controller.TargetProtocol = Value(e)" />
+            </div>
+            <div class="buttons">
+                <button type="button" @onclick="ProtocolStartValueAsync">@Text.Get("StartvalueForProtocol")</button>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>@Text.Get("Transitivity")</legend>
+            <div class="field">
+                <label for="target">@Text.Get("TargetValue")</label>
+                <input id="target" class="short" inputmode="decimal" value="@_controller.TargetValue" @onchange="e => _controller.TargetValue = Value(e)" />
+            </div>
+            <div class="buttons">
+                <button type="button" @onclick="TargetStartValueAsync">@Text.Get("StartvalueForTargetvalue")</button>
+            </div>
+        </fieldset>
+
+        @if (_message is not null)
+        {
+            <p class="error" role="alert">@_message</p>
+        }
+    </section>
+
+    <section class="lists protocol-lists">
+        <div>
+            <p class="caption">@Text.Get("XValues")</p>
+            <div class="protocol value-list" role="log">
+                @foreach (var value in _controller.ValueList.TakeLast(DisplayLines).Reverse())
+                {
+                    <div>@value</div>
+                }
+            </div>
+        </div>
+        <div>
+            <p class="caption">@Text.Get("Log")</p>
+            <div class="protocol value-list narrow" role="log">
+                @foreach (var bit in _controller.Protocol.TakeLast(DisplayLines).Reverse())
+                {
+                    <div>@bit</div>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    // VB: FrmIteration.Designer, PicDiagram 530 x 530
+    private const int DiagramSize = 530;
+    private const int DisplayLines = 1000;
+
+    private readonly IterationController _controller = new(DiagramSize);
+
+    private IJSObjectReference? _module;
+    private List<string> _names = [];
+    private string? _message;
+
+    private static string Value(ChangeEventArgs e) => e.Value?.ToString() ?? "";
+
+    protected override void OnInitialized() => _names = _controller.Names.ToList();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/canvas.js");
+        await _module.InvokeVoidAsync("setup", "iteration-diagram", DiagramSize);
+        await PrepareDiagramAsync();
+    }
+
+    private async Task DrawAsync(DrawBatch batch)
+    {
+        if (_module is not null && !batch.IsEmpty)
+        {
+            await _module.InvokeVoidAsync("draw", "iteration-diagram", batch.Take());
+        }
+    }
+
+    /// <summary>
+    /// VB: PrepareDiagram, coordinate system (and 45° line) plus the function graph. VB drew the graph and the
+    /// iteration on the picture box, so a new graph (parameter, iteration depth) also wiped the iteration.
+    /// </summary>
+    private DrawBatch Background()
+    {
+        var batch = new DrawBatch(_controller.Transform);
+        batch.Clear();
+        foreach (var line in _controller.CoordinateSystem())
+        {
+            batch.Line(line.A, line.B, CanvasColor.Black, 1);
+        }
+
+        if (_controller.Presentation == IterationPresentation.FunctionGraph)
+        {
+            var graph = _controller.FunctionGraph();
+            for (var i = 0; i + 1 < graph.Count; i++)
+            {
+                batch.Line(graph[i], graph[i + 1], CanvasColor.Blue, 1);
+            }
+        }
+
+        return batch;
+    }
+
+    private Task PrepareDiagramAsync() => DrawAsync(Background());
+
+    private async Task OnSystemChangedAsync(ChangeEventArgs e)
+    {
+        _message = null;
+        _controller.SelectSystem(int.Parse(Value(e), CultureInfo.InvariantCulture));
+        await PrepareDiagramAsync();
+    }
+
+    private async Task OnPowerChangedAsync(ChangeEventArgs e)
+    {
+        _controller.SetPower(int.Parse(Value(e), CultureInfo.InvariantCulture));
+        await PrepareDiagramAsync();
+    }
+
+    private async Task OnTrackBarAsync(ChangeEventArgs e)
+    {
+        _controller.SetTrackBar(int.Parse(Value(e), CultureInfo.InvariantCulture));
+        await PrepareDiagramAsync();
+    }
+
+    private async Task OnParameterAsync(ChangeEventArgs e)
+    {
+        _message = _controller.SetParameterA(Value(e));
+        await PrepareDiagramAsync();
+    }
+
+    /// <summary>VB: TxtStartValue LostFocus resets the iteration.</summary>
+    private async Task OnStartValueAsync(ChangeEventArgs e)
+    {
+        _controller.StartValue = Value(e);
+        await ResetAsync();
+    }
+
+    private async Task OnStretchingAsync(ChangeEventArgs e)
+    {
+        _controller.XStretching = Value(e);
+        await ResetAsync();
+    }
+
+    private async Task OnPresentationAsync(IterationPresentation presentation)
+    {
+        _message = null;
+        _controller.SetPresentation(presentation);
+        await PrepareDiagramAsync();
+    }
+
+    private async Task ResetAsync()
+    {
+        _message = null;
+        _controller.ResetIteration();
+        await PrepareDiagramAsync();
+    }
+
+    private async Task DefaultAsync()
+    {
+        _message = null;
+        _controller.DefaultUserData();
+        await PrepareDiagramAsync();
+    }
+
+    private async Task ProtocolStartValueAsync()
+    {
+        _message = _controller.CalculateStartValueForProtocol();
+        await PrepareDiagramAsync();
+    }
+
+    private async Task TargetStartValueAsync()
+    {
+        _message = _controller.CalculateStartValueForTargetValue();
+        await PrepareDiagramAsync();
+    }
+
+    private async Task IterateAsync(int endOfLoop)
+    {
+        var (error, drawing) = _controller.Iterate(endOfLoop);
+        _message = error;
+        if (drawing is null)
+        {
+            return;
+        }
+
+        var batch = drawing.ClearPicture ? Background() : new DrawBatch(_controller.Transform);
+        if (drawing.TargetLine is { } target)
+        {
+            batch.Line(target.A, target.B, CanvasColor.Green, 1);
+        }
+
+        foreach (var line in drawing.Lines)
+        {
+            batch.Line(line.A, line.B, CanvasColor.Red, 1);
+        }
+
+        await DrawAsync(batch);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null)
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+}

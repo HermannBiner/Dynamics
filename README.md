@@ -32,7 +32,8 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 3. NumericMethods ✔ (`/numericmethods`)
 4. Julia/Mandelbrot ✔ (`/julia`, `/mandelbrotmap`), architecture review (see below)
 5. Remaining systems: Newton iteration ✔ (`/newton`, `/singlenewton`), strange attractors ✔ (`/strangeattractor`,
-   `/bifurcation`), billiards ✔ (`/billiard`, `/cdiagram`), universe ✔ (`/universe`); next growth models, L-systems
+   `/bifurcation`), billiards ✔ (`/billiard`, `/cdiagram`), universe ✔ (`/universe`), growth models ✔ (`/population`, `/iteration`, `/sensitivity`,
+   `/histogram`, `/twodimensions`, `/feigenbaum`); next L-systems
 6. Switch from Decimal to Double (all systems at once, checked against the VB data with tolerance)
 
 ## Name mapping (GeneralClassLibrary → Dynamics.Core.General)
@@ -81,6 +82,12 @@ tests check the corrected behaviour mathematically instead.
 | `UniverseBase.IterationStep` (Runge-Kutta of the stars) | every star was stepped on its own with the accelerations of the actual positions in all four stages: the velocity was advanced as with Euler, order 1 (energy drift 51 % instead of 1.7e-6 for two stars, h = 1, 500 steps) | all stars together with the stage positions; order 4, energy conservation, circular orbit |
 | `UniverseController` (velocity track bar) | the track bar was set to −8 for the original velocity, but turned −8 into 20 % of it | the original velocity is 0, the inverse of the factor 1 + 0.1 · value |
 | `UniverseController` (user data) | vx was checked twice, vy never | vy is checked |
+| `GrowthModelBase.CalculateStartValueForTargetValue` (complement) | the target was complemented for an odd number of ones in the start value; correct is a last digit 1 (after k steps of the tent map the rest is complemented exactly if the k-th digit is 1): for about half of the start values the orbit reached the mirrored target (logistic growth 0.1 instead of 0.9, parabola 0.8 instead of −0.8) | 147 start/target pairs of three models reach the target after 20 steps (± 1e-5); start values stay within 1e-5 of VB |
+| `GrowthModelBase.CalculateStartValueForTargetValue` (digits) | the start value kept 21 dual digits (not 20) and the target was not filled up: a short target like 0.5 = 0.1₂ became 0.111₂ (0.78), and with power 5 (two dimensions) the target was never hit directly, only by chance | start exactly 20 digits, target filled to 20 digits; transitivity in two dimensions hits the target cell after 4 steps |
+| `IterationController.ShowFullDiagram` | the target line was drawn for a target ≠ 0, but the time axis stopped only for a target > 0 (never for the negative values of the parabola) | stops at the target −0.8 of the parabola |
+| `SensitivityController.IterationLoop` | the next point of the second orbit was FN(x1): orbit 2 jumped to orbit 1 and the difference fell to 0 after every step | both orbits and the difference are continuous lines |
+| `TwoDimensionsController` (cells) | the cell under the mouse was Fix(x / DeltaX) · DeltaX without the left border of the range: for the parabola (from −1) the cells were not those of the raster and negative coordinates went to the wrong cell; the mouse was moved by (−2, −7) for the hand cursor | cells lie on the raster and contain the pointer |
+| `TwoDimensionsController` (start circle, experiment) | the circle around the start point had radius 5 in mathematical units (far outside the picture); a new experiment before the first start iterated with a = 0 | circle of 5 pixels; a is read for every new experiment |
 
 Deliberate VB behaviour that is kept (marked `VB-compatible`): `NTuple(n)` has n + 1 components (`ReDim`),
 `Vector.ToMathPoint` returns a shared instance, `ComplexNumber.Div` divides in Decimal.
@@ -219,3 +226,28 @@ Web differences of the pendulum and numeric-methods pages: both have a speed sli
 (lengths in metres, g = 9.81 m/s², so 1/d steps per second is real time), default 1×. Numeric methods: chart feed in
 pixels per second, default 30. "maximum" runs as fast as possible. Pacing: `Drawing/StepPacer`. Also,
 the value and protocol lists show the newest entry first.
+
+## Name mapping (GrowthModelClassLibrary → Dynamics.Core.GrowthModel)
+
+| VB | C# |
+|---|---|
+| `IIteration`, `ClsGrowthModelAbstract` | `IIteration`, `GrowthModelBase` (`IsBehaviourChaotic` returns the result; the controllers show `NonChaoticBehaviour`) |
+| `ClsLogisticGrowth`, `ClsMandelbrotReal`, `ClsParabola`, `ClsTentmap` | `LogisticGrowth`, `MandelbrotReal`, `Parabola`, `Tentmap` (all in `Models.cs`); `GrowthModels` finds them by reflection |
+| `FillDynamicSystem` / `SetDS` of the six controllers | `GrowthControllerBase` (the Mandelbrot iteration only for the Feigenbaum diagram, as in VB) |
+| `ClsPopulationController` | `PopulationController` (`PopulationPicture`: living circle and random individuals) + `Pages/PopulationPage.razor` |
+| `ClsIterationController` | `IterationController` (cobweb and time axis as `Segment`s, value list, protocol) + `Pages/IterationPage.razor` |
+| `ClsSensitivityController` | `SensitivityController` + `Pages/SensitivityPage.razor` |
+| `ClsHistogramController` | `HistogramController` + `Pages/HistogramPage.razor` |
+| `ClsTwoDimensionsController` | `TwoDimensionsController` (raster, marked cells, one orbit step per call) + `Pages/TwoDimensionsPage.razor` |
+| `ClsFeigenbaumController` | `FeigenbaumController` (one column per call, `ComputeColumn`) + `Pages/FeigenbaumPage.razor` |
+
+11 VB trajectories (FN with power 1 to 5, including the two sensitivity start values 1e-27 apart), the start values for
+36 protocols, 13 Feigenbaum columns (each 999 + 2321 steps) and 4 histograms (up to 20'000 steps) match VB exactly; the
+start values for target values are corrected (see above). Speed (`dotnet run`, Debug and Release alike): Feigenbaum
+diagram about 150 s (1.9 million Decimal steps), drawn column by column; histogram about 20'000 steps per second.
+
+Web differences of the growth pages: population with a speed slider (default 2 steps per second; VB ran as fast as
+possible); the sensitivity diagram is square (600 × 600 instead of 643 × 554); the hover cell in two dimensions is drawn
+on its own layer, so moving the mouse no longer wipes the orbits; the default start point of two dimensions is computed
+in Decimal (VB showed −0.17200000000000004 for the parabola); the histogram is redrawn every frame instead of every
+1000 steps; the newest list entries are shown first.

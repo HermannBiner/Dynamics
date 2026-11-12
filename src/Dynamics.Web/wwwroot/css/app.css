@@ -592,3 +592,38 @@ input.short {
 .conservation .caption {
     margin-bottom: 0.2rem;
 }
+
+/* Growth models */
+
+.growth-page {
+    display: grid;
+    grid-template-columns: minmax(0, 600px) minmax(16rem, 22rem) minmax(12rem, 18rem);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@media (max-width: 1250px) {
+    .growth-page {
+        grid-template-columns: minmax(0, 600px) minmax(16rem, 22rem);
+    }
+}
+
+@media (max-width: 760px) {
+    .growth-page {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.growth-page .lists {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.6rem;
+}
+
+.growth-page .lists .value-list {
+    height: 34rem;
+}
+
+.growth-page .lists.protocol-lists {
+    grid-template-columns: minmax(0, 1fr) 3rem;
+}
