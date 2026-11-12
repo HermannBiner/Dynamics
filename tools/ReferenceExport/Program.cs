@@ -201,7 +201,8 @@ var lsystemThread = new Thread(() =>
     // Creating the controls would install the WinForms synchronization context; the await of the VB turtle
     // would then wait for this blocked thread.
     System.Windows.Forms.WindowsFormsSynchronizationContext.AutoInstall = false;
-    var dataFile = Path.GetFullPath(Path.Combine(outDir, "..", "..", "..", "..", "Simulator", "Simulator", "Data", "LSystemsEN.json"));
+    // Copied next to Simulator.dll by tools/build-simulator.ps1
+    var dataFile = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "SimulatorBin", "Data", "LSystemsEN.json"));
     lsystems = LSystemExport.Run(dataFile);
 });
 lsystemThread.SetApartmentState(ApartmentState.STA);

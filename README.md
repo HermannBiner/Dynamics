@@ -13,12 +13,17 @@ C# / Blazor WebAssembly port of the VB.NET WinForms application **Simulator** (s
 
 ## Reference data
 
-Simulator is frozen as reference at commit `200c300`. To regenerate the reference data:
+Simulator (https://github.com/HermannBiner/Simulator) is frozen as reference at commit `200c300`. To regenerate the
+reference data:
 
 ```powershell
-./tools/build-simulator.ps1               # builds Simulator into tools/SimulatorBin (not into Publish)
+./tools/build-simulator.ps1 -SimulatorRepo <path of the Simulator repository>   # or set SIMULATOR_REPO
 dotnet run --project tools/ReferenceExport
 ```
+
+`build-simulator.ps1` builds Simulator into `tools/SimulatorBin` (not into its Publish folder) and copies
+`Data/LSystemsEN.json` there. Without `-SimulatorRepo` and `SIMULATOR_REPO` it looks for
+`..\..\Simulator 8.0 GitHubRep\Simulator` relative to this repository.
 
 The first port kept `Decimal` and the VB mixed Decimal/Double arithmetic so results matched exactly; since step 6
 Dynamics computes in `Double` and the tests compare with tolerance (see "Step 6: Double" below).
