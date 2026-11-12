@@ -4,7 +4,7 @@ namespace Dynamics.Core.General;
 /// Value range of a parameter of a dynamic system, e.g. the reflection angle of a billiard
 /// or the two angles of a double pendulum. Port of ClsGeneralParameter.
 /// </summary>
-public class GeneralParameter(int id, string name, Interval range, GeneralParameter.ParameterType typeOfParameter, decimal defaultValue = 0)
+public class GeneralParameter(int id, string name, Interval range, GeneralParameter.ParameterType typeOfParameter, double defaultValue = 0)
 {
     public enum ParameterType
     {
@@ -20,5 +20,5 @@ public class GeneralParameter(int id, string name, Interval range, GeneralParame
     public Interval Range { get; set; } = range;
 
     public ParameterType TypeOfParameter { get; } = typeOfParameter;
-    public decimal DefaultValue { get; set; } = defaultValue;
+    public double DefaultValue { get; set; } = defaultValue;
 }

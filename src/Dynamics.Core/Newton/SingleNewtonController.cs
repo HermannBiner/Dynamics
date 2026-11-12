@@ -15,7 +15,7 @@ public sealed class SingleNewtonController
     public const int MaxSteps = 100;
 
     /// <summary>VB: Const ConvergenceLimit As Decimal = 0.01, compared with a Double.</summary>
-    private static readonly double ConvergenceLimit = (double)0.01m;
+    private static readonly double ConvergenceLimit = 0.01;
 
     private readonly List<ComplexNumber> _orbit = [];
     private readonly List<ComplexNumber> _unitRoots = [];
@@ -32,7 +32,7 @@ public sealed class SingleNewtonController
         B = "1";
     }
 
-    public static Interval MathInterval { get; } = new(-1.5m, 1.5m);
+    public static Interval MathInterval { get; } = new(-1.5, 1.5);
 
     public CoordinateTransform Transform { get; }
 
@@ -67,7 +67,7 @@ public sealed class SingleNewtonController
 
         for (var k = 2; k <= N; k++)
         {
-            w = w.Rotate((double)(decimal)(2 * Math.PI / N));
+            w = w.Rotate((double)(2 * Math.PI / N));
             _unitRoots.Add(w);
         }
 

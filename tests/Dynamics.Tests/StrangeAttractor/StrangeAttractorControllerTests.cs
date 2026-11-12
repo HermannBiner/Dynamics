@@ -26,7 +26,7 @@ public class StrangeAttractorControllerTests
         Assert.Equal(933, controller.DSParameterTrackBar);
         Assert.Equal("28", controller.DSParameterText);
         Assert.Equal(5, controller.StepWidthTrackBar);
-        Assert.Equal((decimal)(-Math.PI / 15), controller.Phi);
+        Assert.Equal((-Math.PI / 15), controller.Phi);
         Assert.All(controller.AttractorNames, name => Assert.DoesNotContain("Cls", name));
     }
 
@@ -44,7 +44,7 @@ public class StrangeAttractorControllerTests
         Assert.Equal(1, controller.N);
 
         // The step equals the model with the step width of the track bar
-        var lorenz = new Lorenz { StepWidth = 0.001m, ActualMathPoint = new MathPoint(1, 1, 1) };
+        var lorenz = new Lorenz { StepWidth = 0.001, ActualMathPoint = new MathPoint(1, 1, 1) };
         lorenz.IterationStep();
         Assert.Equal(lorenz.ActualMathPoint.X, controller.IterationPointSet.Points[0].ActualPoint.X);
 
@@ -66,7 +66,7 @@ public class StrangeAttractorControllerTests
 
         controller.Z = "4";
         Assert.Null(controller.TakeOverPointSet());
-        Assert.Equal(new[] { 2.5m, -3m, 4m },
+        Assert.Equal(new[] { 2.5, -3.0, 4.0 },
             new[] { controller.IterationPointSet.Points[0].ActualPoint.X, controller.IterationPointSet.Points[0].ActualPoint.Y, controller.IterationPointSet.Points[0].ActualPoint.Z });
 
         // Several points cannot be edited; the texts list all points
@@ -81,7 +81,7 @@ public class StrangeAttractorControllerTests
         var controller = new StrangeAttractorController(600);
         controller.TakeOverPointSet();
         controller.SetDSParameterFromTrackBar(500);
-        Assert.Equal(15m, controller.DS.DSParameterValue);
+        Assert.Equal(15.0, controller.DS.DSParameterValue);
         Assert.Equal("15", controller.DSParameterText);
         Assert.False(controller.CanStart);
     }
@@ -95,14 +95,14 @@ public class StrangeAttractorControllerTests
         // Lorenz: interval [0, 60], view corrections -10, 10, -10
         controller.SetProjection(AttractorProjection.XY);
         Assert.Equal(new MathPoint(33, 4 + 20 + 10).Y, controller.Project(point).Y);
-        Assert.Equal(33m, controller.Project(point).X);
+        Assert.Equal(33.0, controller.Project(point).X);
         controller.SetProjection(AttractorProjection.XZ);
-        Assert.Equal(5m + 20 - 10, controller.Project(point).Y);
+        Assert.Equal(5.0 + 20 - 10, controller.Project(point).Y);
 
         controller.SetProjection(AttractorProjection.ThreeD);
         double phi = (double)controller.Phi, theta = (double)controller.Theta;
-        var rotatedX = (decimal)(3 * Math.Cos(phi) - 4 * Math.Sin(phi) * Math.Cos(theta) - 5 * Math.Sin(phi) * Math.Sin(theta));
-        var rotatedZ = (decimal)(-4 * Math.Sin(theta) + 5 * Math.Cos(theta));
+        var rotatedX = (3 * Math.Cos(phi) - 4 * Math.Sin(phi) * Math.Cos(theta) - 5 * Math.Sin(phi) * Math.Sin(theta));
+        var rotatedZ = (-4 * Math.Sin(theta) + 5 * Math.Cos(theta));
         var plane = controller.Project(point);
         Assert.Equal(-rotatedX + 30, plane.X);
         Assert.Equal(Math.Max(0, rotatedZ + 20 - 10), plane.Y);
@@ -119,10 +119,10 @@ public class StrangeAttractorControllerTests
         Assert.True(controller.MouseDown());
         Assert.True(controller.MouseMove(300, 300));
 
-        // x = 300 → Phi = CDec(π) / 2 - CDec(π / 2), almost 0 (Decimal rounding as in VB);
+        // x = 300 → Phi = π / 2 - π / 2 = 0 up to rounding;
         // y = 300 → plane y = 30 → Theta = π/2 · (60 - 90) / 60 < 0.01 → 0.01
-        Assert.Equal(3.14159265358979m * 300 / 600 - 1.5707963267949m, controller.Phi);
-        Assert.Equal(0.01m, controller.Theta);
+        Assert.Equal(0, controller.Phi, 12);
+        Assert.Equal(0.01, controller.Theta);
         controller.MouseUp();
         Assert.False(controller.MouseMove(0, 0));
 
@@ -133,14 +133,14 @@ public class StrangeAttractorControllerTests
     [Fact]
     public void LinearMapUsesTheRealOrComplexForm()
     {
-        var linear = new Linear { StepWidth = 0.005m, ActualMathPoint = new MathPoint(1, 0, 1) };
+        var linear = new Linear { StepWidth = 0.005, ActualMathPoint = new MathPoint(1, 0, 1) };
         linear.SetIterationParameters();
         linear.IterationStep();
 
         // ρ = 4 ≤ 10: diagonal map with λ = 0.989, α = 0.993, δ = 0.997
-        Assert.Equal(0.993m, linear.ActualMathPoint.X);
-        Assert.Equal(0m, linear.ActualMathPoint.Y);
-        Assert.Equal(0.989m, linear.ActualMathPoint.Z);
+        Assert.Equal(0.993, linear.ActualMathPoint.X);
+        Assert.Equal(0.0, linear.ActualMathPoint.Y);
+        Assert.Equal(0.989, linear.ActualMathPoint.Z);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class StrangeAttractorControllerTests
         Assert.Equal("50", controller.XMax);
 
         // The split points of the Lorenz attractor; the last one red
-        Assert.Equal([(1m, false), (1.346m, false), (13.926m, false), (24.06m, false), (24.74m, true)], controller.SplitLines());
+        Assert.Equal([(1.0, false), (1.346, false), (13.926, false), (24.06, false), (24.74, true)], controller.SplitLines());
 
         controller.SetAMin("31");
         Assert.NotNull(controller.Start());
@@ -166,7 +166,7 @@ public class StrangeAttractorControllerTests
         // Area selection whenever stopped
         controller.SetDefaultUserData();
         Assert.True(controller.SelectArea(1, 1, 580, 580));
-        Assert.Equal(0m, Dec(controller.AMin));
-        Assert.Equal(30m, Dec(controller.AMax));
+        Assert.Equal(0.0, Dec(controller.AMin));
+        Assert.Equal(30.0, Dec(controller.AMax));
     }
 }

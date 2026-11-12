@@ -12,7 +12,7 @@ public interface IIteration
     GeneralParameter DSParameter { get; }
 
     /// <summary>Value of the steering parameter a.</summary>
-    decimal ParameterA { get; set; }
+    double ParameterA { get; set; }
 
     /// <summary>Definition of the iterated value x.</summary>
     GeneralParameter ValueParameter { get; }
@@ -21,22 +21,22 @@ public interface IIteration
     int Power { get; set; }
 
     /// <summary>Split points of the Feigenbaum diagram; the last one is the limit of the period doubling.</summary>
-    IReadOnlyList<decimal> Splitpoints { get; }
+    IReadOnlyList<double> Splitpoints { get; }
 
     /// <summary>Critical point (start value of the Feigenbaum diagram).</summary>
-    decimal CriticalPoint { get; }
+    double CriticalPoint { get; }
 
     /// <summary>The parameter value with chaotic behaviour.</summary>
-    decimal ChaoticParameterValue { get; }
+    double ChaoticParameterValue { get; }
 
     /// <summary>Start value that produces the given protocol (in case of chaos); see the mathematical documentation.</summary>
-    decimal CalculateStartValueForProtocol(string targetProtocol);
+    double CalculateStartValueForProtocol(string targetProtocol);
 
     /// <summary>Start value near startValue whose orbit approaches the target value (in case of chaos).</summary>
-    decimal CalculateStartValueForTargetValue(decimal startValue, decimal targetValue);
+    double CalculateStartValueForTargetValue(double startValue, double targetValue);
 
     /// <summary>F performed Power times.</summary>
-    decimal FN(decimal x);
+    double FN(double x);
 
     /// <summary>
     /// Chaotic behaviour is only guaranteed at the border of the parameter range.
@@ -60,15 +60,15 @@ public abstract class GrowthModelBase : IIteration
 
     public GeneralParameter ValueParameter { get; protected set; } = null!;
 
-    public virtual decimal ParameterA { get; set; }
+    public virtual double ParameterA { get; set; }
 
     public int Power { get; set; }
 
-    public IReadOnlyList<decimal> Splitpoints { get; protected set; } = [];
+    public IReadOnlyList<double> Splitpoints { get; protected set; } = [];
 
-    public decimal CriticalPoint { get; protected set; }
+    public double CriticalPoint { get; protected set; }
 
-    public decimal ChaoticParameterValue { get; protected set; }
+    public double ChaoticParameterValue { get; protected set; }
 
     public bool IsBehaviourChaotic()
     {
@@ -76,7 +76,7 @@ public abstract class GrowthModelBase : IIteration
         return !((0 <= a && a < DSParameter.Range.B) || (DSParameter.Range.A < a && a <= 0));
     }
 
-    public decimal FN(decimal x)
+    public double FN(double x)
     {
         for (var i = 1; i <= Power; i++)
         {
@@ -86,7 +86,7 @@ public abstract class GrowthModelBase : IIteration
         return x;
     }
 
-    public virtual decimal CalculateStartValueForProtocol(string targetProtocol)
+    public virtual double CalculateStartValueForProtocol(string targetProtocol)
     {
         // First a dual start value of the tent map that generates the protocol, then the conjugation
         var binaryTentmapStartvalue = MathHelperUnimodal.ProtocolToTentmapStartValueAsString(targetProtocol);
@@ -94,7 +94,7 @@ public abstract class GrowthModelBase : IIteration
         return TentmapToIteration(decimalTentmapStartvalue);
     }
 
-    public virtual decimal CalculateStartValueForTargetValue(decimal startValue, decimal targetValue)
+    public virtual double CalculateStartValueForTargetValue(double startValue, double targetValue)
     {
         // Conjugated start and target value of the tent map
         var tentmapDecimalStartvalue = IterationToTentmap(startValue);
@@ -133,11 +133,11 @@ public abstract class GrowthModelBase : IIteration
     protected abstract void InitializeIterator();
 
     /// <summary>The original iteration function.</summary>
-    protected abstract decimal F(decimal x);
+    protected abstract double F(double x);
 
     /// <summary>Conjugation to the tent map.</summary>
-    protected abstract decimal IterationToTentmap(decimal x);
+    protected abstract double IterationToTentmap(double x);
 
     /// <summary>Conjugation from the tent map.</summary>
-    protected abstract decimal TentmapToIteration(decimal u);
+    protected abstract double TentmapToIteration(double u);
 }

@@ -21,7 +21,7 @@ public sealed class TurtleState
     public MathPoint Position { get; } = new(0, 0);
     public int Angle { get; set; }
     public int Color { get; set; }
-    public decimal StepLength { get; set; }
+    public double StepLength { get; set; }
 
     public TurtleState Copy()
     {
@@ -49,11 +49,11 @@ public sealed class Turtle
     private int _i;
 
     /// <summary>Mathematical range of the picture in both directions (VB MathInterval).</summary>
-    public static readonly Interval MathInterval = new(0m, 13m);
+    public static readonly Interval MathInterval = new(0.0, 13.0);
 
     public int AngleLeft { get; set; }
     public int AngleRight { get; set; }
-    public decimal ScaleFactor { get; set; }
+    public double ScaleFactor { get; set; }
     public bool IsColorFixed { get; set; }
     public bool IsBudding { get; set; }
     public LSystemScaling Scaling { get; set; }
@@ -67,7 +67,7 @@ public sealed class Turtle
     /// <summary>Position in the itinerary of the generation being drawn.</summary>
     public int Index => _i;
 
-    private decimal _startLength;
+    private double _startLength;
 
     /// <summary>VB: setting the default color also sets the actual color.</summary>
     public int DefaultColor
@@ -76,7 +76,7 @@ public sealed class Turtle
     }
 
     /// <summary>VB: setting the start length also sets the actual step length.</summary>
-    public decimal StartLength
+    public double StartLength
     {
         set
         {
@@ -85,7 +85,7 @@ public sealed class Turtle
         }
     }
 
-    public void SetStartPosition(decimal x, decimal y)
+    public void SetStartPosition(double x, double y)
     {
         State.Position.X = x;
         State.Position.Y = y;
@@ -224,14 +224,14 @@ public sealed class Turtle
         }
     }
 
-    /// <summary>VB: Move; the Decimal/Double mix of VB is kept.</summary>
+    /// <summary>VB: Move.</summary>
     private TurtleMove Move(bool drawing)
     {
         var from = new MathPoint(State.Position.X, State.Position.Y);
-        var radians = (double)(decimal)(State.Angle * Math.PI / 180);
+        var radians = (double)(State.Angle * Math.PI / 180);
         var to = new MathPoint(
-            from.X + (decimal)((double)State.StepLength * Math.Cos(radians)),
-            from.Y + (decimal)((double)State.StepLength * Math.Sin(radians)));
+            from.X + ((double)State.StepLength * Math.Cos(radians)),
+            from.Y + ((double)State.StepLength * Math.Sin(radians)));
 
         var width = Scaling == LSystemScaling.ByIteration ? 1 : Convert.ToInt32(1 + State.StepLength / 2);
         State.Position.X = to.X;

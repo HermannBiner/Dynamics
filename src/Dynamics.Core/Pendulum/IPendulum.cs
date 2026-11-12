@@ -26,7 +26,7 @@ public enum DrawRole
 }
 
 /// <summary>A pendulum arm from a suspension point to a bob.</summary>
-public readonly record struct PendulumArm(MathPoint From, MathPoint To, decimal BobRadius, DrawRole Role);
+public readonly record struct PendulumArm(MathPoint From, MathPoint To, double BobRadius, DrawRole Role);
 
 /// <summary>A point of the phase portrait; points accumulate until the iteration is reset.</summary>
 public readonly record struct PhasePoint(MathPoint Point, DrawRole Role, int Size);
@@ -72,18 +72,18 @@ public interface IPendulum
     int StepWidth { set; }
 
     /// <summary>Internal Runge-Kutta step width d.</summary>
-    decimal StepWidthValue { get; }
+    double StepWidthValue { get; }
 
     Interval? StartEnergyRange { get; }
 
     /// <summary>Runge-Kutta state (u1, v1, u2, v2).</summary>
-    (decimal U1, decimal V1, decimal U2, decimal V2) State { get; }
+    (double U1, double V1, double U2, double V2) State { get; }
 
     /// <summary>True if the Poincaré section was crossed in the last step.</summary>
     bool IsSignumChanged { get; }
 
     /// <summary>Y-coordinate of the suspension line.</summary>
-    decimal Y0 { get; }
+    double Y0 { get; }
 
     /// <summary>Current arms and bobs.</summary>
     IReadOnlyList<PendulumArm> GetArms();
@@ -100,7 +100,7 @@ public interface IPendulum
     /// <summary>Additional background curve (e.g. equilibrium line), in mathematical coordinates.</summary>
     IReadOnlyList<MathPoint> GetBackgroundCurve();
 
-    decimal GetAddParameterValue(int trackBarValue);
+    double GetAddParameterValue(int trackBarValue);
 
     void SetDefaultUserData();
 
@@ -114,7 +114,7 @@ public interface IPendulum
     /// <summary>Sets the second start parameter from a point in mathematical coordinates.</summary>
     void SetStartparameter2(MathPoint position);
 
-    decimal GetEnergy();
+    double GetEnergy();
 
     void IterationStep(bool isTestMode);
 

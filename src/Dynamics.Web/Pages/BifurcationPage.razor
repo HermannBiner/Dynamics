@@ -47,18 +47,18 @@
         <p class="caption">@Text.Get("ExaminatedParameterRange")</p>
         <div class="ranges">
             <label for="amin">@(_controller.DS.DSParameter.Name)Min</label>
-            <input id="amin" inputmode="decimal" value="@_controller.AMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetAMin(Value(e))" />
+            <input id="amin" inputmode="double" value="@_controller.AMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetAMin(Value(e))" />
             <label for="amax">@(_controller.DS.DSParameter.Name)Max</label>
-            <input id="amax" inputmode="decimal" value="@_controller.AMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetAMax(Value(e))" />
+            <input id="amax" inputmode="double" value="@_controller.AMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetAMax(Value(e))" />
             <span class="delta">@_controller.DeltaA</span>
         </div>
 
         <p class="caption">@Text.Get("ExaminatedValueRange")</p>
         <div class="ranges">
             <label for="xmin">@(_controller.ValueParameter.Name)Min</label>
-            <input id="xmin" inputmode="decimal" value="@_controller.XMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetXMin(Value(e))" />
+            <input id="xmin" inputmode="double" value="@_controller.XMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetXMin(Value(e))" />
             <label for="xmax">@(_controller.ValueParameter.Name)Max</label>
-            <input id="xmax" inputmode="decimal" value="@_controller.XMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetXMax(Value(e))" />
+            <input id="xmax" inputmode="double" value="@_controller.XMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetXMax(Value(e))" />
             <span class="delta">@_controller.DeltaX</span>
         </div>
 
@@ -87,7 +87,7 @@
 
     private readonly BifurcationController _controller = new(DiagramSize, DiagramSize);
     private readonly System.Diagnostics.Stopwatch _watch = new();
-    private DrawBatch _overlay = new(new CoordinateTransform(DiagramSize, DiagramSize, new Interval(0m, 1m), new Interval(0m, 1m)));
+    private DrawBatch _overlay = new(new CoordinateTransform(DiagramSize, DiagramSize, new Interval(0.0, 1.0), new Interval(0.0, 1.0)));
 
     private IJSObjectReference? _module;
     private DotNetObjectReference<BifurcationPage>? _selfReference;
@@ -174,7 +174,7 @@
                 {
                     foreach (var value in values)
                     {
-                        diagram.Point(new MathPoint(column.ParameterValue, _controller.ClampToValueRange(value)), color, 1);
+                        diagram.PointOnce(new MathPoint(column.ParameterValue, _controller.ClampToValueRange(value)), color, 1);
                     }
                 }
             }

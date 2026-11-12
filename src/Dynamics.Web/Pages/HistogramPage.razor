@@ -31,12 +31,12 @@
         <div class="field-row">
             <div class="field grow">
                 <label for="parameter">@Text.Get("Parameter") a</label>
-                <input id="parameter" inputmode="decimal" value="@_controller.Parameter" disabled="@(!_controller.IsEditable)"
+                <input id="parameter" inputmode="double" value="@_controller.Parameter" disabled="@(!_controller.IsEditable)"
                        @onchange="e => ChangeInputAsync(() => _controller.Parameter = Value(e))" />
             </div>
             <div class="field grow">
                 <label for="start">@Text.Get("StartValue")</label>
-                <input id="start" inputmode="decimal" value="@_controller.StartValue" disabled="@(!_controller.IsEditable)"
+                <input id="start" inputmode="double" value="@_controller.StartValue" disabled="@(!_controller.IsEditable)"
                        @onchange="e => ChangeInputAsync(() => _controller.StartValue = Value(e))" />
             </div>
         </div>
@@ -68,7 +68,7 @@
     private static readonly int CadetBlue = unchecked((int)0xFF5F9EA0);
 
     private readonly HistogramController _controller = new(DiagramSize);
-    private readonly DrawBatch _diagram = new(new CoordinateTransform(DiagramSize, DiagramSize, new Interval(0m, DiagramSize), new Interval(0m, DiagramSize)));
+    private readonly DrawBatch _diagram = new(new CoordinateTransform(DiagramSize, DiagramSize, new Interval(0.0, DiagramSize), new Interval(0.0, DiagramSize)));
 
     private IJSObjectReference? _module;
     private List<string> _names = [];

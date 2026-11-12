@@ -16,18 +16,18 @@ public readonly record struct NumericMethodStep(
 public class NumericMethodController
 {
     /// <summary>Fixed x-positions of the two pendulums.</summary>
-    public const decimal XPositionA = -0.97m;
-    public const decimal XPositionB = -0.94m;
+    public const double XPositionA = -0.97;
+    public const double XPositionB = -0.94;
 
     /// <summary>VB: the start position can be set with the mouse left of pixel 100 (of 600).</summary>
-    public static readonly decimal StartAreaMaxX = -1m + 100m * 2m / 600m;
+    public static readonly double StartAreaMaxX = -1.0 + 100.0 * 2.0 / 600.0;
 
     public const int StepWidthMin = 1;
     public const int StepWidthMax = 15;
     public const int DefaultStepWidth = 5;
 
-    private const decimal DefaultAmplitude = 0.5m;
-    private const decimal MaxAmplitude = 0.95m;
+    private const double DefaultAmplitude = 0.5;
+    private const double MaxAmplitude = 0.95;
 
     private MathPoint _traceA = new();
     private MathPoint _traceB = new();
@@ -63,13 +63,13 @@ public class NumericMethodController
     /// <summary>Stretched mode: both pendulums use the small step width.</summary>
     public bool IsStretched { get; private set; }
 
-    public decimal StepWidthA { get; private set; } = 0.1m;
-    public decimal StepWidthB { get; private set; } = 0.1m;
+    public double StepWidthA { get; private set; } = 0.1;
+    public double StepWidthB { get; private set; } = 0.1;
     public int NumberOfApproxStepsB { get; private set; } = 1;
     public int NumberOfStepsUntilShift { get; private set; } = 1;
 
     /// <summary>Step width shown in the label (VB: LocStepWidth).</summary>
-    public decimal DisplayedStepWidth { get; private set; }
+    public double DisplayedStepWidth { get; private set; }
 
     public bool IsMouseDown { get; private set; }
 
@@ -133,8 +133,8 @@ public class NumericMethodController
     {
         var stretchFactor = StepWidthTrackBar;
         var locStepWidth = stretchFactor > 5
-            ? (decimal)Math.Max(0.01 - 0.001 * (stretchFactor - 6), 0.001)
-            : (decimal)(0.1 - 0.02 * (stretchFactor - 1));
+            ? Math.Max(0.01 - 0.001 * (stretchFactor - 6), 0.001)
+            : (0.1 - 0.02 * (stretchFactor - 1));
 
         if (IsStretched)
         {
@@ -144,7 +144,7 @@ public class NumericMethodController
         }
         else
         {
-            StepWidthA = 0.1m;
+            StepWidthA = 0.1;
             NumberOfApproxStepsB = Convert.ToInt32(Math.Round(StepWidthA / locStepWidth));
             StepWidthB = StepWidthA / NumberOfApproxStepsB;
         }

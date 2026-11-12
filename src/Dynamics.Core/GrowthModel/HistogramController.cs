@@ -8,7 +8,7 @@ namespace Dynamics.Core.GrowthModel;
 /// </summary>
 public sealed class HistogramController : GrowthControllerBase
 {
-    private decimal _x;
+    private double _x;
 
     public HistogramController(int width) : base(includeMandelbrot: false)
     {

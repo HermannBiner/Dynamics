@@ -61,7 +61,7 @@
                     var index = i;
                     var definition = _controller.MainDS.ValueParameterDefinition[index];
                     <label for="p@(index)">@definition.Name</label>
-                    <input id="p@(index)" class="@(_invalid.Contains(index) ? "invalid" : "")" inputmode="decimal"
+                    <input id="p@(index)" class="@(_invalid.Contains(index) ? "invalid" : "")" inputmode="double"
                            value="@_parameterTexts[index]" @onchange="e => _parameterTexts[index] = e.Value?.ToString() ?? string.Empty" />
                 }
             </div>
@@ -351,7 +351,7 @@
             }
             catch (ArithmeticException)
             {
-                // The pendulum became numerically unstable (e.g. decimal overflow).
+                // The pendulum became numerically unstable (e.g. double overflow).
                 _controller.Stop();
                 _errorMessage = Text.Get("NumericOverflow");
             }

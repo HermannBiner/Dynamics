@@ -153,7 +153,7 @@ public sealed class BilliardTableController
     public void SetParameterFromTrackBar(int value)
     {
         ParameterTrackBar = value;
-        ParameterText = ((decimal)(value * 0.01)).ToString(CultureInfo.CurrentCulture);
+        ParameterText = ((value * 0.01)).ToString(CultureInfo.CurrentCulture);
         DS.C = UserDataCheck.TryParse(ParameterText, out var c) ? c : DS.C;
         ResetIteration();
     }
@@ -223,7 +223,7 @@ public sealed class BilliardTableController
     }
 
     /// <summary>VB: Startparameter and Startangle draw the start and end position permanently and the first line.</summary>
-    private void SetStart(IBilliardBall ball, decimal t, decimal alfa)
+    private void SetStart(IBilliardBall ball, double t, double alfa)
     {
         ball.Startparameter = t;
         _drawings.Add(new PermanentBall(ball.UserStartposition, ball.Color));
@@ -264,7 +264,7 @@ public sealed class BilliardTableController
 
         ResetIteration();
         _numberOfBalls = 30;
-        var t = DS.C < 1 ? (decimal)(Math.PI / 2) : 0;
+        var t = DS.C < 1 ? (Math.PI / 2) : 0;
         var alfa = DS.AlfaValueParameter.DefaultValue;
 
         // VB-compatible: the first (blue) ball moves one segment but is not added to the table
@@ -275,7 +275,7 @@ public sealed class BilliardTableController
 
         for (var i = 0; i <= _numberOfBalls; i++)
         {
-            alfa += (decimal)(Math.PI / _numberOfBalls);
+            alfa += (Math.PI / _numberOfBalls);
             if ((double)alfa < Math.PI)
             {
                 var color = (i % 5) switch

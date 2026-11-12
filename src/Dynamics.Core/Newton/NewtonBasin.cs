@@ -10,12 +10,12 @@ namespace Dynamics.Core.Newton;
 /// </summary>
 public sealed class NewtonBasin
 {
-    public static readonly Interval XInterval = new(0m, 2m);
-    public static readonly Interval YInterval = new(-1m, 1m);
+    public static readonly Interval XInterval = new(0.0, 2.0);
+    public static readonly Interval YInterval = new(-1.0, 1.0);
 
     private const double StepWide = 0.001;
 
-    private NewtonBasin(int n, decimal innerRadius, MathPoint asymptote, List<MathPoint> curvePoints)
+    private NewtonBasin(int n, double innerRadius, MathPoint asymptote, List<MathPoint> curvePoints)
     {
         N = n;
         InnerRadius = innerRadius;
@@ -26,7 +26,7 @@ public sealed class NewtonBasin
     public int N { get; }
 
     /// <summary>Radius of the green circle around 1 (VB: CDec(1 - 1 / 2^(1/n))).</summary>
-    public decimal InnerRadius { get; }
+    public double InnerRadius { get; }
 
     /// <summary>End point of the upper asymptote; the lower one is mirrored.</summary>
     public MathPoint Asymptote { get; }
@@ -36,10 +36,10 @@ public sealed class NewtonBasin
 
     public static NewtonBasin Create(int n)
     {
-        var innerRadius = (decimal)(1 - 1 / Math.Pow(2, 1.0 / n));
+        var innerRadius = (1 - 1 / Math.Pow(2, 1.0 / n));
         var asymptote = new MathPoint(
-            (decimal)(2 * Math.Cos(Math.PI / (2 * n))),
-            (decimal)(2 * Math.Sin(Math.PI / (2 * n))));
+            (2 * Math.Cos(Math.PI / (2 * n))),
+            (2 * Math.Sin(Math.PI / (2 * n))));
 
         var points = new List<MathPoint>();
         var phi = 0.0;
@@ -66,8 +66,8 @@ public sealed class NewtonBasin
         {
             if (radius < limit)
             {
-                points.Add(new MathPoint((decimal)(radius * Math.Cos(angle)), (decimal)(radius * Math.Sin(angle))));
-                points.Add(new MathPoint((decimal)(radius * Math.Cos(angle)), (decimal)(-radius * Math.Sin(angle))));
+                points.Add(new MathPoint((radius * Math.Cos(angle)), (radius * Math.Sin(angle))));
+                points.Add(new MathPoint((radius * Math.Cos(angle)), (-radius * Math.Sin(angle))));
             }
         }
     }

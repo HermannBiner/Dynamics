@@ -47,15 +47,15 @@
 
         <div class="ranges">
             <label for="xmin">XMin</label>
-            <input id="xmin" inputmode="decimal" value="@_controller.XMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetXMin(Value(e))" />
+            <input id="xmin" inputmode="double" value="@_controller.XMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetXMin(Value(e))" />
             <label for="xmax">XMax</label>
-            <input id="xmax" inputmode="decimal" value="@_controller.XMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetXMax(Value(e))" />
+            <input id="xmax" inputmode="double" value="@_controller.XMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetXMax(Value(e))" />
             <span class="delta">@_controller.DeltaX</span>
 
             <label for="ymin">YMin</label>
-            <input id="ymin" inputmode="decimal" value="@_controller.YMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetYMin(Value(e))" />
+            <input id="ymin" inputmode="double" value="@_controller.YMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetYMin(Value(e))" />
             <label for="ymax">YMax</label>
-            <input id="ymax" inputmode="decimal" value="@_controller.YMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetYMax(Value(e))" />
+            <input id="ymax" inputmode="double" value="@_controller.YMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetYMax(Value(e))" />
             <span class="delta">@_controller.DeltaY</span>
         </div>
 
@@ -63,9 +63,9 @@
         {
             <div class="complex-input">
                 <label for="ca">c =</label>
-                <input id="ca" inputmode="decimal" value="@_controller.A" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetA(Value(e))" />
+                <input id="ca" inputmode="double" value="@_controller.A" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetA(Value(e))" />
                 <label for="cb">+ i</label>
-                <input id="cb" inputmode="decimal" value="@_controller.B" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetB(Value(e))" />
+                <input id="cb" inputmode="double" value="@_controller.B" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetB(Value(e))" />
             </div>
         }
 
@@ -192,7 +192,7 @@
     {
         foreach (var root in _controller.DS.Roots)
         {
-            _image.FillCircle(_controller.DS.Transform, new MathPoint((decimal)root.X, (decimal)root.Y), 3,
+            _image.FillCircle(_controller.DS.Transform, new MathPoint(root.X, root.Y), 3,
                 finished ? Argb.Black : root.GetColor(1));
         }
     }

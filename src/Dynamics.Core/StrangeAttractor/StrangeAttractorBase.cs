@@ -10,19 +10,19 @@ public abstract class StrangeAttractorBase : IStrangeAttractor
 
     public GeneralParameter DSParameter { get; protected init; } = null!;
 
-    public decimal DSParameterValue { get; set; }
+    public double DSParameterValue { get; set; }
 
     public GeneralParameter XValueParameter { get; protected init; } = null!;
     public GeneralParameter YValueParameter { get; protected init; } = null!;
     public GeneralParameter ZValueParameter { get; protected init; } = null!;
 
-    public decimal StepWidth { get; set; }
+    public double StepWidth { get; set; }
 
     public IReadOnlyList<PointSet> StartPointSets => MyStartPointSets;
 
     public Interval MathInterval { get; protected init; } = null!;
 
-    public IReadOnlyList<decimal> Splitpoints { get; protected init; } = [];
+    public IReadOnlyList<double> Splitpoints { get; protected init; } = [];
 
     public MathPoint ActualMathPoint
     {
@@ -38,7 +38,7 @@ public abstract class StrangeAttractorBase : IStrangeAttractor
 
     public abstract void IterationStep();
 
-    protected static PointSet NewPointSet(string key, decimal proposedStepWidth, params (decimal X, decimal Y, decimal Z, int Color)[] points)
+    protected static PointSet NewPointSet(string key, double proposedStepWidth, params (double X, double Y, double Z, int Color)[] points)
     {
         var set = new PointSet(Text.Get(key)) { ProposedStepWidth = proposedStepWidth };
         foreach (var (x, y, z, color) in points)
@@ -49,7 +49,7 @@ public abstract class StrangeAttractorBase : IStrangeAttractor
         return set;
     }
 
-    protected void SetViewCorrection(decimal projection3D, decimal xy, decimal xz)
+    protected void SetViewCorrection(double projection3D, double xy, double xz)
     {
         ViewCorrection[0] = projection3D;
         ViewCorrection[1] = xy;
@@ -59,7 +59,7 @@ public abstract class StrangeAttractorBase : IStrangeAttractor
 
 /// <summary>
 /// Base of the strange attractors defined by a differential equation, solved with the classical
-/// Runge-Kutta method in Decimal. Port of ClsRungeKuttaAttractorAbstract.
+/// Runge-Kutta method. Port of ClsRungeKuttaAttractorAbstract.
 /// </summary>
 public abstract class RungeKuttaAttractorBase : StrangeAttractorBase
 {
@@ -126,7 +126,7 @@ public abstract class RungeKuttaAttractorBase : StrangeAttractorBase
     {
     }
 
-    public abstract decimal F(NTuple z);
-    public abstract decimal G(NTuple z);
-    public abstract decimal H(NTuple z);
+    public abstract double F(NTuple z);
+    public abstract double G(NTuple z);
+    public abstract double H(NTuple z);
 }

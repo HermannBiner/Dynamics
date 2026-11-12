@@ -41,15 +41,15 @@
 
         <div class="field">
             <label for="parameter">@Text.Get("Parameter") a</label>
-            <input id="parameter" inputmode="decimal" value="@_controller.Parameter" @onchange="e => ChangeInputAsync(() => _controller.Parameter = Value(e))" />
+            <input id="parameter" inputmode="double" value="@_controller.Parameter" @onchange="e => ChangeInputAsync(() => _controller.Parameter = Value(e))" />
         </div>
         <div class="field">
             <label for="start1">@Text.Get("StartValue1")</label>
-            <input id="start1" inputmode="decimal" value="@_controller.StartValue1" @onchange="e => ChangeInputAsync(() => _controller.StartValue1 = Value(e))" />
+            <input id="start1" inputmode="double" value="@_controller.StartValue1" @onchange="e => ChangeInputAsync(() => _controller.StartValue1 = Value(e))" />
         </div>
         <div class="field">
             <label for="start2">@Text.Get("StartValue2")</label>
-            <input id="start2" inputmode="decimal" value="@_controller.StartValue2" @onchange="e => ChangeInputAsync(() => _controller.StartValue2 = Value(e))" />
+            <input id="start2" inputmode="double" value="@_controller.StartValue2" @onchange="e => ChangeInputAsync(() => _controller.StartValue2 = Value(e))" />
         </div>
 
         <fieldset>
@@ -66,7 +66,7 @@
             </div>
             <div class="field">
                 <label for="stretching">@Text.Get("xStretching"), @Text.Get("DinStretching")</label>
-                <input id="stretching" class="short" inputmode="decimal" value="@_controller.XStretching"
+                <input id="stretching" class="short" inputmode="double" value="@_controller.XStretching"
                        @onchange="e => ChangeInputAsync(() => _controller.XStretching = Value(e))" />
             </div>
         </fieldset>

@@ -33,7 +33,7 @@ public class UniverseReferenceTests
         ds.VFactor = ds.ActiveConstellation.VFactor;
 
         ds.ClearUniverse();
-        decimal totalMass = 0;
+        double totalMass = 0;
         foreach (var star in ds.ActiveConstellation.Stars)
         {
             star.ActualStepWidth = 0;
@@ -50,7 +50,7 @@ public class UniverseReferenceTests
         ds.RedrawUniverse(null, true);
         ds.ResetIteration();
 
-        decimal locTotal = 0;
+        double locTotal = 0;
         foreach (var star in ds.ActiveStarCollection)
         {
             star.ResetIteration();
@@ -70,8 +70,7 @@ public class UniverseReferenceTests
         }
 
         var centre = ds.GlobalCentreOfGravity;
-        Assert.Equal([Dec(setup[3]), Dec(setup[4]), Dec(setup[5]), Dec(setup[6]), Dec(setup[7])],
-            new[] { stepWidth, ds.DiagramZoom, ds.VFactor, centre.X, centre.Y });
+        AssertAll(setup.Skip(3).Take(5), [stepWidth, ds.DiagramZoom, ds.VFactor, centre.X, centre.Y]);
 
         var starRows = rows.Where(r => r[0] == "star").ToList();
         Assert.Equal(starRows.Count, ds.ActiveStarCollection.Count);
@@ -79,9 +78,18 @@ public class UniverseReferenceTests
         {
             var s = ds.ActiveStarCollection[i];
             Assert.Equal(starRows[i][1], s.Name);
-            Assert.Equal(starRows[i].Skip(2).Select(Dec).ToArray(),
-                new[] { s.UserMass, s.UserStartPosition.X, s.UserStartPosition.Y, s.UserStartVelocity.X, s.UserStartVelocity.Y, s.TotalMassOfOtherStars });
+            AssertAll(starRows[i].Skip(2), [s.UserMass, s.UserStartPosition.X, s.UserStartPosition.Y, s.UserStartVelocity.X, s.UserStartVelocity.Y, s.TotalMassOfOtherStars]);
         }
 
+    }
+
+    private static void AssertAll(IEnumerable<string> expected, double[] actual)
+    {
+        var values = expected.ToArray();
+        Assert.Equal(values.Length, actual.Length);
+        for (var i = 0; i < values.Length; i++)
+        {
+            Close(values[i], actual[i]);
+        }
     }
 }

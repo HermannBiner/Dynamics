@@ -37,12 +37,12 @@
         <div class="field-row">
             <div class="field grow">
                 <label for="parameter">a =</label>
-                <input id="parameter" inputmode="decimal" value="@_controller.ParameterA" disabled="@(!_controller.IsEditable)"
+                <input id="parameter" inputmode="double" value="@_controller.ParameterA" disabled="@(!_controller.IsEditable)"
                        @onchange="OnParameterAsync" />
             </div>
             <div class="field grow">
                 <label for="start">@Text.Get("StartValue")</label>
-                <input id="start" inputmode="decimal" value="@_controller.StartValue" disabled="@(!_controller.IsEditable)"
+                <input id="start" inputmode="double" value="@_controller.StartValue" disabled="@(!_controller.IsEditable)"
                        @onchange="OnStartValueAsync" />
             </div>
         </div>

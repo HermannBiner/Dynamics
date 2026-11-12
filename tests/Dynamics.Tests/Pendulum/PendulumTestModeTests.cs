@@ -9,7 +9,7 @@ namespace Dynamics.Tests.Pendulum;
 /// </summary>
 public class PendulumTestModeTests
 {
-    private const decimal g = 9.81m;
+    private const double g = 9.81;
 
     [Fact]
     public void ShakedPendulumTestModeIsThreadPendulumOfLengthL()
@@ -19,7 +19,7 @@ public class PendulumTestModeTests
         var l = p.CalculationConstants![1];
 
         // Thread pendulum of length l: E = v^2/2 - (g/l)·cos(u)
-        double Energy() => (double)(p.State.V2 * p.State.V2) / 2 - (double)(g / l) * Math.Cos((double)p.State.U2);
+        double Energy() => (double)(p.State.V2 * p.State.V2) / 2 - (double)(g / l) * Math.Cos(p.State.U2);
 
         var e0 = Energy();
         for (var i = 0; i < 2000; i++)
@@ -38,14 +38,14 @@ public class PendulumTestModeTests
         var p = new CombinedPendulum { IsMainDS = true, StepWidth = 10 };
         p.SetDefaultUserData();
         var start = new NTuple(1);
-        start[0] = 0.7m; // length l, rest length L0 = 0.5
-        start[1] = 0.6m; // angle
+        start[0] = 0.7; // length l, rest length L0 = 0.5
+        start[1] = 0.6; // angle
         p.CalculationVariables = start;
         var omega = (double)p.GetAddParameterValue(p.AdditionalParameterValue);
 
         // Spring: E1 = v1^2/2 + Omega^2 (l - L0)^2 / 2; thread of length L0: E2 = v2^2/2 - (g/L0)·cos(Phi)
-        double SpringEnergy() => (double)(p.State.V1 * p.State.V1) / 2 + omega * omega * Math.Pow((double)(p.State.U1 - 0.5m), 2) / 2;
-        double ThreadEnergy() => (double)(p.State.V2 * p.State.V2) / 2 - (double)(g / 0.5m) * Math.Cos((double)p.State.U2);
+        double SpringEnergy() => (double)(p.State.V1 * p.State.V1) / 2 + omega * omega * Math.Pow((double)(p.State.U1 - 0.5), 2) / 2;
+        double ThreadEnergy() => (double)(p.State.V2 * p.State.V2) / 2 - (double)(g / 0.5) * Math.Cos(p.State.U2);
 
         var spring0 = SpringEnergy();
         var thread0 = ThreadEnergy();
@@ -64,6 +64,6 @@ public class PendulumTestModeTests
         Assert.True(threadDrift < 1e-8, $"thread relative drift {threadDrift:E2}");
 
         // The length really oscillates around L0 (in VB it was driven by sin(l) instead).
-        Assert.InRange(p.State.U1, 0.29m, 0.71m);
+        Assert.InRange(p.State.U1, 0.29, 0.71);
     }
 }

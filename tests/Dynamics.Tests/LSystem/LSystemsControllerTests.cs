@@ -109,7 +109,14 @@ public class LSystemsControllerTests
     {
         var form = new LSystemForm
         {
-            Name = "Test", Axiom = "F", ScaleFactor = "0.5", AngleLeft = "90", AngleRight = "90", StartLength = "12", X = "1", Y = "1",
+            Name = "Test",
+            Axiom = "F",
+            ScaleFactor = "0.5",
+            AngleLeft = "90",
+            AngleRight = "90",
+            StartLength = "12",
+            X = "1",
+            Y = "1",
         };
         var rules = new Dictionary<string, string> { ["F"] = "F+G" };
 

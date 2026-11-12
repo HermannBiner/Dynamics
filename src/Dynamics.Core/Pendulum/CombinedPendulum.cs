@@ -9,19 +9,19 @@ namespace Dynamics.Core.Pendulum;
 /// </summary>
 public class CombinedPendulum : PendulumBase
 {
-    private const decimal BobRadius = 0.02m;
+    private const double BobRadius = 0.02;
 
     /// <summary>Length of the unstressed spring (l0 in the documentation).</summary>
-    private const decimal L0 = 0.5m;
+    private const double L0 = 0.5;
 
     /// <summary>Minimal length of the spring.</summary>
-    private const decimal Lmin = 0.05m;
+    private const double Lmin = 0.05;
 
     private readonly GeneralParameter[] _valueParameter = new GeneralParameter[2];
     private MathPoint _origin = new(0, 0);
 
     /// <summary>Frequency of the spring pendulum alone (additional parameter).</summary>
-    private decimal Omega;
+    private double Omega;
 
     public CombinedPendulum()
     {
@@ -33,12 +33,12 @@ public class CombinedPendulum : PendulumBase
 
         AdditionalParameterValue = lowerLimitOmega + 5;
         MyAdditionalParameter = new GeneralParameter(AdditionalParameterValue, Text.Get("SpringPendulumFrequency"),
-            new Interval(lowerLimitOmega, (decimal)(lowerLimitOmega + 10)), GeneralParameter.ParameterType.DS);
+            new Interval(lowerLimitOmega, (lowerLimitOmega + 10)), GeneralParameter.ParameterType.DS);
 
         _valueParameter[0] = new GeneralParameter(1, "L", new Interval(Lmin, 2 - MyY0),
             GeneralParameter.ParameterType.Variable, L0);
-        _valueParameter[1] = new GeneralParameter(2, "Phi", new Interval(-(decimal)Math.PI, (decimal)Math.PI),
-            GeneralParameter.ParameterType.Variable, (decimal)(Math.PI / 6));
+        _valueParameter[1] = new GeneralParameter(2, "Phi", new Interval(-Math.PI, Math.PI),
+            GeneralParameter.ParameterType.Variable, (Math.PI / 6));
         MyValueParameterDefinition.AddRange(_valueParameter);
 
         // No constants; variables: L = [0], Phi = [1]
@@ -51,7 +51,7 @@ public class CombinedPendulum : PendulumBase
 
     public override IPendulum GetCopy() => new CombinedPendulum();
 
-    public override decimal GetAddParameterValue(int trackBarValue) => trackBarValue;
+    public override double GetAddParameterValue(int trackBarValue) => trackBarValue;
 
     public override IReadOnlyList<PendulumArm> GetArms() =>
         [new PendulumArm(_origin, Position1, BobRadius, DrawRole.PendulumColor)];
@@ -66,9 +66,9 @@ public class CombinedPendulum : PendulumBase
 
         for (var i = 0; i <= numberOfSteps; i++)
         {
-            var angle = MathHelperPendulum.AngleInMinusPiAndPi((decimal)(-Math.PI + i * 2 * Math.PI / numberOfSteps));
-            var r = L0 + (decimal)((double)g * Math.Cos((double)angle) / Math.Pow((double)Omega, 2));
-            points.Add(new MathPoint(r * (decimal)Math.Sin((double)angle), MyY0 - r * (decimal)Math.Cos((double)angle)));
+            var angle = MathHelperPendulum.AngleInMinusPiAndPi((-Math.PI + i * 2 * Math.PI / numberOfSteps));
+            var r = L0 + (g * Math.Cos((double)angle) / Math.Pow(Omega, 2));
+            points.Add(new MathPoint(r * Math.Sin((double)angle), MyY0 - r * Math.Cos((double)angle)));
         }
 
         return points;
@@ -81,8 +81,8 @@ public class CombinedPendulum : PendulumBase
 
     protected override void SetPosition()
     {
-        Position1.X = MyCalculationVariables[0] * (decimal)Math.Sin((double)MyCalculationVariables[1]);
-        Position1.Y = -MyCalculationVariables[0] * (decimal)Math.Cos((double)MyCalculationVariables[1]) + MyY0;
+        Position1.X = MyCalculationVariables[0] * Math.Sin((double)MyCalculationVariables[1]);
+        Position1.Y = -MyCalculationVariables[0] * Math.Cos((double)MyCalculationVariables[1]) + MyY0;
     }
 
     protected override void SetPhasePortraitParameters()
@@ -92,18 +92,18 @@ public class CombinedPendulum : PendulumBase
         {
             case PhasePortraitType.TorusOrCylinder:
                 MyLabelPhasePortrait = phasePortrait + ": l, Phi. Tangent: l', Phi'";
-                MyUInterval = new Interval(Lmin, 1m);
-                MyVInterval = new Interval((decimal)-Math.PI, (decimal)Math.PI);
+                MyUInterval = new Interval(Lmin, 1.0);
+                MyVInterval = new Interval(-Math.PI, Math.PI);
                 break;
             case PhasePortraitType.PoincareSection:
                 MyLabelPhasePortrait = phasePortrait + ": Phi = 0, l, l'";
-                MyUInterval = new Interval(Lmin, 2m);
-                MyVInterval = new Interval(-10m, 10m);
+                MyUInterval = new Interval(Lmin, 2.0);
+                MyVInterval = new Interval(-10.0, 10.0);
                 break;
             default:
                 MyLabelPhasePortrait = phasePortrait + ": Blue: l, l'. Red: Phi, Phi'";
-                MyUInterval = new Interval((decimal)-Math.PI, (decimal)Math.PI);
-                MyVInterval = new Interval(-10m, 10m);
+                MyUInterval = new Interval(-Math.PI, Math.PI);
+                MyVInterval = new Interval(-10.0, 10.0);
                 break;
         }
     }
@@ -111,7 +111,7 @@ public class CombinedPendulum : PendulumBase
     public override void SetAdditionalParameters()
     {
         Omega = GetAddParameterValue(AdditionalParameterValue);
-        MyY0 = (decimal)((double)g / Math.Pow((double)Omega, 2) / (double)(1 - L0));
+        MyY0 = (g / Math.Pow(Omega, 2) / (double)(1 - L0));
         _origin = new MathPoint(0, MyY0);
 
         if (IsMainDS)
@@ -125,8 +125,8 @@ public class CombinedPendulum : PendulumBase
 
     protected override void SetStartEnergyRange()
     {
-        var emin = -(decimal)Math.Pow((double)(g / Omega), 2) / 2;
-        var emax = (decimal)Math.Pow((double)(Omega * (1 - MyY0 - L0)), 2) / 2 + g * (L0 + 1 - MyY0);
+        var emin = -Math.Pow((double)(g / Omega), 2) / 2;
+        var emax = Math.Pow((double)(Omega * (1 - MyY0 - L0)), 2) / 2 + g * (L0 + 1 - MyY0);
         MyStartEnergyRange = new Interval(emin, emax);
     }
 
@@ -136,7 +136,7 @@ public class CombinedPendulum : PendulumBase
         var py = Math.Min(Math.Max(MathInterval.A * ShrinkFactor, position.Y), MathInterval.B * ShrinkFactor);
         py -= MyY0;
 
-        var l = Math.Min(_valueParameter[0].Range.B, (decimal)Math.Sqrt((double)(px * px + py * py)));
+        var l = Math.Min(_valueParameter[0].Range.B, Math.Sqrt((double)(px * px + py * py)));
         MyCalculationVariables[0] = l;
 
         var phi = MathHelperPendulum.AngleInMinusPiAndPi(MathHelperPendulum.GetAngle(px, py));
@@ -190,35 +190,35 @@ public class CombinedPendulum : PendulumBase
         SetPosition();
     }
 
-    public override decimal GetEnergy()
+    public override double GetEnergy()
     {
         // Norm m = 1. Kinetic: (v1^2 + l^2*v2^2)/2
-        var eKin = (decimal)(Math.Pow((double)v1, 2) + Math.Pow((double)(u1 * v2), 2)) / 2;
+        var eKin = (Math.Pow(v1, 2) + Math.Pow((double)(u1 * v2), 2)) / 2;
 
-        var ePot = g * (L0 - (decimal)((double)u1 * Math.Cos((double)u2)));
+        var ePot = g * (L0 - (u1 * Math.Cos(u2)));
 
         // Spring constant D = Omega^2 (m = 1)
-        var eSpring = (decimal)Math.Pow((double)(Omega * (u1 - L0)), 2) / 2;
+        var eSpring = Math.Pow((double)(Omega * (u1 - L0)), 2) / 2;
 
         return eKin + ePot + eSpring;
     }
 
     // Corrected: VB caught arithmetic errors, showed a message box and went on with a partial value.
     // Here an overflow propagates; the UI stops the iteration and shows a message.
-    protected override decimal G1(NTuple x)
+    protected override double G1(NTuple x)
     {
-        var temp = x[0] * (decimal)Math.Pow((double)x[3], 2);
-        temp += (decimal)(-Math.Pow((double)Omega, 2) * (double)(x[0] - L0) + (double)g * Math.Cos((double)x[2]));
+        var temp = x[0] * Math.Pow((double)x[3], 2);
+        temp += (-Math.Pow(Omega, 2) * (double)(x[0] - L0) + g * Math.Cos((double)x[2]));
         return temp;
     }
 
     // (-2*v2*v1 - g*sin(u2)) / u1, with u1 = l > 0
-    protected override decimal G2(NTuple x) =>
-        (-2 * x[3] * x[1] - g * (decimal)Math.Sin((double)x[2])) / x[0];
+    protected override double G2(NTuple x) =>
+        (-2 * x[3] * x[1] - g * Math.Sin((double)x[2])) / x[0];
 
     // Test mode: u1 = l oscillates as a simple spring pendulum around L0, u2 = Phi as a simple thread pendulum
     // of length L0. Corrected: VB applied the thread equation to l and the spring equation to Phi.
-    protected override decimal G1Test(NTuple x) => -(x[0] - L0) * (decimal)Math.Pow((double)Omega, 2);
+    protected override double G1Test(NTuple x) => -(x[0] - L0) * Math.Pow(Omega, 2);
 
-    protected override decimal G2Test(NTuple x) => -g * (decimal)Math.Sin((double)x[2]) / L0;
+    protected override double G2Test(NTuple x) => -g * Math.Sin((double)x[2]) / L0;
 }

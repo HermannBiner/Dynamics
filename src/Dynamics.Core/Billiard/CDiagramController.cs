@@ -4,7 +4,7 @@ using Dynamics.Core.General;
 namespace Dynamics.Core.Billiard;
 
 /// <summary>One column of the C-diagram: the parameter c and the iterated pairs (t, alfa).</summary>
-public sealed record CDiagramColumn(int P, decimal C, IReadOnlyList<DecValuePair> Pairs);
+public sealed record CDiagramColumn(int P, double C, IReadOnlyList<DecValuePair> Pairs);
 
 /// <summary>
 /// UI-free logic of FrmCDiagramBilliard: for every pixel column the table parameter c is set and Height + 1 pairs
@@ -197,7 +197,7 @@ public sealed class CDiagramController
     }
 
     /// <summary>The value drawn for a pair: t (parameter ID 1) or alfa.</summary>
-    public decimal DrawnValue(DecValuePair pair) => ValueParameter.ID == 1 ? pair.X : pair.Y;
+    public double DrawnValue(DecValuePair pair) => ValueParameter.ID == 1 ? pair.X : pair.Y;
 
     /// <summary>
     /// VB IterationLoop: c of column p, start pair (t = A + width / 3, alfa = A + position · width / 120),

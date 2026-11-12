@@ -12,7 +12,7 @@ namespace Dynamics.Core.Julia;
 public sealed class MandelbrotMapController
 {
     /// <summary>For the Mandelbrot map, the interval of c is a little bigger.</summary>
-    private static readonly Interval CRange = new(-1.9m, 1.9m);
+    private static readonly Interval CRange = new(-1.9, 1.9);
 
     private IEnumerator<(int P, int Q)>? _mandelbrotSpiral;
     private IEnumerator<(int P, int Q)>? _juliaSpiral;
@@ -49,8 +49,8 @@ public sealed class MandelbrotMapController
     /// <summary>VB: SetDefaultUserData, the parameters of the seahorse. Returns an error message or null.</summary>
     public string? SetDefaultUserData()
     {
-        A = 0.32m.ToString(CultureInfo.CurrentCulture);
-        B = 0.043m.ToString(CultureInfo.CurrentCulture);
+        A = 0.32.ToString(CultureInfo.CurrentCulture);
+        B = 0.043.ToString(CultureInfo.CurrentCulture);
         return StartJulia();
     }
 

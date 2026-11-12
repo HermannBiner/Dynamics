@@ -7,13 +7,13 @@ namespace Dynamics.Core.General;
 public static class MathHelperUnimodal
 {
     /// <summary>
-    /// Converts a dual string (positive dual number &lt; 1, digits only) to a decimal number.
+    /// Converts a dual string (positive dual number &lt; 1, digits only) to a double number.
     /// With isMidOfInterval the result is moved to the middle of the interval of the missing digits.
     /// </summary>
-    public static decimal DualStringToDecimalNumber(string dualString, bool isMidOfInterval = false)
+    public static double DualStringToDecimalNumber(string dualString, bool isMidOfInterval = false)
     {
-        decimal result = 0;
-        decimal factor = 1;
+        double result = 0;
+        double factor = 1;
 
         foreach (var digit in dualString)
         {
@@ -39,10 +39,10 @@ public static class MathHelperUnimodal
     }
 
     /// <summary>
-    /// Converts a decimal number to a dual string. At most numberOfDigits + 1 digits are produced
+    /// Converts a double number to a dual string. At most numberOfDigits + 1 digits are produced
     /// behind the point, because the dual number can be periodic.
     /// </summary>
-    public static string DecimalNumberToDualString(decimal decNumber, int numberOfDigits = 20)
+    public static string DecimalNumberToDualString(double decNumber, int numberOfDigits = 20)
     {
         var dualString = "";
         var leadingDigits = Math.Floor(decNumber);

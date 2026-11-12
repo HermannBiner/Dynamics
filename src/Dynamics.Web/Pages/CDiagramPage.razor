@@ -43,18 +43,18 @@
         <p class="caption">@Text.Get("ExaminatedParameterRange")</p>
         <div class="ranges">
             <label for="cmin">CMin</label>
-            <input id="cmin" inputmode="decimal" value="@_controller.CMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetCMin(Value(e))" />
+            <input id="cmin" inputmode="double" value="@_controller.CMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetCMin(Value(e))" />
             <label for="cmax">CMax</label>
-            <input id="cmax" inputmode="decimal" value="@_controller.CMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetCMax(Value(e))" />
+            <input id="cmax" inputmode="double" value="@_controller.CMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetCMax(Value(e))" />
             <span class="delta">@_controller.DeltaC</span>
         </div>
 
         <p class="caption">@Text.Get(_controller.ValueParameter.Name)</p>
         <div class="ranges">
             <label for="vmin">Min</label>
-            <input id="vmin" inputmode="decimal" value="@_controller.VMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetVMin(Value(e))" />
+            <input id="vmin" inputmode="double" value="@_controller.VMin" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetVMin(Value(e))" />
             <label for="vmax">Max</label>
-            <input id="vmax" inputmode="decimal" value="@_controller.VMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetVMax(Value(e))" />
+            <input id="vmax" inputmode="double" value="@_controller.VMax" disabled="@(!_controller.IsEditable)" @oninput="e => _controller.SetVMax(Value(e))" />
             <span class="delta">@_controller.DeltaV</span>
         </div>
 
@@ -89,7 +89,7 @@
 
     private readonly CDiagramController _controller = new(DiagramSize, DiagramSize);
     private readonly System.Diagnostics.Stopwatch _watch = new();
-    private readonly DrawBatch _overlay = new(new CoordinateTransform(DiagramSize, DiagramSize, new Interval(0m, 1m), new Interval(0m, 1m)));
+    private readonly DrawBatch _overlay = new(new CoordinateTransform(DiagramSize, DiagramSize, new Interval(0.0, 1.0), new Interval(0.0, 1.0)));
 
     private IJSObjectReference? _module;
     private DotNetObjectReference<CDiagramPage>? _selfReference;
@@ -180,7 +180,7 @@
             {
                 foreach (var pair in column.Pairs)
                 {
-                    diagram.Point(new MathPoint(column.C, _controller.DrawnValue(pair)), CanvasColor.Blue, 1);
+                    diagram.PointOnce(new MathPoint(column.C, _controller.DrawnValue(pair)), CanvasColor.Blue, 1);
                 }
             }
 

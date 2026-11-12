@@ -23,19 +23,19 @@ public class GeneralTests
     [Fact]
     public void IntervalRejectsWrongOrder()
     {
-        Assert.Throws<ArgumentException>(() => new Interval(2m, 1m));
+        Assert.Throws<ArgumentException>(() => new Interval(2.0, 1.0));
         Assert.Throws<ArgumentException>(() => new Interval(1.0, 1.0));
     }
 
     [Fact]
     public void IntervalContains()
     {
-        var interval = new Interval(-1m, 2m);
+        var interval = new Interval(-1.0, 2.0);
         Assert.True(interval.IsNumberInInterval(2));
-        Assert.True(interval.IsNumberInInterval(-0.5m));
+        Assert.True(interval.IsNumberInInterval(-0.5));
         Assert.False(interval.IsNumberInInterval(2.0001));
-        Assert.True(interval.IsInterval2PartOfInterval(new Interval(0m, 1m)));
-        Assert.Equal(3m, interval.IntervalWidth);
+        Assert.True(interval.IsInterval2PartOfInterval(new Interval(0.0, 1.0)));
+        Assert.Equal(3.0, interval.IntervalWidth);
     }
 
     [Fact]
@@ -68,6 +68,6 @@ public class GeneralTests
         var source = new MathPoint(1, 2, 3);
         var target = new MathPoint();
         ObjectCopy.CopyProperties(source, target);
-        Assert.Equal((1m, 2m, 3m), (target.X, target.Y, target.Z));
+        Assert.Equal((1.0, 2.0, 3.0), (target.X, target.Y, target.Z));
     }
 }

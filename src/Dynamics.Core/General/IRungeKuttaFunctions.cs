@@ -6,8 +6,8 @@ namespace Dynamics.Core.General;
 /// </summary>
 public interface IRungeKuttaFunctions
 {
-    decimal F1(NTuple x);
-    decimal F2(NTuple x);
-    decimal G1(NTuple x);
-    decimal G2(NTuple x);
+    double F1(NTuple x);
+    double F2(NTuple x);
+    double G1(NTuple x);
+    double G2(NTuple x);
 }

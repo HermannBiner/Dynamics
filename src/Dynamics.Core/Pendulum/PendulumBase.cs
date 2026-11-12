@@ -4,18 +4,18 @@ namespace Dynamics.Core.Pendulum;
 
 /// <summary>
 /// Parameters and Runge-Kutta frame common to all pendulums. Port of ClsPendulumAbstract.
-/// All arithmetic reproduces the VB mixed Decimal/Double evaluation exactly.
+/// VB mixed Decimal and Double; here everything is Double (step 6 of the port).
 /// </summary>
 public abstract class PendulumBase : IPendulum
 {
-    protected const decimal ShrinkFactor = 0.95m;
-    protected const decimal StepWidthUnit = 0.0005m;
+    protected const double ShrinkFactor = 0.95;
+    protected const double StepWidthUnit = 0.0005;
 
     /// <summary>Gravitational acceleration.</summary>
-    protected const decimal g = 9.81m;
+    protected const double g = 9.81;
 
     // The diagram is a square: MathInterval is used for X and Y.
-    protected readonly Interval MathInterval = new(-1m, 1m);
+    protected readonly Interval MathInterval = new(-1.0, 1.0);
     protected readonly Interval ShrinkedInterval;
 
     protected List<GeneralParameter> MyValueParameterDefinition = [];
@@ -31,9 +31,9 @@ public abstract class PendulumBase : IPendulum
     protected PhasePortraitType MyPhasePortraitType;
 
     /// <summary>Internal step width.</summary>
-    protected decimal d;
+    protected double d;
 
-    protected decimal MyY0;
+    protected double MyY0;
 
     // Positions of the pendulums
     protected readonly MathPoint Position1 = new();
@@ -42,10 +42,10 @@ public abstract class PendulumBase : IPendulum
     protected readonly MathPoint OldPosition2 = new();
 
     // Runge-Kutta state
-    protected decimal u1;
-    protected decimal v1;
-    protected decimal u2;
-    protected decimal v2;
+    protected double u1;
+    protected double v1;
+    protected double u2;
+    protected double v2;
 
     protected bool MyIsSignumChanged;
 
@@ -147,15 +147,15 @@ public abstract class PendulumBase : IPendulum
         set => d = value * StepWidthUnit;
     }
 
-    public decimal StepWidthValue => d;
+    public double StepWidthValue => d;
 
     public Interval? StartEnergyRange => MyStartEnergyRange;
 
-    public (decimal U1, decimal V1, decimal U2, decimal V2) State => (u1, v1, u2, v2);
+    public (double U1, double V1, double U2, double V2) State => (u1, v1, u2, v2);
 
     public bool IsSignumChanged => MyIsSignumChanged;
 
-    public decimal Y0 => MyY0;
+    public double Y0 => MyY0;
 
     public IterationStatus IterationStatus { get; protected set; }
 
@@ -195,12 +195,12 @@ public abstract class PendulumBase : IPendulum
 
     public abstract IReadOnlyList<PendulumArm> GetArms();
     public abstract (MathPoint From, MathPoint To) GetTrackSegment();
-    public abstract decimal GetAddParameterValue(int trackBarValue);
+    public abstract double GetAddParameterValue(int trackBarValue);
     public abstract void SetDefaultUserData();
     public abstract void SetAdditionalParameters();
     public abstract void SetStartparameter1(MathPoint position);
     public abstract void SetStartparameter2(MathPoint position);
-    public abstract decimal GetEnergy();
+    public abstract double GetEnergy();
     public abstract void IterationStep(bool isTestMode);
     public abstract IPendulum GetCopy();
 
@@ -217,12 +217,12 @@ public abstract class PendulumBase : IPendulum
     }
 
     // Right-hand sides of the differential equations; u1' = F1, v1' = G1, u2' = F2, v2' = G2.
-    protected virtual decimal F1(NTuple x) => x[1];
-    protected virtual decimal F2(NTuple x) => x[3];
-    protected abstract decimal G1(NTuple x);
-    protected abstract decimal G2(NTuple x);
-    protected abstract decimal G1Test(NTuple x);
-    protected abstract decimal G2Test(NTuple x);
+    protected virtual double F1(NTuple x) => x[1];
+    protected virtual double F2(NTuple x) => x[3];
+    protected abstract double G1(NTuple x);
+    protected abstract double G2(NTuple x);
+    protected abstract double G1Test(NTuple x);
+    protected abstract double G2Test(NTuple x);
 
     /// <summary>
     /// One classical Runge-Kutta step for (u1, v1, u2, v2), as in ClsDoublePendulum and ClsCombinedPendulum.
@@ -257,6 +257,7 @@ public abstract class PendulumBase : IPendulum
         v1 += d * (h1[0] + 2 * h1[1] + 2 * h1[2] + h1[3]) / 6;
         u2 += d * (k2[0] + 2 * k2[1] + 2 * k2[2] + k2[3]) / 6;
         v2 += d * (h2[0] + 2 * h2[1] + 2 * h2[2] + h2[3]) / 6;
+        NumericCheck.EnsureFinite(u1, v1, u2, v2);
     }
 
     private void Evaluate(int step, bool isTestMode)

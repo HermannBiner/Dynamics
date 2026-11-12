@@ -18,6 +18,17 @@ public class LSystemReferenceTests
 
     private static int Int(string s) => int.Parse(s, CultureInfo.InvariantCulture);
 
+    /// <summary>VB move line "C: x/y-> N: x/y" with N2: the numbers within the rounding to 2 decimals.</summary>
+    private static void AssertMoveLine(string expected, TurtleMove move)
+    {
+        var numbers = expected.Replace("C: ", "").Replace("-> N: ", "/").Split('/').Select(Dec).ToArray();
+        double[] actual = [move.From.X, move.From.Y, move.To.X, move.To.Y];
+        for (var i = 0; i < 4; i++)
+        {
+            Assert.True(Math.Abs(numbers[i] - actual[i]) <= 0.0051, $"{expected}: {MoveLine(move)}");
+        }
+    }
+
     private static string MoveLine(TurtleMove move) =>
         "C: " + move.From.X.ToString("N2", CultureInfo.InvariantCulture) + "/" + move.From.Y.ToString("N2", CultureInfo.InvariantCulture) +
         "-> N: " + move.To.X.ToString("N2", CultureInfo.InvariantCulture) + "/" + move.To.Y.ToString("N2", CultureInfo.InvariantCulture);
@@ -68,19 +79,19 @@ public class LSystemReferenceTests
             {
                 var expected = row.Skip(4 + 8 * t).Take(8).ToArray();
                 var state = controller.Turtles[t].State;
-                Assert.Equal(Dec(expected[0]), state.Position.X);
-                Assert.Equal(Dec(expected[1]), state.Position.Y);
+                Close(expected[0], state.Position.X);
+                Close(expected[1], state.Position.Y);
                 Assert.Equal(Int(expected[2]), state.Angle);
 
                 // VB read the step length before the scaling for the next generation
                 var stepLength = Dec(expected[3]);
-                Assert.Equal(system.Scaling == LSystemScaling.ByIteration ? stepLength * system.ScaleFactor : system.StartLength, state.StepLength);
+                Close(system.Scaling == LSystemScaling.ByIteration ? stepLength * system.ScaleFactor : system.StartLength, state.StepLength);
                 Assert.Equal(expected[4], LSystemColors.Colors[state.Color].Name);
                 Assert.Equal(Int(expected[5]), perTurtle);
                 if (perTurtle > 0)
                 {
-                    Assert.Equal(expected[6], MoveLine(moves[t * perTurtle]));
-                    Assert.Equal(expected[7], MoveLine(moves[(t + 1) * perTurtle - 1]));
+                    AssertMoveLine(expected[6], moves[t * perTurtle]);
+                    AssertMoveLine(expected[7], moves[(t + 1) * perTurtle - 1]);
                 }
             }
         }

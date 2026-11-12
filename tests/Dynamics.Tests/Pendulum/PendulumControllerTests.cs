@@ -21,8 +21,8 @@ public class PendulumControllerTests
         controller.SelectPendulum(IndexOf(controller, typeof(DoublePendulum)));
         var values = controller.GetStartParameterValues();
         Assert.Equal(4, values.Count);
-        Assert.Equal(0.7m, values[0]);
-        Assert.Equal(0.2m, values[1]);
+        Assert.Equal(0.7, values[0]);
+        Assert.Equal(0.2, values[1]);
 
         controller.SelectPendulum(IndexOf(controller, typeof(CombinedPendulum)));
         Assert.Equal(2, controller.GetStartParameterValues().Count);
@@ -37,7 +37,7 @@ public class PendulumControllerTests
         Assert.False(controller.TakeOverStartParameter(["0.7", "5", "0.5", "0.5"]));
         Assert.False(controller.TakeOverStartParameter(["0.7", "abc", "0.5", "0.5"]));
         Assert.True(controller.TakeOverStartParameter(["0.6", "0.3", "1.5", "-0.5"]));
-        Assert.Equal([0.6m, 0.3m, 1.5m, -0.5m], controller.GetStartParameterValues());
+        Assert.Equal([0.6, 0.3, 1.5, -0.5], controller.GetStartParameterValues());
         Assert.True(controller.MainDS.IsStartparameter2Set);
     }
 
@@ -50,7 +50,7 @@ public class PendulumControllerTests
 
         var shadow = Assert.IsType<DoublePendulum>(controller.ShadowDS);
         Assert.False(shadow.IsMainDS);
-        Assert.Equal(controller.MainDS.CalculationVariables[0] + 0.005m, shadow.CalculationVariables[0]);
+        Assert.Equal(controller.MainDS.CalculationVariables[0] + 0.005, shadow.CalculationVariables[0]);
         Assert.Equal(controller.MainDS.CalculationConstants![1], shadow.CalculationConstants![1]);
 
         controller.ResetIteration();
@@ -85,12 +85,12 @@ public class PendulumControllerTests
         var controller = new PendulumController();
         controller.SelectPendulum(IndexOf(controller, typeof(DoublePendulum)));
 
-        Assert.True(controller.MouseDown(new MathPoint(0.5m, -0.5m)));
+        Assert.True(controller.MouseDown(new MathPoint(0.5, -0.5)));
         controller.MouseUp();
         Assert.True(controller.MainDS.IsStartparameter1Set);
         var l1 = controller.GetStartParameterValues()[0];
 
-        Assert.True(controller.MouseDown(new MathPoint(0.6m, -0.8m)));
+        Assert.True(controller.MouseDown(new MathPoint(0.6, -0.8)));
         controller.MouseUp();
         Assert.Equal(l1, controller.GetStartParameterValues()[0]);
         Assert.False(controller.MainDS.IsStartparameter2Set);
@@ -102,17 +102,17 @@ public class PendulumControllerTests
     [Fact]
     public void CoordinateTransformMatchesVBAndRoundTrips()
     {
-        var transform = new CoordinateTransform(600, 600, new Interval(-1m, 1m), new Interval(-1m, 1m));
+        var transform = new CoordinateTransform(600, 600, new Interval(-1.0, 1.0), new Interval(-1.0, 1.0));
 
         // VB: A + (x - 1) * width / (size - 1)
         var point = transform.PixelToMathPoint(300, 300);
-        Assert.Equal(-1m + 299m * 2m / 599m, point.X);
-        Assert.Equal(1m - 299m * 2m / 599m, point.Y);
+        Assert.Equal(-1.0 + 299.0 * 2.0 / 599.0, point.X);
+        Assert.Equal(1.0 - 299.0 * 2.0 / 599.0, point.Y);
 
         var (x, y) = transform.MathToPixel(point);
         Assert.Equal(300, x, 9);
         Assert.Equal(300, y, 9);
-        Assert.False(transform.IsInside(new MathPoint(1.1m, 0)));
+        Assert.False(transform.IsInside(new MathPoint(1.1, 0)));
     }
 
     private static int IndexOf(PendulumController controller, Type type) =>

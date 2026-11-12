@@ -34,9 +34,9 @@
             <label for="ca">@Text.Get("StartPoint")</label>
             <div class="complex-input">
                 <span></span>
-                <input id="ca" inputmode="decimal" value="@_controller.A" @oninput="e => _controller.A = Value(e)" />
+                <input id="ca" inputmode="double" value="@_controller.A" @oninput="e => _controller.A = Value(e)" />
                 <label for="cb">+ i</label>
-                <input id="cb" inputmode="decimal" value="@_controller.B" @oninput="e => _controller.B = Value(e)" />
+                <input id="cb" inputmode="double" value="@_controller.B" @oninput="e => _controller.B = Value(e)" />
             </div>
         </div>
 
@@ -96,8 +96,8 @@
     {
         var d = _diagram;
         d.Clear();
-        d.Line(new MathPoint(0, -1.5m), new MathPoint(0, 1.5m), CanvasColor.Black, 1);
-        d.Line(new MathPoint(-1.5m, 0), new MathPoint(1.5m, 0), CanvasColor.Black, 1);
+        d.Line(new MathPoint(0, -1.5), new MathPoint(0, 1.5), CanvasColor.Black, 1);
+        d.Line(new MathPoint(-1.5, 0), new MathPoint(1.5, 0), CanvasColor.Black, 1);
 
         for (var i = 0; i < _controller.UnitRoots.Count; i++)
         {
@@ -108,7 +108,7 @@
         if (_controller.N == 2)
         {
             // Separated by the y-axis
-            d.Line(new MathPoint(0, -1.5m), new MathPoint(0, 1.5m), CanvasColor.Magenta, 1);
+            d.Line(new MathPoint(0, -1.5), new MathPoint(0, 1.5), CanvasColor.Magenta, 1);
         }
         else
         {
@@ -116,7 +116,7 @@
             var bp = new ComplexNumber(-1.5, 0);
             for (var k = 0; k < 3; k++)
             {
-                d.Line(zero, new MathPoint((decimal)bp.X, (decimal)bp.Y), CanvasColor.Magenta, 1);
+                d.Line(zero, new MathPoint(bp.X, bp.Y), CanvasColor.Magenta, 1);
                 bp = bp.Rotate(2 * Math.PI / 3);
             }
         }

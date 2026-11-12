@@ -3,7 +3,7 @@ using Dynamics.Core.General;
 namespace Dynamics.Core.GrowthModel;
 
 /// <summary>One column of the Feigenbaum diagram: parameter a and the drawn values (index k = 0 .. 4 · height).</summary>
-public sealed record FeigenbaumColumn(int P, decimal ParameterValue, IReadOnlyList<decimal> Values);
+public sealed record FeigenbaumColumn(int P, double ParameterValue, IReadOnlyList<double> Values);
 
 /// <summary>
 /// UI-free logic of FrmFeigenbaum. Port of ClsFeigenbaumController: for every pixel column p the parameter a is set,
@@ -188,7 +188,7 @@ public sealed class FeigenbaumController : GrowthControllerBase
             x = DS.FN(x);
         }
 
-        var values = new decimal[LengthOfCycle + 1];
+        var values = new double[LengthOfCycle + 1];
         for (var k = 0; k <= LengthOfCycle; k++)
         {
             values[k] = x;
@@ -202,14 +202,14 @@ public sealed class FeigenbaumController : GrowthControllerBase
     /// The point VB drew for value k: the first one as it is (outside the picture it is not drawn),
     /// the following ones clamped to the value range.
     /// </summary>
-    public decimal DrawnValue(int k, decimal value) =>
+    public double DrawnValue(int k, double value) =>
         k == 0 ? value : Math.Max(ActualValueRange.A, Math.Min(value, ActualValueRange.B));
 
     /// <summary>VB: SetColor(n) with n = RunTimeUntilCycle + k: blue for even n, green for odd n if colored.</summary>
     public bool IsGreen(int k) => IsColored && (RunTimeUntilCycle + k) % 2 == 1;
 
     /// <summary>VB: DrawSplitPoints; green lines, the last one (limit of the period doubling) red.</summary>
-    public IEnumerable<(decimal Value, bool IsLast)> SplitLines()
+    public IEnumerable<(double Value, bool IsLast)> SplitLines()
     {
         var splitpoints = DS.Splitpoints;
         for (var i = 0; i < splitpoints.Count; i++)

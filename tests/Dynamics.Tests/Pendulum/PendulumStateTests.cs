@@ -52,7 +52,7 @@ public class PendulumStateTests
         torus.IterationStep(false);
         Assert.Single(torus.GetPhasePortraitPoints());
         Assert.NotNull(torus.GetPhasePortraitTangent());
-        Assert.Equal(-1m, torus.UInterval.A);
+        Assert.Equal(-1.0, torus.UInterval.A);
     }
 
     [Fact]

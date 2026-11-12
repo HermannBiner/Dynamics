@@ -49,7 +49,7 @@
 
         <div class="field">
             <label for="parameter">@Text.Get("Parameter") a</label>
-            <input id="parameter" inputmode="decimal" value="@_controller.Parameter" disabled="@(!_controller.IsEditable)"
+            <input id="parameter" inputmode="double" value="@_controller.Parameter" disabled="@(!_controller.IsEditable)"
                    @onchange="e => _controller.Parameter = Value(e)" />
         </div>
 
@@ -57,11 +57,11 @@
         <div class="field-row">
             <div class="field grow">
                 <label for="x">x</label>
-                <input id="x" inputmode="decimal" value="@_controller.X" disabled="@(!_controller.IsEditable)" @onchange="e => _controller.X = Value(e)" />
+                <input id="x" inputmode="double" value="@_controller.X" disabled="@(!_controller.IsEditable)" @onchange="e => _controller.X = Value(e)" />
             </div>
             <div class="field grow">
                 <label for="y">y</label>
-                <input id="y" inputmode="decimal" value="@_controller.Y" disabled="@(!_controller.IsEditable)" @onchange="e => _controller.Y = Value(e)" />
+                <input id="y" inputmode="double" value="@_controller.Y" disabled="@(!_controller.IsEditable)" @onchange="e => _controller.Y = Value(e)" />
             </div>
         </div>
 

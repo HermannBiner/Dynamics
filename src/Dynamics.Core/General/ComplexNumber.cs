@@ -38,9 +38,9 @@ public class ComplexNumber
 
         var nominator = new ComplexNumber(c.X * X + c.Y * Y, c.X * Y - c.Y * X);
 
-        // VB-compatible: the divisor is converted to Decimal and 1 / divisor is a Decimal division.
-        var divisor = (decimal)Math.Pow(c.AbsoluteValue, 2);
-        return nominator.Stretch((double)(1m / divisor));
+        // VB converted the divisor to Decimal and divided in Decimal; Dynamics computes in Double throughout
+        var divisor = Math.Pow(c.AbsoluteValue, 2);
+        return nominator.Stretch(1.0 / divisor);
     }
 
     /// <summary>Rotates by the angle phi.</summary>

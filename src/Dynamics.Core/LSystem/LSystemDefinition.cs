@@ -33,7 +33,7 @@ public sealed class LSystemDefinition
     public string Name { get; set; } = "";
     public LSystemType Type { get; set; }
     public string Axiom { get; set; } = "";
-    public decimal ScaleFactor { get; set; }
+    public double ScaleFactor { get; set; }
 
     /// <summary>Angles in degrees.</summary>
     public int AngleLeft { get; set; }
@@ -51,10 +51,10 @@ public sealed class LSystemDefinition
     /// <summary>Before a branch ends with "]", a bud is drawn.</summary>
     public bool IsBudding { get; set; }
 
-    public decimal StartLength { get; set; }
+    public double StartLength { get; set; }
     public LSystemScaling Scaling { get; set; }
-    public decimal StartPositionX { get; set; }
-    public decimal StartPositionY { get; set; }
+    public double StartPositionX { get; set; }
+    public double StartPositionY { get; set; }
     public Dictionary<string, string> Rules { get; set; } = [];
 
     public LSystemDefinition Clone()

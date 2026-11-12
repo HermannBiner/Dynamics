@@ -58,11 +58,11 @@
             <legend>@Text.Get("StartPointCoordinates")</legend>
             <div class="parameters">
                 <label for="sx">X</label>
-                <input id="sx" inputmode="decimal" value="@_controller.X" disabled="@(!_controller.IsStartPointEditable)" @oninput="e => _controller.X = Value(e)" />
+                <input id="sx" inputmode="double" value="@_controller.X" disabled="@(!_controller.IsStartPointEditable)" @oninput="e => _controller.X = Value(e)" />
                 <label for="sy">Y</label>
-                <input id="sy" inputmode="decimal" value="@_controller.Y" disabled="@(!_controller.IsStartPointEditable)" @oninput="e => _controller.Y = Value(e)" />
+                <input id="sy" inputmode="double" value="@_controller.Y" disabled="@(!_controller.IsStartPointEditable)" @oninput="e => _controller.Y = Value(e)" />
                 <label for="sz">Z</label>
-                <input id="sz" inputmode="decimal" value="@_controller.Z" disabled="@(!_controller.IsStartPointEditable)" @oninput="e => _controller.Z = Value(e)" />
+                <input id="sz" inputmode="double" value="@_controller.Z" disabled="@(!_controller.IsStartPointEditable)" @oninput="e => _controller.Z = Value(e)" />
             </div>
             <button type="button" disabled="@(!_controller.CanTakeOver)" @onclick="TakeOverAsync">@Text.Get("TakeOverPointSet")</button>
         </fieldset>

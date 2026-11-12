@@ -7,8 +7,8 @@ public class JuliaPN : JuliaBase
 {
     public JuliaPN()
     {
-        MyXValueParameter = new GeneralParameter(1, "x-Values", new Interval(-1.5m, 1.5m), GeneralParameter.ParameterType.Variable, 0.32m);
-        MyYValueParameter = new GeneralParameter(1, "y-Values", new Interval(-1.5m, 1.5m), GeneralParameter.ParameterType.Variable, 0.043m);
+        MyXValueParameter = new GeneralParameter(1, "x-Values", new Interval(-1.5, 1.5), GeneralParameter.ParameterType.Variable, 0.32);
+        MyYValueParameter = new GeneralParameter(1, "y-Values", new Interval(-1.5, 1.5), GeneralParameter.ParameterType.Variable, 0.043);
         SetActualRanges(MyXValueParameter.Range, MyYValueParameter.Range);
     }
 
@@ -21,7 +21,7 @@ public class JuliaPN : JuliaBase
         var (x, y) = PixelToComplex(pixelX, pixelY);
 
         // VB: Radius is a Decimal, the comparison with the Double |z| is in Double.
-        var radius = (double)(decimal)Math.Max(MyC.AbsoluteValue, MinimalRadius);
+        var radius = (double)Math.Max(MyC.AbsoluteValue, MinimalRadius);
 
         var steps = Iterate(x, y, MyC.X, MyC.Y, radius);
 

@@ -32,7 +32,7 @@ public class UniverseControllerTests
 
         // proposed step width 0.05 → track bar 27 → 0.05
         Assert.Equal(27, controller.StepWidthTrackBar);
-        Assert.Equal(0.05m, controller.StepWidth);
+        Assert.Equal(0.05, controller.StepWidth);
 
         Assert.Null(controller.Start());
         UniverseStep? step = null;
@@ -66,7 +66,7 @@ public class UniverseControllerTests
         controller.MouseUp();
 
         controller.SetMassFromTrackBar(10);
-        Assert.Equal(star.OriginalMass * 1.2m, star.UserMass);
+        Assert.Equal(star.OriginalMass * 1.2, star.UserMass);
         controller.SetVelocityFromTrackBar(0);
         Assert.Equal(star.OriginalStartVelocity.X, star.UserStartVelocity.X);
 
@@ -93,10 +93,10 @@ public class UniverseControllerTests
         var universe = new NewtonUniverse();
 
         // 1.2 is not on the scale: CInt(55.4) = 55 → 1 (VB, the planet system runs with step width 1)
-        Assert.Equal(55, universe.StepWidthToTrbValue(1.2m));
-        Assert.Equal(1m, universe.TrbValueToStepWidth(55));
-        Assert.Equal(0.001m, universe.TrbValueToStepWidth(1));
-        Assert.Equal(9.5m, universe.TrbValueToStepWidth(72));
+        Assert.Equal(55, universe.StepWidthToTrbValue(1.2));
+        Assert.Equal(1.0, universe.TrbValueToStepWidth(55));
+        Assert.Equal(0.001, universe.TrbValueToStepWidth(1));
+        Assert.Equal(9.5, universe.TrbValueToStepWidth(72));
     }
 
     [Fact]

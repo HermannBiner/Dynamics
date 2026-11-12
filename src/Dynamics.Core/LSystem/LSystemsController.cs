@@ -362,7 +362,7 @@ public sealed class LSystemsController
         return [];
     }
 
-    private static decimal Parse(string text) => UserDataCheck.TryParse(text, out var value) ? value : 0;
+    private static double Parse(string text) => UserDataCheck.TryParse(text, out var value) ? value : 0;
 
     /// <summary>VB: Cancel. Corrected: the selected system is shown again (VB kept a new, empty system as actual system).</summary>
     public void Cancel()

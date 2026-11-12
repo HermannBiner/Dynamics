@@ -19,7 +19,7 @@ public class BilliardControllerTests
         var controller = new BilliardTableController();
         Assert.Equal([typeof(EllipseBilliardTable), typeof(OvalBilliardTable), typeof(StadiumBilliardTable)], controller.TableTypes);
         Assert.IsType<EllipseBilliardTable>(controller.DS);
-        Assert.Equal(0.8m, controller.DS.C);
+        Assert.Equal(0.8, controller.DS.C);
         Assert.Equal("0.8", controller.ParameterText);
         Assert.Equal((50, 200), (controller.ParameterTrackBarMinimum, controller.ParameterTrackBarMaximum));
 
@@ -59,7 +59,7 @@ public class BilliardControllerTests
         Assert.Equal(1, controller.Steps);
 
         // The orbit is the one of the model
-        var ball = new EllipseBilliardTable { C = 0.8m }.GetBilliardBall();
+        var ball = new EllipseBilliardTable { C = 0.8 }.GetBilliardBall();
         ball.Speed = 10;
         ball.Startparameter = 0;
         ball.Startangle = 1;
@@ -105,19 +105,19 @@ public class BilliardControllerTests
     public void MouseSetsStartAndDirection()
     {
         var controller = new BilliardTableController();
-        Assert.False(controller.MouseDown(new MathPoint(0, 0.5m)));
+        Assert.False(controller.MouseDown(new MathPoint(0, 0.5)));
         Assert.Null(controller.CreateNewBall());
         Assert.True(controller.CanSetWithMouse);
 
         // start: on the ellipse in the direction of the mouse
-        Assert.True(controller.MouseDown(new MathPoint(0, 0.5m)));
-        Assert.True(controller.MouseUp(new MathPoint(0, 0.5m)));
-        Assert.Equal((decimal)(Math.PI / 2), Dec(controller.TText), 10);
+        Assert.True(controller.MouseDown(new MathPoint(0, 0.5)));
+        Assert.True(controller.MouseUp(new MathPoint(0, 0.5)));
+        Assert.Equal((Math.PI / 2), Dec(controller.TText), 10);
         Assert.Empty(controller.DS.BilliardBallCollection);
 
         // direction: then the ball is on the table
-        Assert.True(controller.MouseDown(new MathPoint(0.5m, 0)));
-        Assert.True(controller.MouseUp(new MathPoint(0.5m, 0)));
+        Assert.True(controller.MouseDown(new MathPoint(0.5, 0)));
+        Assert.True(controller.MouseUp(new MathPoint(0.5, 0)));
         Assert.Single(controller.DS.BilliardBallCollection);
         Assert.False(controller.CanSetWithMouse);
     }
@@ -127,8 +127,8 @@ public class BilliardControllerTests
     {
         var controller = new BilliardTableController();
         controller.SetParameterFromTrackBar(150);
-        Assert.Equal(1.5m, controller.DS.C);
-        Assert.Equal(0.66m, controller.DS.A);
+        Assert.Equal(1.5, controller.DS.C);
+        Assert.Equal(0.66, controller.DS.A);
 
         controller.ParameterText = "3";
         Assert.NotNull(controller.TakeOverParameterText());

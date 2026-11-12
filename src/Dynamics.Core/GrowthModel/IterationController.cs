@@ -22,12 +22,12 @@ public sealed record IterationDrawing(bool ClearPicture, IReadOnlyList<Segment> 
 public sealed class IterationController : GrowthControllerBase
 {
     public const int XStretchingDefault = 2;
-    public const decimal TargetValuePrecision = 0.001m;
+    public const double TargetValuePrecision = 0.001;
 
     private readonly List<string> _valueList = [];
     private readonly List<string> _protocol = [];
-    private decimal _x;
-    private decimal _targetValue;
+    private double _x;
+    private double _targetValue;
     private bool _hasTarget;
     private int _signProtocol;
 
@@ -150,7 +150,7 @@ public sealed class IterationController : GrowthControllerBase
     {
         var range = DS.ValueParameter.Range;
         var lines = new List<Segment>();
-        if (range.IsNumberInInterval(0m))
+        if (range.IsNumberInInterval(0.0))
         {
             lines.Add(new Segment(new MathPoint(range.A, 0), new MathPoint(range.B, 0)));
             lines.Add(new Segment(new MathPoint(0, range.A), new MathPoint(0, range.B)));
@@ -292,7 +292,7 @@ public sealed class IterationController : GrowthControllerBase
     private static MathPoint Copy(MathPoint point) => new(point.X, point.Y);
 
     /// <summary>VB: UpdateListboxes; protocol 0 left of the middle of the value range, 1 otherwise.</summary>
-    private void UpdateLists(decimal u)
+    private void UpdateLists(double u)
     {
         var range = DS.ValueParameter.Range;
         _valueList.Add(Format(u));
@@ -349,12 +349,12 @@ public sealed class IterationController : GrowthControllerBase
     }
 
     /// <summary>VB: IsUserDataOK (parameter, start value, target value, stretching in [1, 10]).</summary>
-    private string? CheckUserData(out decimal a, out decimal x, out decimal target, out decimal stretching)
+    private string? CheckUserData(out double a, out double x, out double target, out double stretching)
     {
         var errorA = UserDataCheck.CheckValue(ParameterA, DS.DSParameter.Range, out a);
         var errorX = UserDataCheck.CheckValue(StartValue, DS.ValueParameter.Range, out x);
         var errorT = UserDataCheck.CheckValue(TargetValue, DS.ValueParameter.Range, out target);
-        var errorS = UserDataCheck.CheckValue(XStretching, new Interval(1m, 10m), out stretching);
+        var errorS = UserDataCheck.CheckValue(XStretching, new Interval(1.0, 10.0), out stretching);
         return Join(errorA, errorX, errorT, errorS);
     }
 }

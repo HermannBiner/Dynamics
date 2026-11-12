@@ -19,7 +19,7 @@ public class LinearMapTests
     [InlineData(10.5, 0.01)]
     public void ComplexCaseIsARotationWithStretching(double rho, double h)
     {
-        var linear = new Linear { DSParameterValue = (decimal)rho, StepWidth = (decimal)h };
+        var linear = new Linear { DSParameterValue = rho, StepWidth = h };
         linear.SetIterationParameters();
         linear.ActualMathPoint = new MathPoint(3, 1, 10);
 
@@ -43,10 +43,10 @@ public class LinearMapTests
     public void RealCaseIsUnchanged()
     {
         // ρ ≤ 10: Beta = 0, the corrected and the VB map are the same (also compared with VB)
-        var linear = new Linear { DSParameterValue = 4, StepWidth = 0.005m, ActualMathPoint = new MathPoint(2, 3, 1) };
+        var linear = new Linear { DSParameterValue = 4, StepWidth = 0.005, ActualMathPoint = new MathPoint(2, 3, 1) };
         linear.SetIterationParameters();
         linear.IterationStep();
-        Assert.Equal(new[] { 2 * 0.993m, 3 * 0.997m, 0.989m },
+        Assert.Equal(new[] { 2 * 0.993, 3 * 0.997, 0.989 },
             new[] { linear.ActualMathPoint.X, linear.ActualMathPoint.Y, linear.ActualMathPoint.Z });
     }
 
@@ -57,14 +57,14 @@ public class LinearMapTests
         var controller = new BifurcationController(580, 580);
         controller.SelectSystem(0);
         Assert.IsType<Linear>(controller.DS);
-        Assert.Equal(0.005m, controller.DS.StepWidth);
+        Assert.Equal(0.005, controller.DS.StepWidth);
         Assert.Null(controller.Start());
 
         var column = controller.NextColumn()!;
         Assert.All(column.Cycles, c => Assert.Contains(c.Values, v => v != 0));
 
         // The values are the iterates of the linear map with the parameter of the column
-        var linear = new Linear { DSParameterValue = column.ParameterValue, ActualMathPoint = new MathPoint(0.1m, 0.1m, 0.1m) };
+        var linear = new Linear { DSParameterValue = column.ParameterValue, ActualMathPoint = new MathPoint(0.1, 0.1, 0.1) };
         linear.SetIterationParameters();
         for (var n = 1; n < BifurcationController.RunTimeUntilCycle; n++)
         {

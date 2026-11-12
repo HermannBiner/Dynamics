@@ -17,8 +17,8 @@ public enum EnergyState
 /// </summary>
 public class PendulumController
 {
-    private const decimal EnergyTolerance = 0.01m;
-    private const decimal DeltaShadowDS = 0.005m;
+    private const double EnergyTolerance = 0.01;
+    private const double DeltaShadowDS = 0.005;
 
     /// <summary>Default of the step-width track bar (1..20).</summary>
     public const int DefaultStepWidth = 10;
@@ -45,7 +45,7 @@ public class PendulumController
     /// <summary>Number of steps.</summary>
     public int N { get; private set; }
 
-    public decimal StartEnergy { get; private set; }
+    public double StartEnergy { get; private set; }
 
     public int StepWidth { get; private set; } = DefaultStepWidth;
 
@@ -131,9 +131,9 @@ public class PendulumController
     }
 
     /// <summary>Start parameters P1..Pn: constants first, then variables (VB: TxtP1..TxtP6).</summary>
-    public IReadOnlyList<decimal> GetStartParameterValues()
+    public IReadOnlyList<double> GetStartParameterValues()
     {
-        var values = new List<decimal>();
+        var values = new List<double>();
         if (MainDS.CalculationConstants is { } constants)
         {
             for (var i = 0; i <= constants.Dimension; i++)
@@ -152,17 +152,17 @@ public class PendulumController
     }
 
     /// <summary>Parses a parameter text (current culture or invariant) and checks its range (VB: ClsCheckUserData).</summary>
-    public bool TryParseParameter(int index, string text, out decimal value)
+    public bool TryParseParameter(int index, string text, out double value)
     {
-        var ok = decimal.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out value) ||
-                 decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+        var ok = double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out value) ||
+                 double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
         return ok && MainDS.ValueParameterDefinition[index].Range.IsNumberInInterval(value);
     }
 
     /// <summary>VB: TakeOverStartParameter. Returns false if a value is invalid (nothing is changed then).</summary>
     public bool TakeOverStartParameter(IReadOnlyList<string> texts)
     {
-        var values = new decimal[MainDS.ValueParameterDefinition.Count];
+        var values = new double[MainDS.ValueParameterDefinition.Count];
         for (var i = 0; i < values.Length; i++)
         {
             if (i >= texts.Count || !TryParseParameter(i, texts[i], out values[i]))

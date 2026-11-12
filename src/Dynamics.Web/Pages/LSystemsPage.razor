@@ -68,11 +68,11 @@
             <div class="field-row">
                 <div class="field grow">
                     <label for="scalefactor">@Text.Get("ScaleFactor")</label>
-                    <input id="scalefactor" inputmode="decimal" value="@Form.ScaleFactor" @onchange="e => Form.ScaleFactor = Value(e)" />
+                    <input id="scalefactor" inputmode="double" value="@Form.ScaleFactor" @onchange="e => Form.ScaleFactor = Value(e)" />
                 </div>
                 <div class="field grow">
                     <label for="startlength">@Text.Get("StartLength")</label>
-                    <input id="startlength" inputmode="decimal" value="@Form.StartLength" @onchange="e => Form.StartLength = Value(e)" />
+                    <input id="startlength" inputmode="double" value="@Form.StartLength" @onchange="e => Form.StartLength = Value(e)" />
                 </div>
             </div>
             <div class="field">
@@ -117,10 +117,10 @@
             <p class="caption">@Text.Get("StartPosition") (X/Y) in [0,13] x [0,13]</p>
             <div class="field-row">
                 <div class="field grow">
-                    <input aria-label="X" inputmode="decimal" value="@Form.X" @onchange="e => Form.X = Value(e)" />
+                    <input aria-label="X" inputmode="double" value="@Form.X" @onchange="e => Form.X = Value(e)" />
                 </div>
                 <div class="field grow">
-                    <input aria-label="Y" inputmode="decimal" value="@Form.Y" @onchange="e => Form.Y = Value(e)" />
+                    <input aria-label="Y" inputmode="double" value="@Form.Y" @onchange="e => Form.Y = Value(e)" />
                 </div>
             </div>
         </fieldset>
@@ -205,7 +205,7 @@
 
     private static string Value(ChangeEventArgs e) => e.Value?.ToString() ?? "";
 
-    private static string N2(decimal value) => value.ToString("N2", CultureInfo.CurrentCulture);
+    private static string N2(double value) => value.ToString("N2", CultureInfo.CurrentCulture);
 
     private static string Css(int argb) => $"rgb({(argb >> 16) & 255},{(argb >> 8) & 255},{argb & 255})";
 

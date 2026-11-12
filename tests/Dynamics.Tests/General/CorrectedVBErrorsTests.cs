@@ -11,22 +11,22 @@ public class CorrectedVBErrorsTests
         var e1 = new Vector(1, 0, 0);
         var e2 = new Vector(0, 1, 0);
         var e3 = e1.Cross(e2);
-        Assert.Equal((0m, 0m, 1m), (e3.X, e3.Y, e3.Z));
+        Assert.Equal((0.0, 0.0, 1.0), (e3.X, e3.Y, e3.Z));
 
         var e1Again = e2.Cross(e3);
-        Assert.Equal((1m, 0m, 0m), (e1Again.X, e1Again.Y, e1Again.Z));
+        Assert.Equal((1.0, 0.0, 0.0), (e1Again.X, e1Again.Y, e1Again.Z));
     }
 
     [Fact]
     public void CrossProductIsOrthogonalAndAnticommutative()
     {
-        var v = new Vector(1.5m, -2m, 0.25m);
-        var w = new Vector(-0.5m, 3m, 4m);
+        var v = new Vector(1.5, -2.0, 0.25);
+        var w = new Vector(-0.5, 3.0, 4.0);
         var c = v.Cross(w);
         var d = w.Cross(v);
 
-        Assert.Equal(0m, c.Scalar(v));
-        Assert.Equal(0m, c.Scalar(w));
+        Assert.Equal(0.0, c.Scalar(v));
+        Assert.Equal(0.0, c.Scalar(w));
         Assert.Equal((-c.X, -c.Y, -c.Z), (d.X, d.Y, d.Z));
     }
 
@@ -34,23 +34,23 @@ public class CorrectedVBErrorsTests
     public void TurnInXYPlaneRotates()
     {
         var v = new Vector(1, 0, 7);
-        v.TurnInXYPlane((decimal)(Math.PI / 2));
+        v.TurnInXYPlane((Math.PI / 2));
         Assert.Equal(0, (double)v.X, 12);
         Assert.Equal(1, (double)v.Y, 12);
-        Assert.Equal(7m, v.Z);
+        Assert.Equal(7.0, v.Z);
 
         // The length in the plane is preserved.
-        var w = new Vector(0.6m, 0.8m, 0);
-        w.TurnInXYPlane(1.234m);
+        var w = new Vector(0.6, 0.8, 0);
+        w.TurnInXYPlane(1.234);
         Assert.Equal(1, (double)w.Abs(), 12);
     }
 
     [Fact]
-    public void IntervalCopyKeepsDoubleBorders()
+    public void IntervalCopyKeepsBorders()
     {
-        var copy = new Interval(new Interval(-1.5m, 2.5m));
-        Assert.Equal((-1.5, 2.5), (copy.DblA, copy.DblB));
-        Assert.Equal(4.0, copy.DblIntervalWidth);
+        var copy = new Interval(new Interval(-1.5, 2.5));
+        Assert.Equal((-1.5, 2.5), (copy.A, copy.B));
+        Assert.Equal(4.0, copy.IntervalWidth);
         Assert.True(copy.IsNumberInInterval(2.0));
     }
 

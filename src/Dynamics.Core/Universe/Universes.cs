@@ -14,7 +14,7 @@ public abstract class UniverseBase
 
     /// <summary>Ranges of the phase portrait: ρ · zoom and |v| · VFactor.</summary>
     public Interval PhaseXInterval { get; protected init; } = null!;
-    public Interval PhaseYInterval { get; } = new(0m, 10m);
+    public Interval PhaseYInterval { get; } = new(0.0, 10.0);
 
     public GeneralParameter PositionParameter { get; protected init; } = null!;
     public GeneralParameter VelocityParameter { get; protected init; } = null!;
@@ -37,11 +37,11 @@ public abstract class UniverseBase
         }
     }
 
-    public decimal MaxZoom { get; protected init; }
+    public double MaxZoom { get; protected init; }
 
-    public decimal DiagramZoom { get; set; } = 1;
+    public double DiagramZoom { get; set; } = 1;
 
-    public decimal VFactor { get; set; }
+    public double VFactor { get; set; }
 
     protected void AddConstellation(StarConstellation constellation) => _constellations.Add(constellation);
 
@@ -58,8 +58,8 @@ public abstract class UniverseBase
             var summand = new Vector();
             var newPosition = new Vector();
             var localCentreOfGravity = new Vector();
-            decimal totalMass = 0;
-            decimal newStarMass = 0;
+            double totalMass = 0;
+            double newStarMass = 0;
             if (newStar is not null)
             {
                 newStarMass = newStar.UserMass;
@@ -103,7 +103,7 @@ public abstract class UniverseBase
 
             _globalCentreOfGravity.Add(localCentreOfGravity);
 
-            decimal maxDistance = 0;
+            double maxDistance = 0;
             if (newStar is not null)
             {
                 maxDistance = newStar.UserStartPosition.Abs();
@@ -144,24 +144,24 @@ public abstract class UniverseBase
 
         // all stars have the same step width (the track bar); VB used each star's own
         var h = stars[0].ActualStepWidth;
-        var u1 = new decimal[n];
-        var v1 = new decimal[n];
-        var u2 = new decimal[n];
-        var v2 = new decimal[n];
+        var u1 = new double[n];
+        var v1 = new double[n];
+        var u2 = new double[n];
+        var v2 = new double[n];
         for (var i = 0; i < n; i++)
         {
             (u1[i], v1[i], u2[i], v2[i]) = stars[i].State;
         }
 
         // k: derivatives of the positions (velocities), a: derivatives of the velocities (accelerations)
-        var kx = new decimal[4, n];
-        var ky = new decimal[4, n];
-        var ax = new decimal[4, n];
-        var ay = new decimal[4, n];
-        var xs = new decimal[n];
-        var ys = new decimal[n];
-        var vxs = new decimal[n];
-        var vys = new decimal[n];
+        var kx = new double[4, n];
+        var ky = new double[4, n];
+        var ax = new double[4, n];
+        var ay = new double[4, n];
+        var xs = new double[n];
+        var ys = new double[n];
+        var vxs = new double[n];
+        var vys = new double[n];
 
         for (var stage = 0; stage < 4; stage++)
         {
@@ -221,7 +221,7 @@ public abstract class UniverseBase
     }
 
     /// <summary>VB: the track bar of the step width (1..72) in four linear sections.</summary>
-    public virtual int StepWidthToTrbValue(decimal stepWidth)
+    public virtual int StepWidthToTrbValue(double stepWidth)
     {
         var h = (double)stepWidth;
         return h switch
@@ -233,12 +233,12 @@ public abstract class UniverseBase
         };
     }
 
-    public virtual decimal TrbValueToStepWidth(int value) => value switch
+    public virtual double TrbValueToStepWidth(int value) => value switch
     {
-        < 19 => (decimal)(0.001 + (value - 1) * 0.0005),
-        < 37 => (decimal)(0.01 + (value - 19) * 0.005),
-        < 55 => (decimal)(0.1 + (value - 37) * 0.05),
-        _ => (decimal)(1 + (value - 55) * 0.5),
+        < 19 => (0.001 + (value - 1) * 0.0005),
+        < 37 => (0.01 + (value - 19) * 0.005),
+        < 55 => (0.1 + (value - 37) * 0.05),
+        _ => (1 + (value - 55) * 0.5),
     };
 
     /// <summary>VB GetNewStar: a copy of the default star of the active constellation.</summary>
@@ -263,16 +263,16 @@ public class NewtonUniverse : UniverseBase
 {
     public NewtonUniverse()
     {
-        MathInterval = new Interval(-32m, 32m);
-        PhaseXInterval = new Interval(0m, 30m);
-        PositionParameter = new GeneralParameter(1, "Position", new Interval(-32m, 32m), GeneralParameter.ParameterType.Variable);
-        VelocityParameter = new GeneralParameter(2, "Velocity", new Interval(-1m, 1m), GeneralParameter.ParameterType.Variable);
-        MassParameter = new GeneralParameter(3, "Mass", new Interval(0.05m, 500000m), GeneralParameter.ParameterType.Variable);
+        MathInterval = new Interval(-32.0, 32.0);
+        PhaseXInterval = new Interval(0.0, 30.0);
+        PositionParameter = new GeneralParameter(1, "Position", new Interval(-32.0, 32.0), GeneralParameter.ParameterType.Variable);
+        VelocityParameter = new GeneralParameter(2, "Velocity", new Interval(-1.0, 1.0), GeneralParameter.ParameterType.Variable);
+        MassParameter = new GeneralParameter(3, "Mass", new Interval(0.05, 500000.0), GeneralParameter.ParameterType.Variable);
         MaxZoom = 25;
     }
 
-    private NewtonStar Star(string name, string color, decimal mass, int size, decimal perihel, decimal argumentPerihel,
-        decimal perihelVelocity, decimal proposedStepWidth)
+    private NewtonStar Star(string name, string color, double mass, int size, double perihel, double argumentPerihel,
+        double perihelVelocity, double proposedStepWidth)
     {
         var star = new NewtonStar
         {
@@ -292,15 +292,15 @@ public class NewtonUniverse : UniverseBase
     }
 
     /// <summary>VB: CDec(x · Tau) with Tau = 1, computed in Double.</summary>
-    private static decimal V(double velocity) => (decimal)(velocity * 1.0);
+    private static double V(double velocity) => (velocity * 1.0);
 
-    private static decimal Angle(double angle) => (decimal)angle;
+    private static double Angle(double angle) => angle;
 
     public override void CreateConstellations()
     {
-        var ourPlanetSystem = new StarConstellation(Text.Get("OurPlanetSystem"), 1.2m, 500);
+        var ourPlanetSystem = new StarConstellation(Text.Get("OurPlanetSystem"), 1.2, 500);
         var ourPlanetSystemDisturbed = new StarConstellation(Text.Get("OurPlanetSystemDisturbed"), 2, 500);
-        var innerPlanets = new StarConstellation(Text.Get("InnerPlanets"), 0.05m, 500);
+        var innerPlanets = new StarConstellation(Text.Get("InnerPlanets"), 0.05, 500);
         var innerPlanetsDisturbed = new StarConstellation(Text.Get("InnerPlanetsDisturbed"), 1, 500);
         FillOurPlanetSystem(ourPlanetSystem, ourPlanetSystemDisturbed, innerPlanets, innerPlanetsDisturbed);
         AddConstellation(ourPlanetSystem);
@@ -308,13 +308,13 @@ public class NewtonUniverse : UniverseBase
         AddConstellation(innerPlanets);
         AddConstellation(innerPlanetsDisturbed);
 
-        AddConstellation(Fill3SymmetricBodies(new StarConstellation(Text.Get("3SymmetricBodies"), 1.5m, 1000), false));
+        AddConstellation(Fill3SymmetricBodies(new StarConstellation(Text.Get("3SymmetricBodies"), 1.5, 1000), false));
         AddConstellation(Fill3SymmetricBodies(new StarConstellation(Text.Get("3SymmetricBodiesDisturbed"), 2, 1000), true));
         AddConstellation(Fill4SymmetricBodies(new StarConstellation(Text.Get("4SymmetricBodies"), 3, 1000), false));
         AddConstellation(Fill4SymmetricBodies(new StarConstellation(Text.Get("4SymmetricBodiesDisturbed"), 7, 1000), true));
         AddConstellation(Fill6SymmetricBodies(new StarConstellation(Text.Get("6SymmetricBodies"), 3, 1000), false));
         AddConstellation(Fill6SymmetricBodies(new StarConstellation(Text.Get("6SymmetricBodiesDisturbed"), 4, 1000), true));
-        AddConstellation(FillNetflix3Body(new StarConstellation(Text.Get("Netflix3Body"), 1.5m, 1000)));
+        AddConstellation(FillNetflix3Body(new StarConstellation(Text.Get("Netflix3Body"), 1.5, 1000)));
     }
 
     private StarConstellation Fill3SymmetricBodies(StarConstellation c, bool isDisturbed)
@@ -322,7 +322,7 @@ public class NewtonUniverse : UniverseBase
         var sun = Text.Get("Sun");
         c.AddStar(Star(sun + " 1", "Gold", 333000, 5, 15, 0, V(0.002389), 1));
         c.AddStar(Star(sun + " 2", "Gold", 333000, 5, 15, Angle(2 * Math.PI / 3), V(0.002389), 1));
-        c.AddStar(Star(sun + " 3", isDisturbed ? "GreenYellow" : "Gold", 333000, 5, isDisturbed ? 14.999999m : 15,
+        c.AddStar(Star(sun + " 3", isDisturbed ? "GreenYellow" : "Gold", 333000, 5, isDisturbed ? 14.999999 : 15,
             Angle(4 * Math.PI / 3), V(0.002389), 1));
         return c;
     }
@@ -333,8 +333,8 @@ public class NewtonUniverse : UniverseBase
         c.AddStar(Star(sun + " 1", "Gold", 333000, 5, 20, 0, V(0.003185), 4));
         c.AddStar(Star(sun + " 2", "Gold", 333000, 5, 20, Angle(Math.PI / 2), V(0.003185), 4));
         c.AddStar(Star(sun + " 3", "Gold", 333000, 5, 20, Angle(Math.PI), V(0.003185), 4));
-        c.AddStar(Star(sun + " 4", isDisturbed ? "GreenYellow" : "Gold", 333000, 5, isDisturbed ? (decimal)(19.99999 * 1.0) : 20,
-            Angle(3 * Math.PI / 2), 0.003185m, 4));
+        c.AddStar(Star(sun + " 4", isDisturbed ? "GreenYellow" : "Gold", 333000, 5, isDisturbed ? (19.99999 * 1.0) : 20,
+            Angle(3 * Math.PI / 2), 0.003185, 4));
         return c;
     }
 
@@ -346,7 +346,7 @@ public class NewtonUniverse : UniverseBase
         c.AddStar(Star(sun + " 3", "Gold", 165000, 5, 15, Angle(2 * Math.PI / 3), V(0.003185), 1));
         c.AddStar(Star(sun + " 4", "Gold", 165000, 5, 15, Angle(Math.PI), V(0.003185), 1));
         c.AddStar(Star(sun + " 5", "Gold", 165000, 5, 15, Angle(4 * Math.PI / 3), V(0.003185), 1));
-        c.AddStar(Star(sun + " 6", isDisturbed ? "GreenYellow" : "Gold", 165000, 5, isDisturbed ? 14.999999m : 15,
+        c.AddStar(Star(sun + " 6", isDisturbed ? "GreenYellow" : "Gold", 165000, 5, isDisturbed ? 14.999999 : 15,
             Angle(5 * Math.PI / 3), V(0.003185), 1));
         return c;
     }
@@ -355,15 +355,15 @@ public class NewtonUniverse : UniverseBase
     {
         // The sun is the same star in all four constellations (as in VB)
         var sun = Star(Text.Get("Sun"), "Gold", 332943, 5, 0, 0, 0, 1);
-        var mercury = Star(Text.Get("Mercury"), "LightGray", 0.055m, 1, 0.3075m, 1.3519m, V(0.034063), 0.01m);
-        var venus = Star(Text.Get("Venus"), "Yellow", 0.815m, 2, 0.7184m, 2.2956m, V(0.020364), 0.02m);
-        var earth = Star(Text.Get("Earth"), "SkyBlue", 0.9833m, 2, 0.9833m, 1.7967m, V(0.017494), 0.03m);
-        var mars = Star(Text.Get("Mars"), "Red", 0.107m, 2, 1.3814m, 5.865m, V(0.015305), 0.04m);
-        var jupiter = Star(Text.Get("Jupiter"), "GreenYellow", 317.8m, 3, 4.9501m, 0.2575m, V(0.007924), 0.5m);
-        var strangeJupiter = Star(Text.Get("Jupiter"), "GreenYellow", 31800, 4, 5, 0.7m, V(0.004813), 0.5m);
-        var saturn = Star(Text.Get("Saturn"), "Tomato", 95.2m, 3, 9.0481m, 1.6132m, V(0.005879), 1.5m);
-        var uranus = Star(Text.Get("Uranus"), "Orange", 14.5m, 3, 18.3755m, 2.9839m, V(0.004106), 3);
-        var neptune = Star(Text.Get("Neptune"), "Cyan", 16.8m, 3, 29.7667m, 0.7849m, V(0.003176), 5);
+        var mercury = Star(Text.Get("Mercury"), "LightGray", 0.055, 1, 0.3075, 1.3519, V(0.034063), 0.01);
+        var venus = Star(Text.Get("Venus"), "Yellow", 0.815, 2, 0.7184, 2.2956, V(0.020364), 0.02);
+        var earth = Star(Text.Get("Earth"), "SkyBlue", 0.9833, 2, 0.9833, 1.7967, V(0.017494), 0.03);
+        var mars = Star(Text.Get("Mars"), "Red", 0.107, 2, 1.3814, 5.865, V(0.015305), 0.04);
+        var jupiter = Star(Text.Get("Jupiter"), "GreenYellow", 317.8, 3, 4.9501, 0.2575, V(0.007924), 0.5);
+        var strangeJupiter = Star(Text.Get("Jupiter"), "GreenYellow", 31800, 4, 5, 0.7, V(0.004813), 0.5);
+        var saturn = Star(Text.Get("Saturn"), "Tomato", 95.2, 3, 9.0481, 1.6132, V(0.005879), 1.5);
+        var uranus = Star(Text.Get("Uranus"), "Orange", 14.5, 3, 18.3755, 2.9839, V(0.004106), 3);
+        var neptune = Star(Text.Get("Neptune"), "Cyan", 16.8, 3, 29.7667, 0.7849, V(0.003176), 5);
 
         foreach (var star in new[] { sun, venus, earth, mars, jupiter, saturn, uranus, neptune })
         {
@@ -400,32 +400,32 @@ public class NewtonUniverse : UniverseBase
 /// <summary>Normed universe (G = 1) with the periodic three body orbits. Port of ClsNormedUniverse.</summary>
 public class NormedUniverse : UniverseBase
 {
-    private const decimal Tau = 0.05m;
+    private const double Tau = 0.05;
 
     public NormedUniverse()
     {
-        MathInterval = new Interval(-2m, 2m);
-        PhaseXInterval = new Interval(0m, 2m);
-        PositionParameter = new GeneralParameter(1, "Position", new Interval(-2m, 2m), GeneralParameter.ParameterType.Variable);
-        VelocityParameter = new GeneralParameter(2, "Velocity", new Interval(-1m, 1m), GeneralParameter.ParameterType.Variable);
-        MassParameter = new GeneralParameter(3, "Mass", new Interval(0.00001m, 2m), GeneralParameter.ParameterType.Variable);
-        MaxZoom = 1.5m;
+        MathInterval = new Interval(-2.0, 2.0);
+        PhaseXInterval = new Interval(0.0, 2.0);
+        PositionParameter = new GeneralParameter(1, "Position", new Interval(-2.0, 2.0), GeneralParameter.ParameterType.Variable);
+        VelocityParameter = new GeneralParameter(2, "Velocity", new Interval(-1.0, 1.0), GeneralParameter.ParameterType.Variable);
+        MassParameter = new GeneralParameter(3, "Mass", new Interval(0.00001, 2.0), GeneralParameter.ParameterType.Variable);
+        MaxZoom = 1.5;
     }
 
     /// <summary>VB: CDec(factor · velocity · Tau), computed in Double.</summary>
-    private static decimal V(double velocity) => (decimal)(velocity * (double)Tau);
+    private static double V(double velocity) => (velocity * Tau);
 
     public override void CreateConstellations()
     {
         // Initial velocities (vx, vy) of star 1 and 2; star 3 has -2 times them
-        (string Name, decimal StepWidth, double Vx, double Vy)[] periodic =
+        (string Name, double StepWidth, double Vx, double Vy)[] periodic =
         [
-            ("IA1", 0.01m, 0.3471168881, 0.5327249454),
-            ("IA2", 0.03m, 0.3068934205, 0.125506567),
-            ("IA3", 0.01m, 0.6150407229, 0.5226158545),
-            ("IB1", 0.01m, 0.4644451728, 0.3960600146),
-            ("IB2", 0.01m, 0.4059155671, 0.230163126),
-            ("IIC1", 0.01m, 0.2827020949, 0.3272089716),
+            ("IA1", 0.01, 0.3471168881, 0.5327249454),
+            ("IA2", 0.03, 0.3068934205, 0.125506567),
+            ("IA3", 0.01, 0.6150407229, 0.5226158545),
+            ("IB1", 0.01, 0.4644451728, 0.3960600146),
+            ("IB2", 0.01, 0.4059155671, 0.230163126),
+            ("IIC1", 0.01, 0.2827020949, 0.3272089716),
         ];
 
         foreach (var (name, stepWidth, vx, vy) in periodic)
@@ -437,18 +437,18 @@ public class NormedUniverse : UniverseBase
             AddConstellation(c);
         }
 
-        var satellite = new StarConstellation(Text.Get("Satellite"), 0.02m, 100);
+        var satellite = new StarConstellation(Text.Get("Satellite"), 0.02, 100);
         satellite.AddStar(NewStar(1, "LightBlue", 1, -1, 0, 0, V(0.8)));
 
         // VB-compatible: ActualPosition.X = 0.5 was set before SetDefaultUserData, so the star starts at (1, 0)
         satellite.AddStar(NewStar(2, "GreenYellow", 2, 1, 0, 0, V(-0.4)));
-        var satelliteStar = NewStar(3, "Gold", 0.0001m, -0.8m, 0, V(0 * 0.05), V(0.1));
+        var satelliteStar = NewStar(3, "Gold", 0.0001, -0.8, 0, V(0 * 0.05), V(0.1));
         satelliteStar.Name = Text.Get("Satellite");
         satellite.AddStar(satelliteStar);
         AddConstellation(satellite);
     }
 
-    private NormedStar NewStar(int number, string color, decimal mass, decimal x, decimal y, decimal vx, decimal vy)
+    private NormedStar NewStar(int number, string color, double mass, double x, double y, double vx, double vy)
     {
         var star = new NormedStar
         {
@@ -466,7 +466,7 @@ public class NormedUniverse : UniverseBase
         star.UserStartVelocity.CopyFrom(star.OriginalStartVelocity);
         star.SetDefaultUserData();
         star.Universe = this;
-        star.ProposedStepWidth = 0.01m;
+        star.ProposedStepWidth = 0.01;
         return star;
     }
 }

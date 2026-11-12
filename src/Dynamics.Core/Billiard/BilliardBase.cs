@@ -21,17 +21,17 @@ public abstract class BilliardBallBase : IBilliardBall
     private string? _lastProtocol;
 
     /// <summary>Parameter of the actual hit point (see mathematical documentation).</summary>
-    protected decimal T;
+    protected double T;
 
     /// <summary>Angle between the actual moving direction and the positive x-axis.</summary>
-    protected decimal MyPhi;
+    protected double MyPhi;
 
     protected bool MyIsProtocol;
 
-    public decimal A { get; set; }
-    public decimal B { get; set; }
+    public double A { get; set; }
+    public double B { get; set; }
 
-    public Interval MathInterval { get; set; } = new(-1m, 1m);
+    public Interval MathInterval { get; set; } = new(-1.0, 1.0);
     public Interval TValueRange { get; set; } = null!;
     public Interval AlfaValueRange { get; set; } = null!;
     public Interval ParameterRange { get; set; } = null!;
@@ -49,9 +49,9 @@ public abstract class BilliardBallBase : IBilliardBall
     public MathPoint UserStartposition => _userStartposition;
     public MathPoint UserEndposition => _userEndposition;
 
-    public decimal Phi => MyPhi;
+    public double Phi => MyPhi;
 
-    public decimal Startparameter
+    public double Startparameter
     {
         get => T;
         set
@@ -62,7 +62,7 @@ public abstract class BilliardBallBase : IBilliardBall
         }
     }
 
-    public decimal Startangle
+    public double Startangle
     {
         set
         {
@@ -77,14 +77,14 @@ public abstract class BilliardBallBase : IBilliardBall
         }
     }
 
-    public virtual decimal SetUserStartposition(MathPoint mouse)
+    public virtual double SetUserStartposition(MathPoint mouse)
     {
         T = MathHelperAngles.CalculateAngleOfDirection(mouse.X, mouse.Y);
         _userStartposition = PositionFromT(T);
         return T;
     }
 
-    public abstract decimal SetUserEndposition(MathPoint mouse);
+    public abstract double SetUserEndposition(MathPoint mouse);
 
     public abstract void SetFirstUserStartposition();
 
@@ -161,7 +161,7 @@ public abstract class BilliardBallBase : IBilliardBall
     /// The next direction (reflection at the tangent in t). VB wrote the phase portrait and the protocol here,
     /// with the field T (in GetNextValuePair still the old t).
     /// </summary>
-    private decimal CalculateNextPhi(decimal t, decimal phi)
+    private double CalculateNextPhi(double t, double phi)
     {
         var psi = MathHelperAngles.AngleInNullTwoPi(CalculatePsi(t));
         var nextPhi = MathHelperAngles.AngleInNullTwoPi(2 * psi - phi);
@@ -180,20 +180,20 @@ public abstract class BilliardBallBase : IBilliardBall
         return nextPhi;
     }
 
-    public decimal CalculateAlfa(decimal t, decimal phi)
+    public double CalculateAlfa(double t, double phi)
     {
         var psi = MathHelperAngles.AngleInNullTwoPi(CalculatePsi(t));
         return MathHelperAngles.AngleInNullTwoPi(phi - psi);
     }
 
     /// <summary>The point of the table border with parameter t.</summary>
-    public abstract MathPoint PositionFromT(decimal t);
+    public abstract MathPoint PositionFromT(double t);
 
     /// <summary>The angle between the tangent in the hit point t and the positive x-axis.</summary>
-    protected abstract decimal CalculatePsi(decimal t);
+    protected abstract double CalculatePsi(double t);
 
     /// <summary>The parameter of the next hit point from t in direction phi.</summary>
-    protected abstract decimal ParameterOfNextHitPoint(decimal t, decimal phi);
+    protected abstract double ParameterOfNextHitPoint(double t, double phi);
 
     /// <summary>VB: IsBallOnEllipse / IsBallInOval / IsBallOnStadium, used to correct the last position.</summary>
     protected abstract bool IsBallInside(MathPoint position);
@@ -204,19 +204,19 @@ public abstract class BilliardTableBase : IBilliardTable
 {
     private readonly List<GeneralParameter> _valueParameters = [];
 
-    protected decimal MyA;
-    protected decimal MyB;
-    protected decimal MyC;
+    protected double MyA;
+    protected double MyB;
+    protected double MyC;
 
     protected BilliardTableBase()
     {
         // The DS parameter is the same for all billiard tables
-        DSParameter = new GeneralParameter(3, "Parameter C", new Interval(0.5m, 2m), GeneralParameter.ParameterType.DS, 0.8m);
+        DSParameter = new GeneralParameter(3, "Parameter C", new Interval(0.5, 2.0), GeneralParameter.ParameterType.DS, 0.8);
     }
 
     public List<IBilliardBall> BilliardBallCollection { get; } = [];
 
-    public Interval MathInterval { get; } = new(-1m, 1m);
+    public Interval MathInterval { get; } = new(-1.0, 1.0);
 
     public GeneralParameter DSParameter { get; }
 
@@ -224,9 +224,9 @@ public abstract class BilliardTableBase : IBilliardTable
     public GeneralParameter AlfaValueParameter { get; private set; } = null!;
     public IReadOnlyList<GeneralParameter> ValueParameterList => _valueParameters;
 
-    public abstract decimal C { get; set; }
-    public decimal A => MyA;
-    public decimal B => MyB;
+    public abstract double C { get; set; }
+    public double A => MyA;
+    public double B => MyB;
 
     protected void SetValueParameters(GeneralParameter t, GeneralParameter alfa)
     {

@@ -1,41 +1,40 @@
 namespace Dynamics.Core.General;
 
 // Ports of ClsMathHelperAngles, ClsMathHelperComplex and ClsMathHelperPendulum.
-// The casts reproduce VB's mixed Decimal/Double arithmetic exactly:
-// Decimal op Double is evaluated in Double, CDec(...) becomes (decimal)(...).
+// VB mixed Decimal and Double; since step 6 of the port everything is Double.
 
 /// <summary>Angle calculations used by billiard tables and balls.</summary>
 public static class MathHelperAngles
 {
     /// <summary>Angle between (deltaX, deltaY) and the positive x-axis, in [0, 2π[.</summary>
-    public static decimal CalculateAngleOfDirection(decimal deltaX, decimal deltaY)
+    public static double CalculateAngleOfDirection(double deltaX, double deltaY)
     {
         if (deltaX > 0)
         {
             return deltaY >= 0
-                ? (decimal)Math.Atan((double)(deltaY / deltaX))
-                : (decimal)(2 * Math.PI + Math.Atan((double)(deltaY / deltaX)));
+                ? Math.Atan((double)(deltaY / deltaX))
+                : (2 * Math.PI + Math.Atan((double)(deltaY / deltaX)));
         }
 
         if (deltaX < 0)
         {
-            return (decimal)(Math.PI + Math.Atan((double)(deltaY / deltaX)));
+            return (Math.PI + Math.Atan((double)(deltaY / deltaX)));
         }
 
-        return deltaY > 0 ? (decimal)(Math.PI / 2) : (decimal)(Math.PI * 3 / 2);
+        return deltaY > 0 ? (Math.PI / 2) : (Math.PI * 3 / 2);
     }
 
     /// <summary>Maps an angle into [0, 2π[.</summary>
-    public static decimal AngleInNullTwoPi(decimal angle)
+    public static double AngleInNullTwoPi(double angle)
     {
-        var tempAngle = angle;
+        var tempAngle = NumericCheck.ReduceAngle(angle);
 
         while (!(tempAngle > 0))
         {
-            tempAngle = (decimal)((double)tempAngle + Math.PI * 2);
+            tempAngle = ((double)tempAngle + Math.PI * 2);
         }
 
-        return (decimal)((double)tempAngle % (Math.PI * 2));
+        return ((double)tempAngle % (Math.PI * 2));
     }
 }
 
@@ -70,36 +69,36 @@ public static class MathHelperComplex
 public static class MathHelperPendulum
 {
     /// <summary>Angle between the negative y-axis and the pendulum axis (x, y).</summary>
-    public static decimal GetAngle(decimal x, decimal y)
+    public static double GetAngle(double x, double y)
     {
         if (y == 0)
         {
-            return x > 0 ? (decimal)(Math.PI / 2) : -(decimal)(Math.PI / 2);
+            return x > 0 ? (Math.PI / 2) : -(Math.PI / 2);
         }
 
-        var alfa = -(decimal)Math.Atan((double)(x / y));
+        var alfa = -Math.Atan((double)(x / y));
 
         if (y < 0)
         {
             return alfa;
         }
 
-        return x < 0 ? alfa - (decimal)Math.PI : alfa + (decimal)Math.PI;
+        return x < 0 ? alfa - Math.PI : alfa + Math.PI;
     }
 
     /// <summary>Maps an angle into ]-π, π].</summary>
-    public static decimal AngleInMinusPiAndPi(decimal angle)
+    public static double AngleInMinusPiAndPi(double angle)
     {
-        var tempAngle = angle;
+        var tempAngle = NumericCheck.ReduceAngle(angle);
 
-        while (!(tempAngle > -(decimal)Math.PI))
+        while (!(tempAngle > -Math.PI))
         {
-            tempAngle = (decimal)((double)tempAngle + Math.PI * 2);
+            tempAngle = ((double)tempAngle + Math.PI * 2);
         }
 
-        while (!(tempAngle <= (decimal)Math.PI))
+        while (!(tempAngle <= Math.PI))
         {
-            tempAngle = (decimal)((double)tempAngle - Math.PI * 2);
+            tempAngle = ((double)tempAngle - Math.PI * 2);
         }
 
         return tempAngle;

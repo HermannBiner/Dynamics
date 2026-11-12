@@ -12,7 +12,7 @@ public sealed class PendulumRenderer
     public const int DiagramSize = 600;
     public const int PhasePortraitSize = 320;
 
-    private static readonly Interval MathInterval = new(-1m, 1m);
+    private static readonly Interval MathInterval = new(-1.0, 1.0);
 
     public DrawBatch Diagram { get; } = new(new CoordinateTransform(DiagramSize, DiagramSize, MathInterval, MathInterval));
     public DrawBatch DiagramOverlay { get; } = new(new CoordinateTransform(DiagramSize, DiagramSize, MathInterval, MathInterval));

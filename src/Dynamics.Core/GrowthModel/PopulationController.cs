@@ -4,7 +4,7 @@ using Dynamics.Core.General;
 namespace Dynamics.Core.GrowthModel;
 
 /// <summary>The population of one step: living circle and the individuals as random points in it.</summary>
-public sealed record PopulationPicture(MathPoint Center, decimal Radius, IReadOnlyList<MathPoint> Individuals);
+public sealed record PopulationPicture(MathPoint Center, double Radius, IReadOnlyList<MathPoint> Individuals);
 
 /// <summary>
 /// UI-free logic of FrmPopulation. Port of ClsPopulationController: the size of the population x is shown as a circle
@@ -16,7 +16,7 @@ public sealed class PopulationController : GrowthControllerBase
     public const int D = 1;
 
     private readonly Random _random;
-    private decimal _x;
+    private double _x;
 
     public PopulationController(Random? random = null) : base(includeMandelbrot: false)
     {
@@ -38,7 +38,7 @@ public sealed class PopulationController : GrowthControllerBase
     public int N { get; private set; }
 
     /// <summary>The actual value of the iteration.</summary>
-    public decimal X => _x;
+    public double X => _x;
 
     /// <summary>VB: SetDS + InitializeMe.</summary>
     public void SelectSystem(int index)
@@ -163,7 +163,7 @@ public sealed class PopulationController : GrowthControllerBase
     }
 
     /// <summary>VB: ShowPopulation(x).</summary>
-    public PopulationPicture Picture(decimal x)
+    public PopulationPicture Picture(double x)
     {
         var range = DS.ValueParameter.Range;
         var radius = (x - range.A) / 2;
@@ -174,17 +174,17 @@ public sealed class PopulationController : GrowthControllerBase
         for (var m = 1; m <= numberOfIndividuums; m++)
         {
             // Polar coordinates of a random point in the circle
-            var rho = radius * (decimal)_random.NextSingle();
-            var alfa = (decimal)(2 * Math.PI * _random.NextSingle());
+            var rho = radius * _random.NextSingle();
+            var alfa = (2 * Math.PI * _random.NextSingle());
             individuals.Add(new MathPoint(
-                middle + rho * (decimal)Math.Cos((double)alfa),
-                middle + rho * (decimal)Math.Sin((double)alfa)));
+                middle + rho * Math.Cos((double)alfa),
+                middle + rho * Math.Sin((double)alfa)));
         }
 
         return new PopulationPicture(new MathPoint(middle, middle), radius, individuals);
     }
 
-    private string? CheckUserData(out decimal a, out decimal x)
+    private string? CheckUserData(out double a, out double x)
     {
         var errorA = UserDataCheck.CheckValue(ParameterA, DS.DSParameter.Range, out a);
         var errorX = UserDataCheck.CheckValue(StartValue, DS.ValueParameter.Range, out x);

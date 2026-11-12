@@ -68,7 +68,7 @@ public sealed class TwoDimensionsController : GrowthControllerBase
     public string Y { get; set; } = "";
 
     /// <summary>Size of a cell in mathematical units.</summary>
-    public decimal DeltaX { get; private set; }
+    public double DeltaX { get; private set; }
 
     public CoordinateTransform Transform { get; private set; } = null!;
 
@@ -93,7 +93,7 @@ public sealed class TwoDimensionsController : GrowthControllerBase
         Transform = new CoordinateTransform(DiagramSize, DiagramSize, range, range);
 
         // VB: CDec(Rastersize / Diagramsize) is a Double division
-        DeltaX = (decimal)((double)RasterSize / DiagramSize) * range.IntervalWidth;
+        DeltaX = ((double)RasterSize / DiagramSize) * range.IntervalWidth;
         Mode = TwoDimensionsMode.Sensitivity;
 
         SetDefaultUserData();
@@ -101,15 +101,15 @@ public sealed class TwoDimensionsController : GrowthControllerBase
     }
 
     /// <summary>
-    /// VB: SetDefaultUserData. Start point at 41.4 % / 40.7 % of the value range (VB computed it in Double, which showed
-    /// e.g. −0.17200000000000004 for the parabola).
+    /// VB: SetDefaultUserData. Start point at 41.4 % / 40.7 % of the value range (VB computed it in Double and showed e.g.
+    /// −0.17200000000000004 for the parabola; rounded to 6 decimals here).
     /// </summary>
     public void SetDefaultUserData()
     {
         var range = DS.ValueParameter.Range;
         Parameter = Format(DS.ChaoticParameterValue);
-        X = Format(range.A + range.IntervalWidth * 0.414m);
-        Y = Format(range.A + range.IntervalWidth * 0.407m);
+        X = Format(Math.Round(range.A + range.IntervalWidth * 0.414, 6));
+        Y = Format(Math.Round(range.A + range.IntervalWidth * 0.407, 6));
         Experiment = 0;
     }
 
@@ -155,19 +155,13 @@ public sealed class TwoDimensionsController : GrowthControllerBase
     }
 
     /// <summary>VB: PrepareDiagram, the positions of the raster lines (parallel to both axes).</summary>
-    public IReadOnlyList<decimal> RasterLines()
+    public IReadOnlyList<double> RasterLines()
     {
         var range = DS.ValueParameter.Range;
-        var lines = new List<decimal>();
-        var i = 0;
-        do
-        {
-            lines.Add(range.A + (i * DeltaX));
-            i += 1;
-        }
-        while (i * DeltaX < range.IntervalWidth);
-
-        return lines;
+        // VB: Do ... Loop Until i · DeltaX >= width; that drew the border line only because DeltaX was rounded down in
+        // Decimal. Here the lines up to and including the border.
+        var count = (int)Math.Round(range.IntervalWidth / DeltaX);
+        return Enumerable.Range(0, count + 1).Select(i => range.A + (i * DeltaX)).ToList();
     }
 
     // SECTOR SET START AND TARGET
@@ -250,8 +244,8 @@ public sealed class TwoDimensionsController : GrowthControllerBase
     public MathPoint CellAt(double pixelX, double pixelY)
     {
         var range = DS.ValueParameter.Range;
-        var x = range.A + ((decimal)pixelX * range.IntervalWidth / DiagramSize);
-        var y = range.B - ((decimal)pixelY * range.IntervalWidth / DiagramSize);
+        var x = range.A + (pixelX * range.IntervalWidth / DiagramSize);
+        var y = range.B - (pixelY * range.IntervalWidth / DiagramSize);
         var cells = (int)Math.Ceiling(range.IntervalWidth / DeltaX) - 1;
         var kx = Math.Clamp((int)Math.Floor((x - range.A) / DeltaX), 0, cells);
         var ky = Math.Clamp((int)Math.Floor((y - range.A) / DeltaX), 0, cells);
@@ -351,7 +345,7 @@ public sealed class TwoDimensionsController : GrowthControllerBase
 
     private static MathPoint Copy(MathPoint point) => new(point.X, point.Y);
 
-    private string? CheckUserData(out decimal a, out decimal x, out decimal y) => Join(
+    private string? CheckUserData(out double a, out double x, out double y) => Join(
         UserDataCheck.CheckValue(Parameter, DS.DSParameter.Range, out a),
         UserDataCheck.CheckValue(X, DS.ValueParameter.Range, out x),
         UserDataCheck.CheckValue(Y, DS.ValueParameter.Range, out y));

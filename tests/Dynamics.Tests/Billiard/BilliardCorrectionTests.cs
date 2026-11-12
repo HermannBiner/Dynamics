@@ -13,11 +13,11 @@ public class BilliardCorrectionTests
     public void StadiumBallMovesThroughTheCurvesWithoutJumping(double c)
     {
         // A ball crossing the curved parts: all positions are on the segment, the last one is the end point
-        var table = new StadiumBilliardTable { C = (decimal)c };
+        var table = new StadiumBilliardTable { C = c };
         var ball = table.GetBilliardBall();
         ball.Speed = 10;
         ball.Startparameter = 2 * table.A + table.B; // in the left half circle
-        ball.Startangle = 1.2m;
+        ball.Startangle = 1.2;
 
         for (var i = 0; i < 30; i++)
         {
@@ -44,10 +44,10 @@ public class BilliardCorrectionTests
     [InlineData(1.5, 0.2, -0.8)]
     public void OvalEndPositionIsInTheDirectionOfTheMouse(double c, double mouseX, double mouseY)
     {
-        var table = new OvalBilliardTable { C = (decimal)c };
+        var table = new OvalBilliardTable { C = c };
         var ball = table.GetBilliardBall();
         ball.Startparameter = 1;
-        var mouse = new MathPoint((decimal)mouseX, (decimal)mouseY);
+        var mouse = new MathPoint(mouseX, mouseY);
         ball.SetUserEndposition(mouse);
 
         // seen from the center (m, 0), the end position is on the border in the direction of the mouse

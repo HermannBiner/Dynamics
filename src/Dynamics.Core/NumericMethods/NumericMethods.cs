@@ -13,16 +13,16 @@ public interface INumericMethod
     string ClassName { get; }
 
     /// <summary>Step width of one approximation step.</summary>
-    decimal h { get; set; }
+    double h { get; set; }
 
     /// <summary>Number of approximation steps per <see cref="Iteration"/>.</summary>
     int NumberOfApproxSteps { set; }
 
     /// <summary>Start position (y); also sets ActualParameter(1).</summary>
-    decimal Amplitude { set; }
+    double Amplitude { set; }
 
     /// <summary>[0] = time t (mod 2π), [1] = y, [2] = y'.</summary>
-    decimal this[int index] { get; set; }
+    double this[int index] { get; set; }
 
     void Iteration();
 }
@@ -30,17 +30,17 @@ public interface INumericMethod
 /// <summary>Common parameters of all methods. Port of ClsNumericMethodAbstract.</summary>
 public abstract class NumericMethodBase : INumericMethod
 {
-    protected decimal MyH;
+    protected double MyH;
     protected int MyNumberOfApproxSteps;
-    protected decimal MyAmplitude;
+    protected double MyAmplitude;
     protected readonly NTuple MyActualParameter = new(2);
 
     // VB: CDec(2 * Math.PI)
-    protected static readonly decimal TwoPi = (decimal)(2 * Math.PI);
+    protected static readonly double TwoPi = (2 * Math.PI);
 
     public abstract string ClassName { get; }
 
-    public decimal h
+    public double h
     {
         get => MyH;
         set => MyH = value;
@@ -51,7 +51,7 @@ public abstract class NumericMethodBase : INumericMethod
         set => MyNumberOfApproxSteps = value;
     }
 
-    public decimal Amplitude
+    public double Amplitude
     {
         set
         {
@@ -60,7 +60,7 @@ public abstract class NumericMethodBase : INumericMethod
         }
     }
 
-    public decimal this[int index]
+    public double this[int index]
     {
         get => MyActualParameter[index];
         set => MyActualParameter[index] = value;
@@ -97,7 +97,7 @@ public class RealSpringPendulum : NumericMethodBase
     }
 
     protected override void AfterIteration() =>
-        MyActualParameter[1] = MyAmplitude * (decimal)Math.Cos((double)MyActualParameter[0]);
+        MyActualParameter[1] = MyAmplitude * Math.Cos((double)MyActualParameter[0]);
 }
 
 /// <summary>Spring pendulum with the forward (explicit) Euler method. Port of ClsForwardEuler.</summary>
@@ -190,18 +190,18 @@ public class RealThreadPendulum : NumericMethodBase
         var v = MyActualParameter[2];
 
         k[0] = MyH * v;
-        l[0] = -MyH * (decimal)Math.Sin((double)u);
+        l[0] = -MyH * Math.Sin((double)u);
 
         k[1] = MyH * (v + l[0] / 2);
-        l[1] = MyH * -(decimal)Math.Sin((double)(u + k[0] / 2));
+        l[1] = MyH * -Math.Sin((double)(u + k[0] / 2));
 
         k[2] = MyH * (v + l[1] / 2);
-        l[2] = MyH * -(decimal)Math.Sin((double)(u + k[1] / 2));
+        l[2] = MyH * -Math.Sin((double)(u + k[1] / 2));
 
         // Corrected: VB used k[2] / 2 here, which reduced the method to order 1
         // (energy drift 4.5e-3 instead of 1e-10 for h = 0.02 up to t = 10).
         k[3] = MyH * (v + l[2]);
-        l[3] = MyH * -(decimal)Math.Sin((double)(u + k[2]));
+        l[3] = MyH * -Math.Sin((double)(u + k[2]));
 
         MyActualParameter[1] = u + (k[0] + 2 * k[1] + 2 * k[2] + k[3]) / 6;
         MyActualParameter[2] = v + (l[0] + 2 * l[1] + 2 * l[2] + l[3]) / 6;

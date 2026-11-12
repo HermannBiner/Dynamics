@@ -26,7 +26,7 @@ public readonly record struct AttractorPoint(MathPoint Plane, int Color);
 public sealed class StrangeAttractorController
 {
     /// <summary>VB TrbStepWidth 1..9.</summary>
-    public static readonly IReadOnlyList<decimal> StepWidths = [0.00001m, 0.00005m, 0.0001m, 0.0005m, 0.001m, 0.005m, 0.01m, 0.05m, 0.1m];
+    public static readonly IReadOnlyList<double> StepWidths = [0.00001, 0.00005, 0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1];
 
     public const int DSParameterTrackBarMaximum = 1000;
 
@@ -68,8 +68,8 @@ public sealed class StrangeAttractorController
 
     public AttractorProjection Projection { get; private set; } = AttractorProjection.ThreeD;
 
-    public decimal Phi { get; private set; }
-    public decimal Theta { get; private set; }
+    public double Phi { get; private set; }
+    public double Theta { get; private set; }
 
     public string PhiText => Phi.ToString("N5", CultureInfo.CurrentCulture);
     public string ThetaText => Theta.ToString("N5", CultureInfo.CurrentCulture);
@@ -114,8 +114,8 @@ public sealed class StrangeAttractorController
         SetStartPointSet(0);
         Transform = new CoordinateTransform(DiagramSize, DiagramSize, DS.MathInterval, DS.MathInterval);
         Projection = AttractorProjection.ThreeD;
-        Phi = (decimal)(-Math.PI / 15);
-        Theta = (decimal)(Math.PI / 8);
+        Phi = (-Math.PI / 15);
+        Theta = (Math.PI / 8);
     }
 
     /// <summary>VB: SetStartPointSet (CboStartpointSets).</summary>
@@ -200,7 +200,7 @@ public sealed class StrangeAttractorController
         ResetIteration();
     }
 
-    private void SetTrackBarFromDSParameter(decimal value)
+    private void SetTrackBarFromDSParameter(double value)
     {
         var range = DS.DSParameter.Range;
         DSParameterTrackBar = Convert.ToInt32((value - range.A) * DSParameterTrackBarMaximum / (range.B - range.A));
@@ -214,7 +214,7 @@ public sealed class StrangeAttractorController
         DS.StepWidth = StepWidths[value - 1];
     }
 
-    private void SetTrackBarFromStepWidth(decimal stepWidth)
+    private void SetTrackBarFromStepWidth(double stepWidth)
     {
         var index = StepWidths.ToList().IndexOf(stepWidth);
         StepWidthTrackBar = index >= 0 ? index + 1 : 9;
@@ -307,10 +307,10 @@ public sealed class StrangeAttractorController
         var planeX = Math.Min(interval.B, Math.Max(interval.A, interval.A + (interval.B - interval.A) * mouseX / DiagramSize));
         var planeY = Math.Min(interval.B, Math.Max(interval.A, interval.B - (interval.B - interval.A) * mouseY / DiagramSize));
 
-        Phi = Math.Max((decimal)(-(Math.PI / 2)),
-            Math.Min((decimal)(Math.PI / 2), (decimal)Math.PI * (planeX - interval.A) / (interval.B - interval.A) - (decimal)(Math.PI / 2)));
-        Theta = Math.Min(1, Math.Max(0.01m,
-            (decimal)(Math.PI / 2) * ((interval.B + 2 * interval.A - 3 * planeY) / (interval.B - interval.A))));
+        Phi = Math.Max((-(Math.PI / 2)),
+            Math.Min((Math.PI / 2), Math.PI * (planeX - interval.A) / (interval.B - interval.A) - (Math.PI / 2)));
+        Theta = Math.Min(1, Math.Max(0.01,
+            (Math.PI / 2) * ((interval.B + 2 * interval.A - 3 * planeY) / (interval.B - interval.A))));
         return true;
     }
 
@@ -331,8 +331,8 @@ public sealed class StrangeAttractorController
         double phi = (double)Phi, theta = (double)Theta;
         double x = (double)realPoint.X, y = (double)realPoint.Y, z = (double)realPoint.Z;
 
-        var rotatedX = (decimal)(x * Math.Cos(phi) - y * Math.Sin(phi) * Math.Cos(theta) - z * Math.Sin(phi) * Math.Sin(theta));
-        var rotatedZ = (decimal)((double)(-realPoint.Y) * Math.Sin(theta) + z * Math.Cos(theta));
+        var rotatedX = (x * Math.Cos(phi) - y * Math.Sin(phi) * Math.Cos(theta) - z * Math.Sin(phi) * Math.Sin(theta));
+        var rotatedZ = ((double)(-realPoint.Y) * Math.Sin(theta) + z * Math.Cos(theta));
 
         var interval = DS.MathInterval;
         var planePoint = new MathPoint(-rotatedX, rotatedZ);
@@ -361,7 +361,7 @@ public sealed class StrangeAttractorController
     /// <summary>VB: DrawCoordinateCube; the cube in 3D, only the axes (red) in XY and XZ.</summary>
     public (List<CubeLine> Lines, List<CubePoint> Points) CoordinateCube()
     {
-        var e = (decimal)((double)(DS.MathInterval.B - DS.MathInterval.A) / (2 * Math.Sqrt(2)));
+        var e = ((double)(DS.MathInterval.B - DS.MathInterval.A) / (2 * Math.Sqrt(2)));
         MathPoint[] c =
         [
             new(e, e, 0), new(e, -e, 0), new(-e, -e, 0), new(-e, e, 0), new(e, -e, e), new(-e, -e, e),

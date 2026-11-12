@@ -20,7 +20,8 @@ Simulator is frozen as reference at commit `200c300`. To regenerate the referenc
 dotnet run --project tools/ReferenceExport
 ```
 
-The first port keeps `Decimal` and the VB mixed Decimal/Double arithmetic so results match exactly.
+The first port kept `Decimal` and the VB mixed Decimal/Double arithmetic so results matched exactly; since step 6
+Dynamics computes in `Double` and the tests compare with tolerance (see "Step 6: Double" below).
 The exporter runs the VB code on .NET 10, the runtime of Dynamics: on .NET 8 (Simulator's runtime) the same VB code
 gives a slightly different trajectory for the shaken pendulum after some hundred steps (last digits, then chaotic divergence).
 Switching to `Double` is a separate step, because it changes chaotic trajectories.
@@ -34,7 +35,7 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 5. Remaining systems: Newton iteration ✔ (`/newton`, `/singlenewton`), strange attractors ✔ (`/strangeattractor`,
    `/bifurcation`), billiards ✔ (`/billiard`, `/cdiagram`), universe ✔ (`/universe`), growth models ✔ (`/population`, `/iteration`, `/sensitivity`,
    `/histogram`, `/twodimensions`, `/feigenbaum`), L-systems ✔ (`/lsystems`)
-6. Switch from Decimal to Double (all systems at once, checked against the VB data with tolerance)
+6. Switch from Decimal to Double ✔ (all systems at once, checked against the VB data with tolerance)
 
 ## Name mapping (GeneralClassLibrary → Dynamics.Core.General)
 
@@ -95,7 +96,7 @@ tests check the corrected behaviour mathematically instead.
 | `ClsLSystemsController.RestoreCopy` | the backup was copied, but the restored systems appeared only after reopening the window | the restored systems are shown at once |
 
 Deliberate VB behaviour that is kept (marked `VB-compatible`): `NTuple(n)` has n + 1 components (`ReDim`),
-`Vector.ToMathPoint` returns a shared instance, `ComplexNumber.Div` divides in Decimal.
+`Vector.ToMathPoint` returns a shared instance.
 
 Fixed in the copy of the resources: key typos `ClsRealThreadàPendulum`, `Pulee`, `Y-RangeNotAllowed1` (EN) and `StartConstellatrions` (DE), text typos "Prokotoll", "Startpunt" and "Billiardtisch" (DE).
 
@@ -121,7 +122,7 @@ dotnet test
 Language: German (de-CH) by default, English via the switch in the header (stored in the browser, reloads the app).
 
 Speed (double pendulum with shadow, Decimal, interpreted WebAssembly): about 500 steps/s with `dotnet run` (Debug),
-about 7400 steps/s in the Release build (`dotnet publish -c Release`). AOT and Double are evaluated in step 4.
+about 7400 steps/s in the Release build (`dotnet publish -c Release`). AOT and Double were evaluated in step 4 (Double done in step 6).
 
 ## Name mapping (NumericMethodsClassLibrary → Dynamics.Core.NumericMethods)
 
@@ -161,10 +162,10 @@ drawn spirally while computing. AOT is therefore not needed now; a Web Worker ne
 | `ClsNewtonIterationController` (+ `ShowBasin`, `GetR`) | `NewtonController`, `NewtonBasin` + `Pages/NewtonPage.razor` (`/newton`) |
 | `ClsSingleNewtonIterationController` | `SingleNewtonController` (the temporary drawing is the state `Orbit`, `ConvergedRoot`) + `Pages/SingleNewtonPage.razor` (`/singlenewton`) |
 
-The models keep the operations of `ClsComplexNumber` (including the Decimal division of `Div`); 16 VB pictures
+The models keep the operations of `ClsComplexNumber` (in Double since step 6); 16 VB pictures
 (every pixel, plus the protocol) match exactly. The spiral, the pixel image and the area selection are shared
 with the Julia sets. Speed (Release): unit roots n = 3 about 2.3 s, polynomial with three roots about 4–5 s; with
-rotation (many points that do not converge within 100 steps, each with a Decimal division) up to about 40 s.
+rotation (many points that do not converge within 100 steps) up to about 40 s.
 
 Web differences of the Newton pages: if c is not allowed, the iteration does not start (VB went on with the old c,
 or failed if there was none); the protocol keeps the newest 10'000 lines (one line per pixel).
@@ -173,7 +174,7 @@ or failed if there was none); the protocol keeps the newest 10'000 lines (one li
 
 | VB | C# |
 |---|---|
-| `IStrangeAttractor`, `ClsStrangeAttractorAbstract`, `ClsRungeKuttaAttractorAbstract` | `IStrangeAttractor`, `StrangeAttractorBase`, `RungeKuttaAttractorBase` (Runge-Kutta in Decimal) |
+| `IStrangeAttractor`, `ClsStrangeAttractorAbstract`, `ClsRungeKuttaAttractorAbstract` | `IStrangeAttractor`, `StrangeAttractorBase`, `RungeKuttaAttractorBase` (Runge-Kutta) |
 | `ClsLinear`, `ClsLorenz`, `ClsRoessler`, `ClsThomas` | `Linear`, `Lorenz`, `Roessler`, `Thomas` (all in `Attractors.cs`) |
 | `ClsPointSet`, `ClsIterationPoint` (brushes) | `PointSet`, `IterationPoint` (ARGB colors, `AttractorColors`) |
 | `ClsStrangeAttractorController` | `StrangeAttractorController` (projections, cube, mouse rotation) + `Pages/StrangeAttractorPage.razor` |
@@ -209,7 +210,7 @@ by (+2, −25) for its hand cursor); the C-diagram is computed column by column.
 
 | VB | C# |
 |---|---|
-| `IStar`, `ClsStarAbstract` | `StarBase` (Runge-Kutta in Decimal; `IterationStep` returns the phase portrait point, `MoveActualPosition` the track) |
+| `IStar`, `ClsStarAbstract` | `StarBase` (Runge-Kutta; `IterationStep` returns the phase portrait point, `MoveActualPosition` the track) |
 | `ClsNewtonStar`, `ClsNormedStar` | `NewtonStar`, `NormedStar` (`DrawOrbit` → `GetOrbit` returns the points of the Kepler orbit) |
 | `IUniverse`, `ClsUniverseAbstract`, `ClsNewtonUniverse`, `ClsNormedUniverse` | `UniverseBase`, `NewtonUniverse`, `NormedUniverse` (all in `Universes.cs`) |
 | `ClsStarConstellation`, brushes | `StarConstellation`, `StarColors` (ARGB with the key of the name) |
@@ -249,12 +250,12 @@ the value and protocol lists show the newest entry first.
 11 VB trajectories (FN with power 1 to 5, including the two sensitivity start values 1e-27 apart), the start values for
 36 protocols, 13 Feigenbaum columns (each 999 + 2321 steps) and 4 histograms (up to 20'000 steps) match VB exactly; the
 start values for target values are corrected (see above). Speed (`dotnet run`, Debug and Release alike): Feigenbaum
-diagram about 150 s (1.9 million Decimal steps), drawn column by column; histogram about 20'000 steps per second.
+diagram about 150 s with Decimal, 13 s since step 6 (1.9 million steps), drawn column by column; histogram about 20'000 steps per second.
 
 Web differences of the growth pages: population with a speed slider (default 2 steps per second; VB ran as fast as
 possible); the sensitivity diagram is square (600 × 600 instead of 643 × 554); the hover cell in two dimensions is drawn
 on its own layer, so moving the mouse no longer wipes the orbits; the default start point of two dimensions is computed
-in Decimal (VB showed −0.17200000000000004 for the parabola); the histogram is redrawn every frame instead of every
+rounded to 6 decimals (VB showed −0.17200000000000004 for the parabola); the histogram is redrawn every frame instead of every
 1000 steps; the newest list entries are shown first.
 
 ## Name mapping (FractalClassLibrary → Dynamics.Core.LSystem)
@@ -275,3 +276,34 @@ step length and color of every turtle, number of moves, first and last move). Th
 
 Web differences of the L-system page: the picture is square (600 × 600 instead of 607 × 605); the generation is drawn
 frame by frame with the progress in percent; questions (delete, default systems) are browser dialogs.
+
+## Step 6: Double
+
+All models compute in `Double` instead of `Decimal` (Decimal → double, `Interval` keeps only `A`/`B`, `ComplexNumber.Div`
+in Double). The reference data of VB stay Decimal; the tests compare with tolerance (`ReferenceData.Close`, relative 1e-9):
+
+| What | Check | Measured (2026-11-12) |
+|---|---|---|
+| general helpers, numeric methods, start states (universe, billiard tables, mouse positions), protocol start values, L-systems | within 1e-9 (protocol start values 1e-12, move lines within the N2 rounding) | all |
+| chaotic trajectories (`ReferenceData.FollowsVB`) | the rows follow VB within 1e-6 at least up to a minimum, then Double and Decimal may part | pendulums 27–40 of 40 rows (min 25), attractors 42–65 of 65 (min 40), billiard 14–60 steps / 14–200 pairs (min 10), growth models ≥ 30 applications of F (logistic a = 4: 33–35) |
+| columns of bifurcation, Feigenbaum and C-diagrams (`ReferenceData.AssertColumn`) | periodic columns within 1e-6; chaotic ones inside VB's range (widened by half) | 14 of 16 Feigenbaum, 12 of 13 bifurcation, 4 of 8 C-diagram columns follow VB |
+| Newton pictures | at most 0.5 % different pixels and protocol lines (2.5 % with rotation) | 0 in 14 pictures, 0.25 % (n = 12), 1.9 % (rotation) |
+| histograms | 20 coarse classes, each within 2 % of the steps | all |
+
+Changes that came with Double:
+
+- **Tent map:** its step `Tentmap.F` still computes in Decimal. With a = 2, binary Double shifts out one bit per step,
+  so every orbit fell to the fixed point 0 after about 53 steps (histogram, iteration, Feigenbaum column). Double →
+  Decimal keeps 15 significant digits, so the orbit stays on the decimal grid of its start value and follows VB exactly.
+- **Sensitivity:** the second start value is 0.100000000001 (VB: 0.100000000000000000000000001, which is 0.1 in Double).
+- **Overflow:** Decimal threw an `OverflowException`, Double goes on with infinity or NaN. `NumericCheck` throws the
+  same exception for the pendulums (the page stops with a message) and in the angle normalisations (which would loop
+  forever with infinity or NaN, or for huge angles where adding 2π no longer changes the Double). Drawing commands with
+  infinity or NaN are dropped (`DrawBatch`), input like "NaN" or "Infinity" is not a number (`UserDataCheck`).
+- **Raster of two dimensions:** the lines up to and including the border (VB got the border line only because DeltaX
+  was rounded down in Decimal).
+- **Drawing of the column diagrams:** a point at the same half pixel and color is drawn once per frame (`PointOnce`);
+  the thousands of cycle values per column fall on few pixels.
+
+Speed with `dotnet run` (Debug), Decimal → Double: Feigenbaum diagram 150 s → 13 s, bifurcation diagram (Release 130 s
+with Decimal) → 19 s, C-diagram 43 s → 13 s, Newton (unit roots n = 3) 17 s, Julia set 5 s.

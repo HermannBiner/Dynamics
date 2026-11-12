@@ -29,15 +29,32 @@ public sealed class DrawBatch(CoordinateTransform transform)
 
     public void Clear() => _commands.Add(0);
 
+    /// <summary>
+    /// Adds one command. A command with an infinite or NaN number is dropped: Double does not throw on overflow
+    /// like Decimal did, and JSON (the transfer to JavaScript) cannot carry such numbers.
+    /// </summary>
+    private void Add(ReadOnlySpan<double> command)
+    {
+        foreach (var value in command)
+        {
+            if (!double.IsFinite(value))
+            {
+                return;
+            }
+        }
+
+        _commands.AddRange(command);
+    }
+
     public void Line(MathPoint a, MathPoint b, CanvasColor color, int width)
     {
         var (x1, y1) = Transform.MathToPixel(a);
         var (x2, y2) = Transform.MathToPixel(b);
-        _commands.AddRange([1, x1, y1, x2, y2, (int)color, width]);
+        Add([1, x1, y1, x2, y2, (int)color, width]);
     }
 
     /// <summary>Filled circle with radius in mathematical units; like VB only if the centre is inside.</summary>
-    public void FillCircle(MathPoint center, decimal radius, CanvasColor color)
+    public void FillCircle(MathPoint center, double radius, CanvasColor color)
     {
         if (!Transform.IsInside(center))
         {
@@ -45,7 +62,7 @@ public sealed class DrawBatch(CoordinateTransform transform)
         }
 
         var (x, y) = Transform.MathToPixel(center);
-        _commands.AddRange([2, x, y, Transform.LengthToPixel(radius), (int)color]);
+        Add([2, x, y, Transform.LengthToPixel(radius), (int)color]);
     }
 
     /// <summary>Point of about "size" pixels; like VB only if it is inside.</summary>
@@ -57,7 +74,43 @@ public sealed class DrawBatch(CoordinateTransform transform)
         }
 
         var (x, y) = Transform.MathToPixel(point);
-        _commands.AddRange([3, x, y, size, (int)color]);
+        Add([3, x, y, size, (int)color]);
+    }
+
+    private readonly HashSet<(int X, int Y, int Color)> _drawnPoints = [];
+
+    /// <summary>
+    /// Like <see cref="Point(MathPoint, CanvasColor, int)"/>, but a point at the same half pixel with the same color is
+    /// drawn only once per batch. For diagrams with thousands of values per column (Feigenbaum, bifurcation,
+    /// C-diagram), most of which fall on the same pixels of a cycle.
+    /// </summary>
+    public void PointOnce(MathPoint point, CanvasColor color, int size)
+    {
+        if (!Transform.IsInside(point))
+        {
+            return;
+        }
+
+        var (x, y) = Transform.MathToPixel(point);
+        if (_drawnPoints.Add(((int)Math.Round(x * 2), (int)Math.Round(y * 2), (int)color)))
+        {
+            Add([3, x, y, size, (int)color]);
+        }
+    }
+
+    /// <summary>Like <see cref="PointOnce(MathPoint, CanvasColor, int)"/> with any ARGB color.</summary>
+    public void PointOnce(MathPoint point, int argb, int size)
+    {
+        if (!Transform.IsInside(point))
+        {
+            return;
+        }
+
+        var (x, y) = Transform.MathToPixel(point);
+        if (_drawnPoints.Add(((int)Math.Round(x * 2), (int)Math.Round(y * 2), argb)))
+        {
+            Add([7, x, y, size, argb]);
+        }
     }
 
     /// <summary>Point with any ARGB color (VB brushes); like VB only if it is inside.</summary>
@@ -69,7 +122,7 @@ public sealed class DrawBatch(CoordinateTransform transform)
         }
 
         var (x, y) = Transform.MathToPixel(point);
-        _commands.AddRange([7, x, y, size, argb]);
+        Add([7, x, y, size, argb]);
     }
 
     /// <summary>Line with any ARGB color.</summary>
@@ -77,18 +130,18 @@ public sealed class DrawBatch(CoordinateTransform transform)
     {
         var (x1, y1) = Transform.MathToPixel(a);
         var (x2, y2) = Transform.MathToPixel(b);
-        _commands.AddRange([9, x1, y1, x2, y2, argb, width]);
+        Add([9, x1, y1, x2, y2, argb, width]);
     }
 
     /// <summary>Arc of an ellipse; angles in degrees, clockwise on the screen (as GDI DrawArc).</summary>
-    public void Arc(MathPoint center, decimal radiusX, decimal radiusY, int startAngle, int sweep, int argb, int width)
+    public void Arc(MathPoint center, double radiusX, double radiusY, int startAngle, int sweep, int argb, int width)
     {
         var (x, y) = Transform.MathToPixel(center);
-        _commands.AddRange([8, x, y, Transform.LengthToPixel(radiusX), Transform.LengthToPixel(radiusY), startAngle, sweep, argb, width]);
+        Add([8, x, y, Transform.LengthToPixel(radiusX), Transform.LengthToPixel(radiusY), startAngle, sweep, argb, width]);
     }
 
     /// <summary>VB DrawVerticalLine: a line over the whole height at x, if x is inside.</summary>
-    public void VerticalLine(decimal x, CanvasColor color, int width)
+    public void VerticalLine(double x, CanvasColor color, int width)
     {
         if (!Transform.MathXInterval.IsNumberInInterval(x))
         {
@@ -99,15 +152,15 @@ public sealed class DrawBatch(CoordinateTransform transform)
     }
 
     /// <summary>Shifts the whole picture right by dx pixels (chart recorder).</summary>
-    public void ShiftRight(int dx) => _commands.AddRange([4, dx]);
+    public void ShiftRight(int dx) => Add([4, dx]);
 
     /// <summary>Rectangle outline in pixel coordinates (e.g. the selection of an area).</summary>
     public void PixelRectangle(double x, double y, double width, double height, CanvasColor color, int lineWidth) =>
-        _commands.AddRange([5, x, y, width, height, (int)color, lineWidth]);
+        Add([5, x, y, width, height, (int)color, lineWidth]);
 
     /// <summary>Filled rectangle in pixel coordinates with any ARGB color.</summary>
     public void FillPixelRectangle(double x, double y, double width, double height, int argb) =>
-        _commands.AddRange([10, x, y, width, height, argb]);
+        Add([10, x, y, width, height, argb]);
 
     /// <summary>
     /// Filled rectangle between two mathematical corners (VB FillRectangle with the lower left corner a and the
@@ -134,11 +187,11 @@ public sealed class DrawBatch(CoordinateTransform transform)
         }
 
         var (x, y) = Transform.MathToPixel(center);
-        _commands.AddRange([8, x, y, radius, radius, 0, 360, argb, width]);
+        Add([8, x, y, radius, radius, 0, 360, argb, width]);
     }
 
     /// <summary>Circle outline with radius in mathematical units; like VB only if the centre is inside.</summary>
-    public void Circle(MathPoint center, decimal radius, CanvasColor color, int width)
+    public void Circle(MathPoint center, double radius, CanvasColor color, int width)
     {
         if (!Transform.IsInside(center))
         {
@@ -146,7 +199,7 @@ public sealed class DrawBatch(CoordinateTransform transform)
         }
 
         var (x, y) = Transform.MathToPixel(center);
-        _commands.AddRange([6, x, y, Transform.LengthToPixel(radius), (int)color, width]);
+        Add([6, x, y, Transform.LengthToPixel(radius), (int)color, width]);
     }
 
     /// <summary>Line between complex numbers (Double); far away points are cut, invalid ones skipped.</summary>
@@ -160,7 +213,7 @@ public sealed class DrawBatch(CoordinateTransform transform)
         }
 
         const double far = 1e6;
-        _commands.AddRange([1, Math.Clamp(x1, -far, far), Math.Clamp(y1, -far, far),
+        Add([1, Math.Clamp(x1, -far, far), Math.Clamp(y1, -far, far),
             Math.Clamp(x2, -far, far), Math.Clamp(y2, -far, far), (int)color, width]);
     }
 
@@ -173,13 +226,14 @@ public sealed class DrawBatch(CoordinateTransform transform)
         }
 
         var (x, y) = Transform.MathToPixel(z.X, z.Y);
-        _commands.AddRange([3, x, y, size, (int)color]);
+        Add([3, x, y, size, (int)color]);
     }
 
     public double[] Take()
     {
         var result = _commands.ToArray();
         _commands.Clear();
+        _drawnPoints.Clear();
         return result;
     }
 }

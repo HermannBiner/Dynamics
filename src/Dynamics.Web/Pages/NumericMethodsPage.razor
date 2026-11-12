@@ -84,7 +84,7 @@
         ? Text.Get("SpeedMax")
         : $"{PixelsPerSecond[_speedIndex]} {Text.Get("PixelsPerSecond")}";
 
-    private static readonly Interval MathInterval = new(-1m, 1m);
+    private static readonly Interval MathInterval = new(-1.0, 1.0);
 
     private readonly NumericMethodController _controller = new();
     private readonly DrawBatch _diagram = new(new CoordinateTransform(DiagramSize, DiagramSize, MathInterval, MathInterval));
@@ -206,7 +206,7 @@
                 if (step.IsShift)
                 {
                     _diagram.ShiftRight(1);
-                    _diagram.Line(new MathPoint(-1, 0), new MathPoint(-0.9m, 0), CanvasColor.Black, 1);
+                    _diagram.Line(new MathPoint(-1, 0), new MathPoint(-0.9, 0), CanvasColor.Black, 1);
                 }
                 _values.Add(step.ValueLine);
             }

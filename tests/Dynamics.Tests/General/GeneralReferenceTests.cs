@@ -4,7 +4,7 @@ using static Dynamics.Tests.ReferenceData;
 
 namespace Dynamics.Tests.General;
 
-/// <summary>Compares the C# port of the general classes exactly with the VB reference results.</summary>
+/// <summary>Compares the general classes with the VB reference results (Double against Decimal: with tolerance).</summary>
 public class GeneralReferenceTests
 {
     private static string[][] Rows(string name) => ReferenceData.Rows("general.json", name);
@@ -14,7 +14,7 @@ public class GeneralReferenceTests
     {
         foreach (var r in Rows("CalculateAngleOfDirection"))
         {
-            Assert.Equal(Dec(r[2]), MathHelperAngles.CalculateAngleOfDirection(Dec(r[0]), Dec(r[1])));
+            Close(r[2], MathHelperAngles.CalculateAngleOfDirection(Dec(r[0]), Dec(r[1])));
         }
     }
 
@@ -23,7 +23,7 @@ public class GeneralReferenceTests
     {
         foreach (var r in Rows("PendulumGetAngle"))
         {
-            Assert.Equal(Dec(r[2]), MathHelperPendulum.GetAngle(Dec(r[0]), Dec(r[1])));
+            Close(r[2], MathHelperPendulum.GetAngle(Dec(r[0]), Dec(r[1])));
         }
     }
 
@@ -32,7 +32,7 @@ public class GeneralReferenceTests
     {
         foreach (var r in Rows("ComplexGetArgument"))
         {
-            Assert.Equal(Dbl(r[2]), MathHelperComplex.GetArgument(Dbl(r[0]), Dbl(r[1])));
+            Close(r[2], MathHelperComplex.GetArgument(Dbl(r[0]), Dbl(r[1])));
         }
     }
 
@@ -41,7 +41,7 @@ public class GeneralReferenceTests
     {
         foreach (var r in Rows("AngleInNullTwoPi"))
         {
-            Assert.Equal(Dec(r[1]), MathHelperAngles.AngleInNullTwoPi(Dec(r[0])));
+            Close(r[1], MathHelperAngles.AngleInNullTwoPi(Dec(r[0])));
         }
     }
 
@@ -50,7 +50,7 @@ public class GeneralReferenceTests
     {
         foreach (var r in Rows("AngleInMinusPiAndPi"))
         {
-            Assert.Equal(Dec(r[1]), MathHelperPendulum.AngleInMinusPiAndPi(Dec(r[0])));
+            Close(r[1], MathHelperPendulum.AngleInMinusPiAndPi(Dec(r[0])));
         }
     }
 
@@ -63,17 +63,17 @@ public class GeneralReferenceTests
             var w = new Vector(Dec(r[3]), Dec(r[4]), Dec(r[5]));
             var phi = Dec(r[6]);
 
-            Assert.Equal(Dec(r[7]), v.Abs());
-            Assert.Equal(Dec(r[8]), v.Scalar(w));
+            Close(r[7], v.Abs());
+            Close(r[8], v.Scalar(w));
 
             // Cross (columns 9-11) and TurnInXYPlane (12-14) were corrected in Dynamics,
             // so only the unchanged parts are compared with VB.
-            Assert.Equal(Dec(r[10]), v.Cross(w).Y);
-            Assert.Equal(Dec(r[11]), v.Cross(w).Z);
+            Close(r[10], v.Cross(w).Y);
+            Close(r[11], v.Cross(w).Z);
             var turned = new Vector(v.X, v.Y, v.Z);
             turned.TurnInXYPlane(phi);
-            Assert.Equal(Dec(r[12]), turned.X);
-            Assert.Equal(Dec(r[14]), turned.Z);
+            Close(r[12], turned.X);
+            Close(r[14], turned.Z);
         }
     }
 
@@ -95,10 +95,13 @@ public class GeneralReferenceTests
 
             var expected = r[5..^4].Select(Dbl).ToArray();
             var actual = results.SelectMany(c => new[] { c.X, c.Y }).ToArray();
-            Assert.Equal(expected, actual);
+            for (var i = 0; i < expected.Length; i++)
+            {
+                Close(expected[i], actual[i]);
+            }
 
-            Assert.Equal(Dbl(r[^2]), z.AbsoluteValue);
-            Assert.Equal(Dbl(r[^1]), z.Argument);
+            Close(r[^2], z.AbsoluteValue);
+            Close(r[^1], z.Argument);
         }
     }
 
@@ -107,8 +110,8 @@ public class GeneralReferenceTests
     {
         foreach (var r in Rows("DualStringToDecimalNumber"))
         {
-            Assert.Equal(Dec(r[1]), MathHelperUnimodal.DualStringToDecimalNumber(r[0], false));
-            Assert.Equal(Dec(r[2]), MathHelperUnimodal.DualStringToDecimalNumber(r[0], true));
+            Close(r[1], MathHelperUnimodal.DualStringToDecimalNumber(r[0], false));
+            Close(r[2], MathHelperUnimodal.DualStringToDecimalNumber(r[0], true));
         }
     }
 

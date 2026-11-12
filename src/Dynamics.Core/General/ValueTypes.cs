@@ -10,22 +10,22 @@ public class MathPoint
     {
     }
 
-    public MathPoint(decimal x, decimal y)
+    public MathPoint(double x, double y)
     {
         X = x;
         Y = y;
     }
 
-    public MathPoint(decimal x, decimal y, decimal z)
+    public MathPoint(double x, double y, double z)
     {
         X = x;
         Y = y;
         Z = z;
     }
 
-    public decimal X { get; set; }
-    public decimal Y { get; set; }
-    public decimal Z { get; set; }
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Z { get; set; }
 
     /// <summary>Copies the coordinates of another point (VB: Equal).</summary>
     public void CopyFrom(MathPoint other)
@@ -37,10 +37,10 @@ public class MathPoint
 }
 
 /// <summary>A value pair describing the state of a dynamic system.</summary>
-public class DecValuePair(decimal x, decimal y)
+public class DecValuePair(double x, double y)
 {
-    public decimal X { get; set; } = x;
-    public decimal Y { get; set; } = y;
+    public double X { get; set; } = x;
+    public double Y { get; set; } = y;
 }
 
 /// <summary>A value pair describing the state of a dynamic system.</summary>
@@ -53,7 +53,7 @@ public class DblValuePair(double x, double y)
 /// <summary>A vector of decimals with the dimension given in the constructor.</summary>
 public class NTuple
 {
-    private readonly decimal[] _components;
+    private readonly double[] _components;
 
     /// <summary>
     /// VB-compatible: like <c>ReDim MyComponents(N)</c>, valid indices are 0..n (n + 1 components).
@@ -62,12 +62,12 @@ public class NTuple
     public NTuple(int n)
     {
         Dimension = n;
-        _components = new decimal[n + 1];
+        _components = new double[n + 1];
     }
 
     public int Dimension { get; }
 
-    public decimal this[int index]
+    public double this[int index]
     {
         get => _components[index];
         set => _components[index] = value;

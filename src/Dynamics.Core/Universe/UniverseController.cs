@@ -80,7 +80,7 @@ public sealed class UniverseController
     public int MassTrackBar { get; private set; }
     public int VelocityTrackBar { get; private set; }
     public int StepWidthTrackBar { get; private set; } = 10;
-    public decimal StepWidth => DS.TrbValueToStepWidth(StepWidthTrackBar);
+    public double StepWidth => DS.TrbValueToStepWidth(StepWidthTrackBar);
 
     // Text boxes (VB: UpdateTextFields)
     public string MassText { get; private set; } = "";
@@ -160,7 +160,7 @@ public sealed class UniverseController
     public void TakeOverConstellation()
     {
         ClearUniverse();
-        decimal totalMass = 0;
+        double totalMass = 0;
         foreach (var star in DS.ActiveConstellation!.Stars)
         {
             star.ActualStepWidth = 0;
@@ -239,8 +239,8 @@ public sealed class UniverseController
             return;
         }
 
-        NewStar.UserMass = NewStar.OriginalMass * (decimal)((100 + 2.0 * value) / 100);
-        NewStar.UserMass = (decimal)Math.Max(0.05, (double)NewStar.UserMass);
+        NewStar.UserMass = NewStar.OriginalMass * ((100 + 2.0 * value) / 100);
+        NewStar.UserMass = Math.Max(0.05, (double)NewStar.UserMass);
         NewStar.UserMass = Math.Min(500000, NewStar.UserMass);
         UpdateTextFields(NewStar);
         DS.RedrawUniverse(NewStar, IsZoom);
@@ -267,7 +267,7 @@ public sealed class UniverseController
             return;
         }
 
-        var factor = (decimal)(0.1 * value + 1);
+        var factor = (0.1 * value + 1);
         var range = DS.VelocityParameter.Range;
         var velocity = new Vector(
             Math.Min(range.B, Math.Max(range.A, NewStar.OriginalStartVelocity.X * factor)),
@@ -288,7 +288,7 @@ public sealed class UniverseController
         }
     }
 
-    private void SetTrackBarFromStepWidth(decimal stepWidth)
+    private void SetTrackBarFromStepWidth(double stepWidth)
     {
         if (stepWidth > 0)
         {
@@ -406,14 +406,14 @@ public sealed class UniverseController
             _startEnergy = 0;
             _startAngularMomentum = 0;
             _startPulse.Reset();
-            decimal totalMass = 0;
+            double totalMass = 0;
             foreach (var star in DS.ActiveStarCollection)
             {
                 star.ResetIteration();
                 if (IsConservationLaws)
                 {
-                    _startEnergy += (double)star.GetEnergy();
-                    _startAngularMomentum += (double)star.GetAngularMomentum();
+                    _startEnergy += star.GetEnergy();
+                    _startAngularMomentum += star.GetAngularMomentum();
                     _startPulse.X += star.GetPulse().X;
                     _startPulse.Y += star.GetPulse().Y;
                 }

@@ -51,7 +51,7 @@ public sealed class SensitivityController : GrowthControllerBase
         CreateDS(index);
         Power = 1;
         DS.Power = 1;
-        Transform = new CoordinateTransform(Width, Height, new Interval(1m, Width), DS.ValueParameter.Range);
+        Transform = new CoordinateTransform(Width, Height, new Interval(1.0, Width), DS.ValueParameter.Range);
         SetDefaultUserData();
         ResetIteration();
     }
@@ -60,8 +60,9 @@ public sealed class SensitivityController : GrowthControllerBase
     public void SetDefaultUserData()
     {
         Parameter = Format(DS.ChaoticParameterValue);
-        StartValue1 = Format(0.1m);
-        StartValue2 = Format(0.100000000000000000000000001m);
+        StartValue1 = Format(0.1);
+        // VB: 0.100000000000000000000000001 (1e-27 apart in Decimal); in Double that is 0.1 itself, so 1e-12 apart
+        StartValue2 = Format(0.100000000001);
         XStretching = Format(XStretchingDefault);
     }
 
@@ -101,7 +102,7 @@ public sealed class SensitivityController : GrowthControllerBase
             UserDataCheck.CheckValue(Parameter, DS.DSParameter.Range, out var a),
             UserDataCheck.CheckValue(StartValue1, DS.ValueParameter.Range, out var x1),
             UserDataCheck.CheckValue(StartValue2, DS.ValueParameter.Range, out var x2),
-            UserDataCheck.CheckValue(XStretching, new Interval(1m, 10m), out var stretching));
+            UserDataCheck.CheckValue(XStretching, new Interval(1.0, 10.0), out var stretching));
         if (error is not null)
         {
             return (error, null);
@@ -118,13 +119,13 @@ public sealed class SensitivityController : GrowthControllerBase
     }
 
     /// <summary>VB: IterationLoop, one step per xStretching pixels until the right border.</summary>
-    private SensitivityDrawing IterationLoop(decimal x1, decimal x2, int xStretching)
+    private SensitivityDrawing IterationLoop(double x1, double x2, int xStretching)
     {
         var orbit1 = new List<Segment>();
         var orbit2 = new List<Segment>();
         var difference = new List<Segment>();
         var a = DS.ValueParameter.Range.A;
-        decimal p = 0;
+        double p = 0;
         do
         {
             var next1 = DS.FN(x1);

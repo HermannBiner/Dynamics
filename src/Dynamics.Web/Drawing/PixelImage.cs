@@ -43,8 +43,8 @@ public sealed class PixelImage(int size)
     /// <summary>VB DrawCoordinateSystem: axes through 0 if 0 is inside the ranges (1 pixel, black).</summary>
     public void DrawAxes(CoordinateTransform transform)
     {
-        var (axisX, axisY) = transform.MathToPixel(0m, 0m);
-        if (transform.MathXInterval.IsNumberInInterval(0m))
+        var (axisX, axisY) = transform.MathToPixel(0.0, 0.0);
+        if (transform.MathXInterval.IsNumberInInterval(0.0))
         {
             var p = (int)Math.Round(axisX);
             for (var q = 1; q <= size; q++)
@@ -53,7 +53,7 @@ public sealed class PixelImage(int size)
             }
         }
 
-        if (transform.MathYInterval.IsNumberInInterval(0m))
+        if (transform.MathYInterval.IsNumberInInterval(0.0))
         {
             var q = (int)Math.Round(axisY);
             for (var p = 1; p <= size; p++)

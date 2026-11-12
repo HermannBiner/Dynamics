@@ -9,13 +9,13 @@ namespace Dynamics.Tests.Universe;
 public class UniverseRungeKuttaTests
 {
     /// <summary>Two equal stars of the normed universe (G = τ² = 0.0025) on a circular orbit around their centre.</summary>
-    private static NormedUniverse TwoStars(decimal stepWidth)
+    private static NormedUniverse TwoStars(double stepWidth)
     {
         var universe = new NormedUniverse();
 
         // circular orbit: v² / r = G m / (2r)² with r = 0.5, m = 1 → v = sqrt(G / 2) / ... = sqrt(0.0025 / 2)
-        var v = (decimal)Math.Sqrt(0.0025 * 1 / (4 * 0.5));
-        foreach (var (x, vy) in new[] { (-0.5m, -v), (0.5m, v) })
+        var v = Math.Sqrt(0.0025 * 1 / (4 * 0.5));
+        foreach (var (x, vy) in new[] { (-0.5, -v), (0.5, v) })
         {
             var star = new NormedStar { Universe = universe, OriginalMass = 1 };
             star.OriginalStartPosition.X = x;
@@ -67,7 +67,7 @@ public class UniverseRungeKuttaTests
     [Fact]
     public void CircularOrbitKeepsItsRadius()
     {
-        var universe = TwoStars(0.5m);
+        var universe = TwoStars(0.5);
         Run(universe, 400);
         var s = universe.ActiveStarCollection[1].State;
         var r = Math.Sqrt((double)(s.U1 * s.U1 + s.U2 * s.U2));
@@ -78,14 +78,14 @@ public class UniverseRungeKuttaTests
     public void MethodHasOrderFour()
     {
         // The position after the time T = 80 with h, h/2 and a reference with h/16
-        static double X(decimal h)
+        static double X(double h)
         {
             var universe = TwoStars(h);
             Run(universe, (int)(80 / h));
-            return (double)universe.ActiveStarCollection[1].State.U1;
+            return universe.ActiveStarCollection[1].State.U1;
         }
 
-        var reference = X(0.25m);
+        var reference = X(0.25);
         var error1 = Math.Abs(X(4) - reference);
         var error2 = Math.Abs(X(2) - reference);
 

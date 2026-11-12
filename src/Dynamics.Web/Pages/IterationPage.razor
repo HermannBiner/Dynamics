@@ -47,11 +47,11 @@
         <div class="field-row">
             <div class="field grow">
                 <label for="parameter">a =</label>
-                <input id="parameter" inputmode="decimal" value="@_controller.ParameterA" @onchange="OnParameterAsync" />
+                <input id="parameter" inputmode="double" value="@_controller.ParameterA" @onchange="OnParameterAsync" />
             </div>
             <div class="field grow">
                 <label for="start">@Text.Get("StartValue")</label>
-                <input id="start" inputmode="decimal" value="@_controller.StartValue" @onchange="OnStartValueAsync" />
+                <input id="start" inputmode="double" value="@_controller.StartValue" @onchange="OnStartValueAsync" />
             </div>
         </div>
 
@@ -73,7 +73,7 @@
             {
                 <div class="field">
                     <label for="stretching">@Text.Get("xStretching"), @Text.Get("DinStretching")</label>
-                    <input id="stretching" class="short" inputmode="decimal" value="@_controller.XStretching" @onchange="OnStretchingAsync" />
+                    <input id="stretching" class="short" inputmode="double" value="@_controller.XStretching" @onchange="OnStretchingAsync" />
                 </div>
             }
         </fieldset>
@@ -110,7 +110,7 @@
             <legend>@Text.Get("Transitivity")</legend>
             <div class="field">
                 <label for="target">@Text.Get("TargetValue")</label>
-                <input id="target" class="short" inputmode="decimal" value="@_controller.TargetValue" @onchange="e => _controller.TargetValue = Value(e)" />
+                <input id="target" class="short" inputmode="double" value="@_controller.TargetValue" @onchange="e => _controller.TargetValue = Value(e)" />
             </div>
             <div class="buttons">
                 <button type="button" @onclick="TargetStartValueAsync">@Text.Get("StartvalueForTargetvalue")</button>

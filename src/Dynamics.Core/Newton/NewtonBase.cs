@@ -30,8 +30,8 @@ public abstract class NewtonBase : INewton
 
     protected NewtonBase()
     {
-        XValueParameter = new GeneralParameter(1, "x-Values", new Interval(-1.5m, 1.5m), GeneralParameter.ParameterType.Variable);
-        YValueParameter = new GeneralParameter(1, "y-Values", new Interval(-1.5m, 1.5m), GeneralParameter.ParameterType.Variable);
+        XValueParameter = new GeneralParameter(1, "x-Values", new Interval(-1.5, 1.5), GeneralParameter.ParameterType.Variable);
+        YValueParameter = new GeneralParameter(1, "y-Values", new Interval(-1.5, 1.5), GeneralParameter.ParameterType.Variable);
         _actualXRange = XValueParameter.Range;
         _actualYRange = YValueParameter.Range;
         UpdateTransform();
@@ -194,7 +194,7 @@ public abstract class NewtonBase : INewton
         _ => z,
     };
 
-    /// <summary>The n unit roots: 1 and its rotations by 2π(k-1)/n (VB: the angle passes through Decimal).</summary>
+    /// <summary>The n unit roots: 1 and its rotations by 2π(k-1)/n.</summary>
     protected void PrepareNUnitRoots()
     {
         UnitRootCollection.Clear();
@@ -204,7 +204,7 @@ public abstract class NewtonBase : INewton
 
         for (var k = 2; k <= MyN; k++)
         {
-            UnitRootCollection.Add(new UnitRoot(w.Rotate((double)(decimal)(2 * Math.PI * (k - 1) / MyN)), k));
+            UnitRootCollection.Add(new UnitRoot(w.Rotate((double)(2 * Math.PI * (k - 1) / MyN)), k));
         }
 
         IterationDeepness = 60 * MyN;

@@ -161,7 +161,7 @@ public class NewtonControllerTests
 
         var basin = NewtonBasin.Create(n);
         Assert.NotEmpty(basin.CurvePoints);
-        Assert.Equal((decimal)(1 - 1 / Math.Pow(2, 1.0 / n)), basin.InnerRadius);
+        Assert.Equal((1 - 1 / Math.Pow(2, 1.0 / n)), basin.InnerRadius);
     }
 
     [Fact]
@@ -200,12 +200,12 @@ public class NewtonControllerTests
         // n = 2: the left half plane converges to -1
         controller.LoadRoots(2);
         Assert.Empty(controller.Orbit);
-        controller.MouseDown(new MathPoint(-0.3m, 0.9m));
-        Assert.True(controller.MouseMove(new MathPoint(-0.3m, 0.9m)));
+        controller.MouseDown(new MathPoint(-0.3, 0.9));
+        Assert.True(controller.MouseMove(new MathPoint(-0.3, 0.9)));
         Assert.Equal(1, controller.ConvergedRoot);
         Assert.Equal("-0.3000000000", controller.A);
         controller.MouseUp();
-        Assert.False(controller.MouseMove(new MathPoint(0.3m, 0.9m)));
+        Assert.False(controller.MouseMove(new MathPoint(0.3, 0.9)));
     }
 
     [Fact]

@@ -32,7 +32,7 @@ public abstract class GrowthControllerBase
         DS = GrowthModels.Create(Types[index]);
     }
 
-    protected static string Format(decimal value) => value.ToString(CultureInfo.CurrentCulture);
+    protected static string Format(double value) => value.ToString(CultureInfo.CurrentCulture);
 
     /// <summary>Joins the messages that are not null (VB showed one message box after the other).</summary>
     protected static string? Join(params string?[] messages)
@@ -42,10 +42,10 @@ public abstract class GrowthControllerBase
     }
 
     /// <summary>VB: TrbParameterA.Value = CInt((a − A) · 999 / width + 1), track bar 1..1000.</summary>
-    protected int TrackBarOf(decimal a) =>
+    protected int TrackBarOf(double a) =>
         Math.Clamp(Convert.ToInt32((a - DS.DSParameter.Range.A) * 999 / DS.DSParameter.Range.IntervalWidth + 1), 1, 1000);
 
     /// <summary>VB: a = A + width · (TrbParameterA.Value − 1) / 999.</summary>
-    protected decimal ParameterOf(int trackBar) =>
+    protected double ParameterOf(int trackBar) =>
         DS.DSParameter.Range.A + DS.DSParameter.Range.IntervalWidth * (trackBar - 1) / 999;
 }

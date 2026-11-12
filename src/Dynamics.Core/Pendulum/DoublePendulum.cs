@@ -11,10 +11,10 @@ public class DoublePendulum : PendulumBase
     private readonly GeneralParameter[] _valueParameter = new GeneralParameter[4];
 
     /// <summary>Mass ratio: m2 = M * m1.</summary>
-    private decimal M;
+    private double M;
 
     /// <summary>Mu = M / (1 + M).</summary>
-    private decimal Mu;
+    private double Mu;
 
     private readonly NTuple _pendulumSize = new(1);
     private readonly MathPoint _origin = new(0, 0);
@@ -23,14 +23,14 @@ public class DoublePendulum : PendulumBase
     {
         MyLabelProtocol = Text.Get("Parameterlist") + ": u1, v1, u2, v2, Etot";
 
-        _valueParameter[0] = new GeneralParameter(1, "L1", new Interval(0.1m, ShrinkedInterval.B),
-            GeneralParameter.ParameterType.Constant, 0.7m);
-        _valueParameter[1] = new GeneralParameter(2, "L2", new Interval(0.1m, ShrinkedInterval.B),
-            GeneralParameter.ParameterType.Constant, 0.2m);
-        _valueParameter[2] = new GeneralParameter(3, "Phi 1", new Interval(-(decimal)Math.PI, (decimal)Math.PI),
-            GeneralParameter.ParameterType.Variable, (decimal)(Math.PI / 4));
-        _valueParameter[3] = new GeneralParameter(4, "Phi 2", new Interval(-(decimal)Math.PI, (decimal)Math.PI),
-            GeneralParameter.ParameterType.Variable, (decimal)(Math.PI / 6));
+        _valueParameter[0] = new GeneralParameter(1, "L1", new Interval(0.1, ShrinkedInterval.B),
+            GeneralParameter.ParameterType.Constant, 0.7);
+        _valueParameter[1] = new GeneralParameter(2, "L2", new Interval(0.1, ShrinkedInterval.B),
+            GeneralParameter.ParameterType.Constant, 0.2);
+        _valueParameter[2] = new GeneralParameter(3, "Phi 1", new Interval(-Math.PI, Math.PI),
+            GeneralParameter.ParameterType.Variable, (Math.PI / 4));
+        _valueParameter[3] = new GeneralParameter(4, "Phi 2", new Interval(-Math.PI, Math.PI),
+            GeneralParameter.ParameterType.Variable, (Math.PI / 6));
         MyValueParameterDefinition.AddRange(_valueParameter);
 
         MyLabelPhasePortrait = Text.Get("PhasePortrait") + ": -- ";
@@ -38,7 +38,7 @@ public class DoublePendulum : PendulumBase
         // Track bar value 2 means m2 = m1.
         AdditionalParameterValue = 2;
         MyAdditionalParameter = new GeneralParameter(AdditionalParameterValue, Text.Get("MassRatioM"),
-            new Interval(0m, 4m), GeneralParameter.ParameterType.DS);
+            new Interval(0.0, 4.0), GeneralParameter.ParameterType.DS);
 
         // Constants: L1 = [0], L2 = [1]; variables: Phi1 = [0], Phi2 = [1]
         MyCalculationConstants = new NTuple(1);
@@ -53,7 +53,7 @@ public class DoublePendulum : PendulumBase
 
     public override IPendulum GetCopy() => new DoublePendulum();
 
-    public override decimal GetAddParameterValue(int trackBarValue) => (decimal)Math.Pow(2, trackBarValue - 2);
+    public override double GetAddParameterValue(int trackBarValue) => Math.Pow(2, trackBarValue - 2);
 
     public override IReadOnlyList<PendulumArm> GetArms() =>
     [
@@ -66,11 +66,11 @@ public class DoublePendulum : PendulumBase
 
     protected override void SetPosition()
     {
-        Position1.X = C[0] * (decimal)Math.Sin((double)MyCalculationVariables[0]);
-        Position1.Y = -C[0] * (decimal)Math.Cos((double)MyCalculationVariables[0]);
+        Position1.X = C[0] * Math.Sin((double)MyCalculationVariables[0]);
+        Position1.Y = -C[0] * Math.Cos((double)MyCalculationVariables[0]);
 
-        Position2.X = Position1.X + C[1] * (decimal)Math.Sin((double)MyCalculationVariables[1]);
-        Position2.Y = Position1.Y - C[1] * (decimal)Math.Cos((double)MyCalculationVariables[1]);
+        Position2.X = Position1.X + C[1] * Math.Sin((double)MyCalculationVariables[1]);
+        Position2.Y = Position1.Y - C[1] * Math.Cos((double)MyCalculationVariables[1]);
     }
 
     protected override void SetPhasePortraitParameters()
@@ -80,18 +80,18 @@ public class DoublePendulum : PendulumBase
         {
             case PhasePortraitType.TorusOrCylinder:
                 MyLabelPhasePortrait = phasePortrait + ": Phi1, Phi2. Tangent: Phi1', Phi2'";
-                MyUInterval = new Interval((decimal)-Math.PI, (decimal)Math.PI);
-                MyVInterval = new Interval((decimal)-Math.PI, (decimal)Math.PI);
+                MyUInterval = new Interval(-Math.PI, Math.PI);
+                MyVInterval = new Interval(-Math.PI, Math.PI);
                 break;
             case PhasePortraitType.PoincareSection:
                 MyLabelPhasePortrait = phasePortrait + ": Phi1 = 0, Phi2, Phi2'";
-                MyUInterval = new Interval((decimal)-Math.PI, (decimal)Math.PI);
-                MyVInterval = new Interval(-10m, 10m);
+                MyUInterval = new Interval(-Math.PI, Math.PI);
+                MyVInterval = new Interval(-10.0, 10.0);
                 break;
             default:
                 MyLabelPhasePortrait = phasePortrait + ": Blue: Phi1, Phi1'. Red: Phi2, Phi2'";
-                MyUInterval = new Interval((decimal)-Math.PI, (decimal)Math.PI);
-                MyVInterval = new Interval(-10m, 10m);
+                MyUInterval = new Interval(-Math.PI, Math.PI);
+                MyVInterval = new Interval(-10.0, 10.0);
                 break;
         }
     }
@@ -123,12 +123,12 @@ public class DoublePendulum : PendulumBase
         // The smaller bob has radius 0.01; m2 = M * m1.
         if (M >= 1)
         {
-            _pendulumSize[0] = 0.01m;
+            _pendulumSize[0] = 0.01;
             _pendulumSize[1] = M * _pendulumSize[0];
         }
         else
         {
-            _pendulumSize[1] = 0.01m;
+            _pendulumSize[1] = 0.01;
             _pendulumSize[0] = _pendulumSize[1] / M;
         }
     }
@@ -137,7 +137,7 @@ public class DoublePendulum : PendulumBase
     {
         // L1 at most Range.B to leave room for L2, at least Range.A because of the divisor in the equations.
         var range = MyValueParameterDefinition[0].Range;
-        var l1 = (decimal)Math.Max((double)range.A,
+        var l1 = Math.Max((double)range.A,
             Math.Min(Math.Sqrt((double)(position.X * position.X + position.Y * position.Y)), (double)range.B));
 
         var l2 = Math.Min(C[1], ShrinkFactor - l1);
@@ -162,7 +162,7 @@ public class DoublePendulum : PendulumBase
 
         // L1 + L2 at most 0.95 to stay visible.
         var range = MyValueParameterDefinition[1].Range;
-        var l2 = (decimal)Math.Max((double)range.A,
+        var l2 = Math.Max((double)range.A,
             Math.Min(Math.Sqrt((double)(deltaX * deltaX + deltaY * deltaY)), 0.95 - (double)C[0]));
         var phi2 = MathHelperPendulum.GetAngle(deltaX, deltaY);
 
@@ -208,67 +208,67 @@ public class DoublePendulum : PendulumBase
         SetPosition();
     }
 
-    public override decimal GetEnergy()
+    public override double GetEnergy()
     {
         // Norm: m1 = 1, m2 = M. Zero level of the potential energy at y = -1.
         // Kinetic energy of m1: L1^2 * v1^2 / 2
-        var eKin = (decimal)(Math.Pow((double)(C[0] * v1), 2) / 2);
+        var eKin = (Math.Pow((double)(C[0] * v1), 2) / 2);
 
         // Kinetic energy of m2
-        eKin += (decimal)((double)M * (Math.Pow((double)(C[0] * v1), 2) +
+        eKin += (M * (Math.Pow((double)(C[0] * v1), 2) +
             (double)(2 * C[0] * v1 * C[1] * v2) * Math.Cos((double)(u1 - u2)) +
             Math.Pow((double)(C[1] * v2), 2)) / 2);
 
         // Potential energy of m1 and m2
-        var ePot = g * (decimal)((1 - (double)C[0] * Math.Cos((double)u1)) * (double)(1 + M) -
-            (double)(M * C[1]) * Math.Cos((double)u2));
+        var ePot = g * ((1 - (double)C[0] * Math.Cos(u1)) * (double)(1 + M) -
+            (double)(M * C[1]) * Math.Cos(u2));
 
         return eKin + ePot;
     }
 
-    protected override decimal G1(NTuple x)
+    protected override double G1(NTuple x)
     {
         var deltaU = x[0] - x[2];
         var cos = Math.Cos((double)deltaU);
 
         // L2*v2^2 + L1*cos(deltaU)*v1^2
-        var temp = (decimal)((double)C[1] * Math.Pow((double)x[3], 2) +
+        var temp = ((double)C[1] * Math.Pow((double)x[3], 2) +
             (double)C[0] * cos * Math.Pow((double)x[1], 2));
 
         // * -Mu * sin(deltaU)
-        temp *= -Mu * (decimal)Math.Sin((double)deltaU);
+        temp *= -Mu * Math.Sin((double)deltaU);
 
         // + g * (Mu*cos(deltaU)*sin(u2) - sin(u1))
-        temp += g * (decimal)((double)Mu * cos * Math.Sin((double)x[2]) - Math.Sin((double)x[0]));
+        temp += g * (Mu * cos * Math.Sin((double)x[2]) - Math.Sin((double)x[0]));
 
         // / L1*(1 - Mu*cos^2(deltaU))
-        temp /= C[0] * (1 - Mu * (decimal)Math.Pow(cos, 2));
+        temp /= C[0] * (1 - Mu * Math.Pow(cos, 2));
 
         return temp;
     }
 
-    protected override decimal G2(NTuple x)
+    protected override double G2(NTuple x)
     {
         var deltaU = x[0] - x[2];
         var cos = Math.Cos((double)deltaU);
 
         // L1*v1^2 + Mu*L2*cos(deltaU)*v2^2
-        var temp = (decimal)((double)C[0] * Math.Pow((double)x[1], 2) +
+        var temp = ((double)C[0] * Math.Pow((double)x[1], 2) +
             (double)(Mu * C[1]) * cos * Math.Pow((double)x[3], 2));
 
-        temp *= (decimal)Math.Sin((double)deltaU);
+        temp *= Math.Sin((double)deltaU);
 
         // + g * (cos(deltaU)*sin(u1) - sin(u2))
-        temp += g * (decimal)(cos * Math.Sin((double)x[0]) - Math.Sin((double)x[2]));
+        temp += g * (cos * Math.Sin((double)x[0]) - Math.Sin((double)x[2]));
 
         // / L2*(1 - Mu*cos^2(deltaU))
-        temp /= C[1] * (1 - Mu * (decimal)Math.Pow(cos, 2));
+        temp /= C[1] * (1 - Mu * Math.Pow(cos, 2));
 
         return temp;
     }
 
     // Test mode: two independent thread pendulums.
-    protected override decimal G1Test(NTuple x) => -g * (decimal)(Math.Sin((double)x[0]) / (double)C[0]);
+    protected override double G1Test(NTuple x) => -g * (Math.Sin((double)x[0]) / (double)C[0]);
 
-    protected override decimal G2Test(NTuple x) => -g * (decimal)(Math.Sin((double)x[2]) / (double)C[1]);
+    protected override double G2Test(NTuple x) => -g * (Math.Sin((double)x[2]) / (double)C[1]);
 }

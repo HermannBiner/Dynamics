@@ -103,7 +103,7 @@ public class JuliaControllerTests
         Assert.Equal("0.043", controller.B);
         Assert.Equal("-1.5", controller.XMin);
         Assert.Equal("1.5", controller.XMax);
-        Assert.Equal("Delta = 3.0", controller.DeltaX);
+        Assert.Equal("Delta = 3", controller.DeltaX);
         Assert.Equal(12, controller.Samples.Count);
     }
 
@@ -164,7 +164,7 @@ public class JuliaControllerTests
 
         controller.A = "0.3";
         Assert.Null(controller.Start());
-        Assert.Equal(-1m, controller.DS.ActualXRange.A);
+        Assert.Equal(-1.0, controller.DS.ActualXRange.A);
     }
 
     [Fact]
@@ -179,8 +179,8 @@ public class JuliaControllerTests
         controller.SetXMax("0.5");
         controller.SetYMin("0.2");
         controller.SetYMax("0.6");
-        Assert.Equal(-0.25m, Dec(controller.A));
-        Assert.Equal(0.4m, Dec(controller.B));
+        Assert.Equal(-0.25, Dec(controller.A));
+        Assert.Equal(0.4, Dec(controller.B));
 
         // The stored selection becomes the first Julia sample
         controller.SelectSystem(0);
@@ -327,8 +327,8 @@ public class JuliaControllerTests
         }
 
         Assert.True(controller.MouseDown(1, 1));
-        Assert.Equal(-2m, Dec(controller.A));
-        Assert.Equal(1.3m, Dec(controller.B));
+        Assert.Equal(-2.0, Dec(controller.A));
+        Assert.Equal(1.3, Dec(controller.B));
 
         Assert.True(controller.MouseMove(300, 300));
         var expected = controller.DSMandelbrot.Transform.PixelToMathPoint(300, 300);

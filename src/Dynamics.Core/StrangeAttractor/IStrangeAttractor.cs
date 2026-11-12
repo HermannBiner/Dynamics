@@ -10,20 +10,20 @@ public interface IStrangeAttractor
     /// <summary>Definition of the parameter relevant for the chaotic behaviour.</summary>
     GeneralParameter DSParameter { get; }
 
-    decimal DSParameterValue { get; set; }
+    double DSParameterValue { get; set; }
 
     GeneralParameter XValueParameter { get; }
     GeneralParameter YValueParameter { get; }
     GeneralParameter ZValueParameter { get; }
 
-    decimal StepWidth { get; set; }
+    double StepWidth { get; set; }
 
     IReadOnlyList<PointSet> StartPointSets { get; }
 
     Interval MathInterval { get; }
 
     /// <summary>Split points of the Hopf bifurcation diagram.</summary>
-    IReadOnlyList<decimal> Splitpoints { get; }
+    IReadOnlyList<double> Splitpoints { get; }
 
     /// <summary>The point that is iterated; setting copies the coordinates (VB: Equal).</summary>
     MathPoint ActualMathPoint { get; set; }
@@ -58,7 +58,7 @@ public static class AttractorColors
 }
 
 /// <summary>A point in the iteration process moving to a strange attractor. Port of ClsIterationPoint.</summary>
-public class IterationPoint(decimal x, decimal y, decimal z, int color)
+public class IterationPoint(double x, double y, double z, int color)
 {
     public MathPoint DefaultStartPoint { get; } = new(x, y, z);
     public MathPoint UserStartPoint { get; } = new(x, y, z);
@@ -83,7 +83,7 @@ public class PointSet(string name)
 
     public string Name { get; } = name;
 
-    public decimal ProposedStepWidth { get; set; }
+    public double ProposedStepWidth { get; set; }
 
     public IReadOnlyList<IterationPoint> Points => _points;
 

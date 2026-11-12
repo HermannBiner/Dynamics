@@ -12,7 +12,7 @@ public enum AttractorCoordinate
 }
 
 /// <summary>The points of one column of the bifurcation diagram: parameter value and the cycle values per start point.</summary>
-public sealed record BifurcationColumn(int P, decimal ParameterValue, IReadOnlyList<(int Color, IReadOnlyList<decimal> Values)> Cycles);
+public sealed record BifurcationColumn(int P, double ParameterValue, IReadOnlyList<(int Color, IReadOnlyList<double> Values)> Cycles);
 
 /// <summary>
 /// UI-free logic of FrmBifurcation (Hopf bifurcation diagram of the strange attractors).
@@ -26,8 +26,8 @@ public sealed class BifurcationController
 
     private readonly List<IterationPoint> _points =
     [
-        new(0.1m, 0.1m, 0.1m, AttractorColors.Blue),
-        new(-0.1m, -0.1m, 0.1m, AttractorColors.Red),
+        new(0.1, 0.1, 0.1, AttractorColors.Blue),
+        new(-0.1, -0.1, 0.1, AttractorColors.Red),
     ];
 
     private int _p;
@@ -229,8 +229,8 @@ public sealed class BifurcationController
     /// The values of one column: each start point is iterated RunTimeUntilCycle - 1 steps, then
     /// lengthOfCycle + 1 values of the coordinate are recorded (VB loop counters).
     /// </summary>
-    public static IReadOnlyList<(int Color, IReadOnlyList<decimal> Values)> Compute(
-        IStrangeAttractor ds, IReadOnlyList<IterationPoint> points, decimal parameterValue,
+    public static IReadOnlyList<(int Color, IReadOnlyList<double> Values)> Compute(
+        IStrangeAttractor ds, IReadOnlyList<IterationPoint> points, double parameterValue,
         AttractorCoordinate coordinate, int lengthOfCycle)
     {
         ds.DSParameterValue = parameterValue;
@@ -238,7 +238,7 @@ public sealed class BifurcationController
         // Corrected: VB never called SetIterationParameters here, so the linear map had only zero entries.
         // For the Runge-Kutta attractors it does nothing.
         ds.SetIterationParameters();
-        var result = new List<(int, IReadOnlyList<decimal>)>();
+        var result = new List<(int, IReadOnlyList<double>)>();
         foreach (var point in points)
         {
             ds.ActualMathPoint = point.ActualPoint;
@@ -247,7 +247,7 @@ public sealed class BifurcationController
                 ds.IterationStep();
             }
 
-            var values = new List<decimal>(lengthOfCycle + 1);
+            var values = new List<double>(lengthOfCycle + 1);
             for (var n = RunTimeUntilCycle; n <= RunTimeUntilCycle + lengthOfCycle; n++)
             {
                 ds.IterationStep();
@@ -266,10 +266,10 @@ public sealed class BifurcationController
     }
 
     /// <summary>VB: CyclePoint.Y = Max(A, Min(x, B)).</summary>
-    public decimal ClampToValueRange(decimal value) => Math.Max(ActualValueRange.A, Math.Min(value, ActualValueRange.B));
+    public double ClampToValueRange(double value) => Math.Max(ActualValueRange.A, Math.Min(value, ActualValueRange.B));
 
     /// <summary>VB: DrawSplitPoints; green lines, the last one red, if the split point is in the parameter range.</summary>
-    public IEnumerable<(decimal Value, bool IsLast)> SplitLines()
+    public IEnumerable<(double Value, bool IsLast)> SplitLines()
     {
         var splitpoints = DS.Splitpoints;
         for (var i = 0; i < splitpoints.Count; i++)

@@ -35,7 +35,7 @@
             <div class="field-row">
                 <input id="parameter" class="grow" type="range" min="@_controller.ParameterTrackBarMinimum" max="@_controller.ParameterTrackBarMaximum"
                        value="@_controller.ParameterTrackBar" disabled="@(!IsStopped)" @oninput="OnParameterTrackBarAsync" />
-                <input class="short" inputmode="decimal" value="@_controller.ParameterText" disabled="@(!IsStopped)"
+                <input class="short" inputmode="double" value="@_controller.ParameterText" disabled="@(!IsStopped)"
                        @oninput="e => _controller.ParameterText = Value(e)" @onchange="OnParameterTextAsync" />
             </div>
         </div>
@@ -63,9 +63,9 @@
             <legend>@Text.Get("StartParameter")</legend>
             <div class="complex-input">
                 <label for="t">t</label>
-                <input id="t" inputmode="decimal" value="@_controller.TText" disabled="@(!IsStopped)" @oninput="e => _controller.TText = Value(e)" />
+                <input id="t" inputmode="double" value="@_controller.TText" disabled="@(!IsStopped)" @oninput="e => _controller.TText = Value(e)" />
                 <label for="alfa">@Text.Get("Alfa")</label>
-                <input id="alfa" inputmode="decimal" value="@_controller.AlfaText" disabled="@(!IsStopped)" @oninput="e => _controller.AlfaText = Value(e)" />
+                <input id="alfa" inputmode="double" value="@_controller.AlfaText" disabled="@(!IsStopped)" @oninput="e => _controller.AlfaText = Value(e)" />
             </div>
             <div class="buttons top-gap">
                 <button type="button" disabled="@(!IsStopped)" @onclick="NewBallAsync">@Text.Get("NewBall")</button>

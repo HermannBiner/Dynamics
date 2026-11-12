@@ -20,7 +20,7 @@ public class NumericMethodTests
     }
 
     /// <summary>Runs the real thread pendulum from (u0, 0) up to t = h · steps.</summary>
-    private static (decimal U, decimal V) RunThreadPendulum(decimal h, int steps, decimal u0)
+    private static (double U, double V) RunThreadPendulum(double h, int steps, double u0)
     {
         var ds = new RealThreadPendulum { h = h, NumberOfApproxSteps = steps, Amplitude = u0 };
         ds[0] = 0;
@@ -29,14 +29,14 @@ public class NumericMethodTests
         return (ds[1], ds[2]);
     }
 
-    private static double Energy((decimal U, decimal V) s) => (double)(s.V * s.V) / 2 - Math.Cos((double)s.U);
+    private static double Energy((double U, double V) s) => (double)(s.V * s.V) / 2 - Math.Cos(s.U);
 
     [Fact]
     public void RealThreadPendulumConservesEnergy()
     {
         // y'' + sin(y) = 0 conserves E = y'^2/2 - cos(y). With the VB error the drift was 2.3e-3.
-        var e0 = Energy((0.8m, 0m));
-        var drift = Math.Abs(Energy(RunThreadPendulum(0.01m, 1000, 0.8m)) - e0);
+        var e0 = Energy((0.8, 0.0));
+        var drift = Math.Abs(Energy(RunThreadPendulum(0.01, 1000, 0.8)) - e0);
         Assert.True(drift < 1e-10, $"energy drift {drift:E2}");
     }
 
@@ -44,9 +44,9 @@ public class NumericMethodTests
     public void RealThreadPendulumHasOrderFour()
     {
         // Halving h reduces the error by about 2^4 = 16 (with the VB error only by 2).
-        var reference = RunThreadPendulum(0.0005m, 20000, 0.8m).U;
-        var error1 = Math.Abs((double)(RunThreadPendulum(0.02m, 500, 0.8m).U - reference));
-        var error2 = Math.Abs((double)(RunThreadPendulum(0.01m, 1000, 0.8m).U - reference));
+        var reference = RunThreadPendulum(0.0005, 20000, 0.8).U;
+        var error1 = Math.Abs((double)(RunThreadPendulum(0.02, 500, 0.8).U - reference));
+        var error2 = Math.Abs((double)(RunThreadPendulum(0.01, 1000, 0.8).U - reference));
         var ratio = error1 / error2;
         Assert.InRange(ratio, 12, 20);
     }
@@ -84,7 +84,9 @@ public class NumericMethodTests
                 n++;
             }
 
-            Assert.Equal([Dec(row[2]), Dec(row[3]), Dec(row[4])], new[] { ds[0], ds[1], ds[2] });
+            Close(row[2], ds[0], 1e-9, $"t, step {n}");
+            Close(row[3], ds[1], 1e-9, $"x, step {n}");
+            Close(row[4], ds[2], 1e-9, $"v, step {n}");
         }
     }
 
@@ -113,11 +115,11 @@ public class NumericMethodTests
         controller.SetStretched(stretched);
         Assert.True(controller.Start());
 
-        Assert.Equal(Dec(a), controller.StepWidthA);
-        Assert.Equal(Dec(b), controller.StepWidthB);
+        Close(a, controller.StepWidthA);
+        Close(b, controller.StepWidthB);
         Assert.Equal(approxStepsB, controller.NumberOfApproxStepsB);
         Assert.Equal(stepsUntilShift, controller.NumberOfStepsUntilShift);
-        Assert.Equal(Dec(a), controller.DSA.h);
+        Close(a, controller.DSA.h);
     }
 
     [Fact]
@@ -132,9 +134,9 @@ public class NumericMethodTests
             controller.Step();
         }
 
-        // B makes 17 steps of 0.1/17 per step of A: same time up to decimal rounding; RK4 stays close to cos(t).
-        Assert.True(Math.Abs(controller.DSA[0] - controller.DSB[0]) < 1e-20m);
-        Assert.True(Math.Abs(controller.DSA[1] - controller.DSB[1]) < 0.000001m);
+        // B makes 17 steps of 0.1/17 per step of A: same time up to rounding; RK4 stays close to cos(t).
+        Assert.True(Math.Abs(controller.DSA[0] - controller.DSB[0]) < 1e-12);
+        Assert.True(Math.Abs(controller.DSA[1] - controller.DSB[1]) < 0.000001);
     }
 
     [Fact]
@@ -158,17 +160,17 @@ public class NumericMethodTests
     {
         var controller = new NumericMethodController();
 
-        Assert.False(controller.MouseDown(new MathPoint(0, 0.3m)));
-        Assert.True(controller.MouseDown(new MathPoint(-0.9m, 0.99m)));
-        Assert.Equal(0.95m, controller.DSA[1]);
-        Assert.Equal(0.95m, controller.DSB[1]);
+        Assert.False(controller.MouseDown(new MathPoint(0, 0.3)));
+        Assert.True(controller.MouseDown(new MathPoint(-0.9, 0.99)));
+        Assert.Equal(0.95, controller.DSA[1]);
+        Assert.Equal(0.95, controller.DSB[1]);
 
-        controller.MouseMove(new MathPoint(-0.9m, -0.2m));
+        controller.MouseMove(new MathPoint(-0.9, -0.2));
         controller.MouseUp();
-        Assert.Equal(-0.2m, controller.DSB[1]);
-        Assert.Equal(0m, controller.DSB[2]);
+        Assert.Equal(-0.2, controller.DSB[1]);
+        Assert.Equal(0.0, controller.DSB[2]);
 
         controller.Start();
-        Assert.False(controller.MouseDown(new MathPoint(-0.9m, 0)));
+        Assert.False(controller.MouseDown(new MathPoint(-0.9, 0)));
     }
 }

@@ -6,7 +6,7 @@ namespace Dynamics.Tests.GrowthModel;
 
 public class GrowthControllerTests
 {
-    private static string F(decimal d) => d.ToString(CultureInfo.CurrentCulture);
+    private static string F(double d) => d.ToString(CultureInfo.CurrentCulture);
 
     private static int IndexOf(GrowthControllerBase controller, Type type) => controller.Types.ToList().IndexOf(type);
 
@@ -15,12 +15,12 @@ public class GrowthControllerTests
     {
         var logistic = new LogisticGrowth { ParameterA = 4 };
         Assert.True(logistic.IsBehaviourChaotic());
-        logistic.ParameterA = 3.9m;
+        logistic.ParameterA = 3.9;
         Assert.False(logistic.IsBehaviourChaotic());
 
         var mandelbrot = new MandelbrotReal { ParameterA = -2 };
         Assert.True(mandelbrot.IsBehaviourChaotic());
-        mandelbrot.ParameterA = -1.5m;
+        mandelbrot.ParameterA = -1.5;
         Assert.False(mandelbrot.IsBehaviourChaotic());
     }
 
@@ -61,14 +61,14 @@ public class GrowthControllerTests
         controller.SelectSystem(IndexOf(controller, typeof(Parabola)));
         controller.SetPresentation(IterationPresentation.TimeAxis);
         controller.SetParameterA("2");
-        controller.TargetValue = F(-0.8m);
+        controller.TargetValue = F(-0.8);
         Assert.Null(controller.CalculateStartValueForTargetValue());
 
         var (error, drawing) = controller.Iterate(10);
         Assert.Null(error);
         Assert.NotNull(drawing!.TargetLine);
-        var last = decimal.Parse(controller.ValueList[^1], CultureInfo.CurrentCulture);
-        Assert.True(Math.Abs(last - -0.8m) < IterationController.TargetValuePrecision);
+        var last = double.Parse(controller.ValueList[^1], CultureInfo.CurrentCulture);
+        Assert.True(Math.Abs(last - -0.8) < IterationController.TargetValuePrecision);
         Assert.True(controller.N < 530 / 2, $"stopped after {controller.N} steps");
     }
 
@@ -110,7 +110,7 @@ public class GrowthControllerTests
         Assert.Equal("2.8", controller.ParameterA.Replace(',', '.'));
         Assert.Equal(700, controller.TrackBar); // CInt(2.8 · 999 / 4 + 1)
         controller.SetTrackBar(1000);
-        Assert.Equal(4m, controller.DS.ParameterA);
+        Assert.Equal(4.0, controller.DS.ParameterA);
     }
 
     [Fact]
@@ -128,9 +128,9 @@ public class GrowthControllerTests
             Assert.Equal(drawing.Orbit1[i].B.Y, drawing.Orbit1[i + 1].A.Y);
         }
 
-        // 1e-27 apart at the start, apart after about 90 doublings
-        Assert.Equal(drawing.Orbit1[10].A.Y, drawing.Orbit2[10].A.Y, 20);
-        Assert.Contains(drawing.Orbit1.Zip(drawing.Orbit2), pair => Math.Abs(pair.First.A.Y - pair.Second.A.Y) > 0.5m);
+        // 1e-12 apart at the start, apart after about 40 doublings
+        Assert.Equal(drawing.Orbit1[10].A.Y, drawing.Orbit2[10].A.Y, 8);
+        Assert.Contains(drawing.Orbit1.Zip(drawing.Orbit2), pair => Math.Abs(pair.First.A.Y - pair.Second.A.Y) > 0.5);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class GrowthControllerTests
         var controller = new SensitivityController(600, 600);
         var (_, drawing) = controller.Start();
         Assert.Equal(300, drawing!.Difference.Count);
-        Assert.Equal(1e-27m, drawing.Difference[0].A.Y);
+        Assert.InRange(drawing.Difference[0].A.Y, 0.99e-12, 1.01e-12);
         for (var i = 0; i + 1 < drawing.Difference.Count; i++)
         {
             Assert.Equal(drawing.Difference[i].B.Y, drawing.Difference[i + 1].A.Y);
@@ -161,7 +161,7 @@ public class GrowthControllerTests
         Assert.Equal(typeof(LogisticGrowth), controller.Types[0]);
         Assert.Equal(("2", "4"), (controller.AMin, controller.AMax));
         controller.SelectSystem(IndexOf(controller, typeof(MandelbrotReal)));
-        Assert.Equal((F(-2m), "0"), (controller.AMin, controller.AMax));
+        Assert.Equal((F(-2.0), "0"), (controller.AMin, controller.AMax));
         Assert.Equal(4, controller.Types.Count);
     }
 
@@ -196,16 +196,16 @@ public class GrowthControllerTests
     public void PopulationShowsTheDensity()
     {
         var controller = new PopulationController(new Random(1));
-        Assert.Equal(F(31.416m), controller.PopulationDensity);
+        Assert.Equal(F(31.416), controller.PopulationDensity);
         var picture = controller.StartPicture()!;
         Assert.Equal(1571, picture.Individuals.Count); // CInt(5000 · 0.314159)
         Assert.All(picture.Individuals, p =>
-            Assert.True((p.X - 0.5m) * (p.X - 0.5m) + (p.Y - 0.5m) * (p.Y - 0.5m) <= picture.Radius * picture.Radius * 1.0000001m));
+            Assert.True((p.X - 0.5) * (p.X - 0.5) + (p.Y - 0.5) * (p.Y - 0.5) <= picture.Radius * picture.Radius * 1.0000001));
 
         Assert.Null(controller.Start(single: true));
         var step = controller.Step();
         Assert.Equal(1, controller.N);
-        Assert.Equal(controller.DS.FN(0.314159m), controller.X);
+        Assert.Equal(controller.DS.FN(0.314159), controller.X);
         Assert.Equal(controller.X / 2, step.Radius);
     }
 
@@ -216,7 +216,7 @@ public class GrowthControllerTests
         controller.StartValue = "2";
         Assert.NotNull(controller.Start(single: false));
         Assert.Equal(IterationStatus.Stopped, controller.Status);
-        Assert.Equal(F(0.314159m), controller.StartValue);
+        Assert.Equal(F(0.314159), controller.StartValue);
     }
 
     [Fact]
@@ -246,8 +246,8 @@ public class GrowthControllerTests
             var cell = controller.CellAt(px, py);
             Assert.Contains(cell.X, raster);
             Assert.Contains(cell.Y, raster);
-            var x = -1m + (decimal)px * 2 / 600;
-            var y = 1m - (decimal)py * 2 / 600;
+            var x = -1.0 + px * 2 / 600;
+            var y = 1.0 - py * 2 / 600;
             Assert.InRange(x, cell.X, cell.X + controller.DeltaX);
             Assert.InRange(y, cell.Y, cell.Y + controller.DeltaX);
         }
@@ -257,11 +257,11 @@ public class GrowthControllerTests
     public void TwoDimensionsDefaultsAndRaster()
     {
         var controller = new TwoDimensionsController(600);
-        Assert.Equal((decimal)(5.0 / 600), controller.DeltaX);
-        Assert.Equal(121, controller.RasterLines().Count); // DeltaX is a little smaller than 1 / 120 (VB: CDec of a Double)
-        Assert.Equal((F(0.414m), F(0.407m)), (controller.X, controller.Y));
+        Assert.Equal((5.0 / 600), controller.DeltaX);
+        Assert.Equal(121, controller.RasterLines().Count); // 120 cells, including the border lines
+        Assert.Equal((F(0.414), F(0.407)), (controller.X, controller.Y));
         controller.SelectSystem(IndexOf(controller, typeof(Parabola)));
-        Assert.Equal((F(-0.172m), F(-0.186m)), (controller.X, controller.Y));
+        Assert.Equal((F(-0.172), F(-0.186)), (controller.X, controller.Y));
     }
 
     [Fact]
@@ -311,14 +311,14 @@ public class GrowthControllerTests
         Assert.Null(controller.Begin(10));
         Assert.Equal(TwoDimensionsController.ExperimentColors[2], controller.Color);
         var first = controller.Step()!;
-        Assert.Equal(0.414m, first.P.X);
-        Assert.Equal(controller.DS.FN(0.414m), first.NextP.X);
-        Assert.NotEqual(0m, first.NextP.X);
+        Assert.Equal(0.414, first.P.X);
+        Assert.Equal(controller.DS.FN(0.414), first.NextP.X);
+        Assert.NotEqual(0.0, first.NextP.X);
         while (controller.Step() is not null)
         {
         }
 
         Assert.Null(controller.Begin(1));
-        Assert.NotEqual(0.414m, controller.Step()!.P.X); // continues the orbit
+        Assert.NotEqual(0.414, controller.Step()!.P.X); // continues the orbit
     }
 }

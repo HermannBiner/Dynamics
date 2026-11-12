@@ -29,14 +29,14 @@ public class Mandelbrot : JuliaBase
         if (MyN == 2)
         {
             // Size of the Mandelbrot set in case n = 2
-            MyXValueParameter = new GeneralParameter(1, "x-Values", new Interval(-2m, 0.6m), GeneralParameter.ParameterType.Variable);
-            MyYValueParameter = new GeneralParameter(1, "y-Values", new Interval(-1.3m, 1.3m), GeneralParameter.ParameterType.Variable);
+            MyXValueParameter = new GeneralParameter(1, "x-Values", new Interval(-2.0, 0.6), GeneralParameter.ParameterType.Variable);
+            MyYValueParameter = new GeneralParameter(1, "y-Values", new Interval(-1.3, 1.3), GeneralParameter.ParameterType.Variable);
         }
         else
         {
             // centered
-            MyXValueParameter = new GeneralParameter(1, "x-Values", new Interval(-1.5m, 1.5m), GeneralParameter.ParameterType.Variable);
-            MyYValueParameter = new GeneralParameter(1, "y-Values", new Interval(-1.5m, 1.5m), GeneralParameter.ParameterType.Variable);
+            MyXValueParameter = new GeneralParameter(1, "x-Values", new Interval(-1.5, 1.5), GeneralParameter.ParameterType.Variable);
+            MyYValueParameter = new GeneralParameter(1, "y-Values", new Interval(-1.5, 1.5), GeneralParameter.ParameterType.Variable);
         }
 
         SetActualRanges(MyXValueParameter.Range, MyYValueParameter.Range);
@@ -49,7 +49,7 @@ public class Mandelbrot : JuliaBase
         MyC.X = cx;
         MyC.Y = cy;
 
-        var radius = (double)(decimal)MinimalRadius;
+        var radius = (double)MinimalRadius;
         var steps = Iterate(0, 0, cx, cy, radius);
 
         int color;
