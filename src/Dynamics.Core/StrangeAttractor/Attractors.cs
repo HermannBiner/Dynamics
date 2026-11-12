@@ -46,19 +46,19 @@ public class Linear : StrangeAttractorBase
         var sector = DSParameter.Range.IntervalWidth / 2;
         if (DSParameterValue <= sector)
         {
-            _lambda = (0.985 + 0.01 * (double)DSParameterValue / (double)sector);
-            _alfa = (0.985 + 0.02 * (double)DSParameterValue / (double)sector);
-            _delta = (0.985 + 0.03 * (double)DSParameterValue / (double)sector);
+            _lambda = 0.985 + 0.01 * DSParameterValue / sector;
+            _alfa = 0.985 + 0.02 * DSParameterValue / sector;
+            _delta = 0.985 + 0.03 * DSParameterValue / sector;
             _beta = 0;
         }
         else
         {
-            _lambda = (0.985 + 0.01 * (double)(DSParameterValue - sector) / (double)sector);
-            _phi = ((double)StepWidth * Math.PI);
-            var a = (0.985 + 0.02 * (double)(DSParameterValue - sector) / (double)sector);
-            _alfa = ((double)a * Math.Cos(_phi));
+            _lambda = 0.985 + 0.01 * (DSParameterValue - sector) / sector;
+            _phi = StepWidth * Math.PI;
+            var a = 0.985 + 0.02 * (DSParameterValue - sector) / sector;
+            _alfa = a * Math.Cos(_phi);
             _delta = _alfa;
-            _beta = ((double)a * Math.Sin(_phi));
+            _beta = a * Math.Sin(_phi);
         }
     }
 
@@ -84,7 +84,7 @@ public class Lorenz : RungeKuttaAttractorBase
     private const double Sigma = 10.0;
 
     /// <summary>Geometry: 4 / (1 + a²) with a = cell height / cell width; VB: CDec(8 / 3).</summary>
-    private static readonly double Beta = (8.0 / 3);
+    private static readonly double Beta = 8.0 / 3;
 
     public Lorenz()
     {
@@ -211,9 +211,9 @@ public class Thomas : RungeKuttaAttractorBase
     }
 
     /// <summary>VB: CDec(-b · x + Sin(y)), the sum is computed in Double.</summary>
-    public override double F(NTuple z) => ((double)(-DSParameterValue * z[0]) + Math.Sin((double)z[1]));
+    public override double F(NTuple z) => -DSParameterValue * z[0] + Math.Sin(z[1]);
 
-    public override double G(NTuple z) => ((double)(-DSParameterValue * z[1]) + Math.Sin((double)z[2]));
+    public override double G(NTuple z) => -DSParameterValue * z[1] + Math.Sin(z[2]);
 
-    public override double H(NTuple z) => ((double)(-DSParameterValue * z[2]) + Math.Sin((double)z[0]));
+    public override double H(NTuple z) => -DSParameterValue * z[2] + Math.Sin(z[0]);
 }

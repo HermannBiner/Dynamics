@@ -73,7 +73,7 @@ public abstract class GrowthModelBase : IIteration
     public bool IsBehaviourChaotic()
     {
         var a = ParameterA;
-        return !((0 <= a && a < DSParameter.Range.B) || (DSParameter.Range.A < a && a <= 0));
+        return !(0 <= a && a < DSParameter.Range.B || DSParameter.Range.A < a && a <= 0);
     }
 
     public double FN(double x)

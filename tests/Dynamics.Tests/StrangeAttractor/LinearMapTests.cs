@@ -9,9 +9,9 @@ namespace Dynamics.Tests.StrangeAttractor;
 /// </summary>
 public class LinearMapTests
 {
-    private static double Norm(MathPoint p) => Math.Sqrt((double)(p.X * p.X + p.Y * p.Y));
+    private static double Norm(MathPoint p) => Math.Sqrt(p.X * p.X + p.Y * p.Y);
 
-    private static double Angle(MathPoint p) => Math.Atan2((double)p.Y, (double)p.X);
+    private static double Angle(MathPoint p) => Math.Atan2(p.Y, p.X);
 
     [Theory]
     [InlineData(15, 0.005)]

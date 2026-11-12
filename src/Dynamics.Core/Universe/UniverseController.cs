@@ -240,7 +240,7 @@ public sealed class UniverseController
         }
 
         NewStar.UserMass = NewStar.OriginalMass * ((100 + 2.0 * value) / 100);
-        NewStar.UserMass = Math.Max(0.05, (double)NewStar.UserMass);
+        NewStar.UserMass = Math.Max(0.05, NewStar.UserMass);
         NewStar.UserMass = Math.Min(500000, NewStar.UserMass);
         UpdateTextFields(NewStar);
         DS.RedrawUniverse(NewStar, IsZoom);
@@ -267,7 +267,7 @@ public sealed class UniverseController
             return;
         }
 
-        var factor = (0.1 * value + 1);
+        var factor = 0.1 * value + 1;
         var range = DS.VelocityParameter.Range;
         var velocity = new Vector(
             Math.Min(range.B, Math.Max(range.A, NewStar.OriginalStartVelocity.X * factor)),
@@ -464,8 +464,8 @@ public sealed class UniverseController
             tracks.Add((from, to, star.Color));
             if (IsConservationLaws)
             {
-                energy += (double)star.GetEnergy();
-                angularMomentum += (double)star.GetAngularMomentum();
+                energy += star.GetEnergy();
+                angularMomentum += star.GetAngularMomentum();
                 pulse.X += star.GetPulse().X;
                 pulse.Y += star.GetPulse().Y;
             }
@@ -475,7 +475,7 @@ public sealed class UniverseController
         {
             Energy = Bar(Math.Abs(100 * energy), _startEnergy);
             AngularMomentum = Bar(Math.Abs(angularMomentum), _startAngularMomentum);
-            Pulse = Bar((double)pulse.Abs(), (double)_startPulse.Abs());
+            Pulse = Bar(pulse.Abs(), _startPulse.Abs());
         }
 
         return new UniverseStep(tracks, phasePoints);

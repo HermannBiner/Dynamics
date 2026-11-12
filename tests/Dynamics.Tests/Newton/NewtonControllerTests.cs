@@ -161,7 +161,7 @@ public class NewtonControllerTests
 
         var basin = NewtonBasin.Create(n);
         Assert.NotEmpty(basin.CurvePoints);
-        Assert.Equal((1 - 1 / Math.Pow(2, 1.0 / n)), basin.InnerRadius);
+        Assert.Equal(1 - 1 / Math.Pow(2, 1.0 / n), basin.InnerRadius);
     }
 
     [Fact]

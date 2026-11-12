@@ -21,7 +21,7 @@ public class JuliaPN : JuliaBase
         var (x, y) = PixelToComplex(pixelX, pixelY);
 
         // VB: Radius is a Decimal, the comparison with the Double |z| is in Double.
-        var radius = (double)Math.Max(MyC.AbsoluteValue, MinimalRadius);
+        var radius = Math.Max(MyC.AbsoluteValue, MinimalRadius);
 
         var steps = Iterate(x, y, MyC.X, MyC.Y, radius);
 

@@ -34,15 +34,15 @@ public class CorrectedVBErrorsTests
     public void TurnInXYPlaneRotates()
     {
         var v = new Vector(1, 0, 7);
-        v.TurnInXYPlane((Math.PI / 2));
-        Assert.Equal(0, (double)v.X, 12);
-        Assert.Equal(1, (double)v.Y, 12);
+        v.TurnInXYPlane(Math.PI / 2);
+        Assert.Equal(0, v.X, 12);
+        Assert.Equal(1, v.Y, 12);
         Assert.Equal(7.0, v.Z);
 
         // The length in the plane is preserved.
         var w = new Vector(0.6, 0.8, 0);
         w.TurnInXYPlane(1.234);
-        Assert.Equal(1, (double)w.Abs(), 12);
+        Assert.Equal(1, w.Abs(), 12);
     }
 
     [Fact]

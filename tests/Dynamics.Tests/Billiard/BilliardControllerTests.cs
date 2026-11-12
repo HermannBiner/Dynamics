@@ -112,7 +112,7 @@ public class BilliardControllerTests
         // start: on the ellipse in the direction of the mouse
         Assert.True(controller.MouseDown(new MathPoint(0, 0.5)));
         Assert.True(controller.MouseUp(new MathPoint(0, 0.5)));
-        Assert.Equal((Math.PI / 2), Dec(controller.TText), 10);
+        Assert.Equal(Math.PI / 2, Dec(controller.TText), 10);
         Assert.Empty(controller.DS.BilliardBallCollection);
 
         // direction: then the ball is on the table

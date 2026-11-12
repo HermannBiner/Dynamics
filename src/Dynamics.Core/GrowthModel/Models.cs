@@ -21,11 +21,11 @@ public sealed class LogisticGrowth : GrowthModelBase
 
     protected override double F(double x) => ParameterA * x * (1 - x);
 
-    protected override double IterationToTentmap(double x) => (2 * Math.Asin(Math.Sqrt((double)x)) / Math.PI);
+    protected override double IterationToTentmap(double x) => 2 * Math.Asin(Math.Sqrt(x)) / Math.PI;
 
     protected override double TentmapToIteration(double u)
     {
-        var x = Math.Sin(Math.PI * (double)u / 2);
+        var x = Math.Sin(Math.PI * u / 2);
         return x * x;
     }
 }
@@ -48,10 +48,10 @@ public sealed class MandelbrotReal : GrowthModelBase
     {
         // VB-compatible: clamped to [-1, 1] (the class is only used for the Feigenbaum diagram)
         x = Math.Max(-1, Math.Min(1, x));
-        return (Math.Acos((double)(x / 2)) / Math.PI);
+        return Math.Acos(x / 2) / Math.PI;
     }
 
-    protected override double TentmapToIteration(double u) => (2 * Math.Cos(Math.PI * (double)u));
+    protected override double TentmapToIteration(double u) => 2 * Math.Cos(Math.PI * u);
 }
 
 /// <summary>Parabola f(x) = 1 − a·x², x in [−1, 1], a in [0, 2].</summary>
@@ -66,16 +66,16 @@ public sealed class Parabola : GrowthModelBase
         Splitpoints = [0.75, 1.24995, 1.3681, 1.39405, 1.401155];
     }
 
-    protected override double F(double x) => 1 - (ParameterA * x * x);
+    protected override double F(double x) => 1 - ParameterA * x * x;
 
     protected override double IterationToTentmap(double x)
     {
         // Because of roundings, x can be a little outside [-1, 1]
         x = Math.Max(-1, Math.Min(1, x));
-        return (1 - (Math.Acos((double)x) / Math.PI));
+        return 1 - Math.Acos(x) / Math.PI;
     }
 
-    protected override double TentmapToIteration(double u) => Math.Cos(Math.PI * (double)(1 - u));
+    protected override double TentmapToIteration(double u) => Math.Cos(Math.PI * (1 - u));
 }
 
 /// <summary>Tent map f(u) = a·u for u &lt; 0.5, a·(1 − u) otherwise; u in [0, 1], a in [0, 2].</summary>

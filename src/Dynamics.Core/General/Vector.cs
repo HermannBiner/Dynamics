@@ -72,13 +72,13 @@ public class Vector
     /// </summary>
     public void TurnInXYPlane(double phi)
     {
-        var x = (double)X;
-        var y = (double)Y;
-        X = (x * Math.Cos((double)phi) - y * Math.Sin((double)phi));
-        Y = (x * Math.Sin((double)phi) + y * Math.Cos((double)phi));
+        var x = X;
+        var y = Y;
+        X = x * Math.Cos(phi) - y * Math.Sin(phi);
+        Y = x * Math.Sin(phi) + y * Math.Cos(phi);
     }
 
-    public double Abs() => Math.Sqrt((double)(X * X + Y * Y + Z * Z));
+    public double Abs() => Math.Sqrt(X * X + Y * Y + Z * Z);
 
     public MathPoint ToMathPoint()
     {

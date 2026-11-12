@@ -117,8 +117,8 @@ public abstract class StarBase
 
     /// <summary>VB DrawPhaseportrait: ρ · zoom and |v| · VFactor.</summary>
     public MathPoint PhasePortraitPoint => new(
-        Math.Sqrt((double)(U1 * U1 + U2 * U2)) * Universe.DiagramZoom,
-        Math.Sqrt((double)(V1 * V1 + V2 * V2)) * Universe.VFactor);
+        Math.Sqrt(U1 * U1 + U2 * U2) * Universe.DiagramZoom,
+        Math.Sqrt(V1 * V1 + V2 * V2) * Universe.VFactor);
 
     /// <summary>
     /// The acceleration of this star at (x, y) caused by the other stars at the positions xs, ys
@@ -174,7 +174,7 @@ public class NewtonStar : StarBase
     private double _perihelVelocity;
 
     /// <summary>See mathematical documentation.</summary>
-    protected virtual double GravConst => (0.00000000088874 * (double)Tau * (double)Tau);
+    protected virtual double GravConst => 0.00000000088874 * Tau * Tau;
 
     public virtual double Tau => 1;
 
@@ -188,8 +188,8 @@ public class NewtonStar : StarBase
     public void SetDefaultParameterByPerihelData()
     {
         var p = OriginalStartPosition;
-        p.X = (_perihel * Math.Cos(_argumentPerihel));
-        p.Y = (_perihel * Math.Sin(_argumentPerihel));
+        p.X = _perihel * Math.Cos(_argumentPerihel);
+        p.Y = _perihel * Math.Sin(_argumentPerihel);
         if (p.Abs() > 0)
         {
             V1 = -_perihelVelocity * p.Y / p.Abs();
@@ -221,12 +221,12 @@ public class NewtonStar : StarBase
             return points;
         }
 
-        double others = (double)TotalMassOfOtherStars, mass = (double)UserMass, g = (double)GravConst;
+        double others = TotalMassOfOtherStars, mass = UserMass, g = GravConst;
         var sum = TotalMassOfOtherStars + UserMass;
-        double l = (double)(UserMass * UserStartPosition.Abs() * UserStartVelocity.Abs());
-        var e = (double)UserMass * Math.Pow((double)UserStartVelocity.Abs(), 2) / 2 -
-                (double)(GravConst * UserMass) * Math.Pow(others, 3) / (Math.Pow(sum, 2) * (double)UserStartPosition.Abs());
-        var p = Math.Pow((sum) * l, 2) / (g * Math.Pow(others, 3) * Math.Pow(mass, 2));
+        double l = UserMass * UserStartPosition.Abs() * UserStartVelocity.Abs();
+        var e = UserMass * Math.Pow(UserStartVelocity.Abs(), 2) / 2 -
+                GravConst * UserMass * Math.Pow(others, 3) / (Math.Pow(sum, 2) * UserStartPosition.Abs());
+        var p = Math.Pow(sum * l, 2) / (g * Math.Pow(others, 3) * Math.Pow(mass, 2));
         var epsSquare = 1 + 2 * e * Math.Pow(l, 2) * Math.Pow(sum, 4) /
                         (Math.Pow(g, 2) * Math.Pow(mass, 3) * Math.Pow(others, 6));
         if (epsSquare < 0)
@@ -237,10 +237,10 @@ public class NewtonStar : StarBase
         var epsilon = Math.Sqrt(epsSquare);
         var argumentStartPosition = MathHelperAngles.AngleInNullTwoPi(
             MathHelperAngles.CalculateAngleOfDirection(UserStartPosition.X, UserStartPosition.Y));
-        var rho = (p / (double)(1 + epsilon));
+        var rho = p / (1 + epsilon);
 
         var correctAlfa = UserStartVelocity.Abs() <
-                          Math.Sqrt((double)(GravConst * TotalMassOfOtherStars / UserStartPosition.Abs())) ? -1 : 1;
+                          Math.Sqrt(GravConst * TotalMassOfOtherStars / UserStartPosition.Abs()) ? -1 : 1;
 
         double numCorrFactor = 0;
         if (rho != 0)
@@ -252,14 +252,14 @@ public class NewtonStar : StarBase
         var end = argumentStartPosition + (Math.PI - 0.01);
         for (var theta = argumentStartPosition - (Math.PI + 0.01); theta <= end; theta += 0.02)
         {
-            rho = (p / (1 + (double)(correctAlfa * epsilon) * Math.Cos((double)(theta - argumentStartPosition))));
+            rho = p / (1 + correctAlfa * epsilon * Math.Cos(theta - argumentStartPosition));
             rho *= (1 + correctAlfa * epsilon) / (1 + epsilon);
             if (rho > 0)
             {
                 // otherwise we are out of the definition range of e.g. the hyperbola
                 points.Add(new MathPoint(
-                    numCorrFactor * zoom * rho * Math.Cos((double)theta),
-                    numCorrFactor * zoom * rho * Math.Sin((double)theta)));
+                    numCorrFactor * zoom * rho * Math.Cos(theta),
+                    numCorrFactor * zoom * rho * Math.Sin(theta)));
             }
         }
 
@@ -269,9 +269,9 @@ public class NewtonStar : StarBase
     public override double GetEnergy()
     {
         var eKin = UserMass * (V1 * V1 + V2 * V2) / 2;
-        var massFactor = ((double)(GravConst * UserMass) * Math.Pow((double)TotalMassOfOtherStars, 3) /
-                                   Math.Pow((double)(TotalMassOfOtherStars + UserMass), 2));
-        var ePot = -((double)massFactor / Math.Max(1, Math.Sqrt((double)(U1 * U1 + U2 * U2))));
+        var massFactor = GravConst * UserMass * Math.Pow(TotalMassOfOtherStars, 3) /
+                                   Math.Pow(TotalMassOfOtherStars + UserMass, 2);
+        var ePot = -(massFactor / Math.Max(1, Math.Sqrt(U1 * U1 + U2 * U2)));
         return eKin + ePot;
     }
 
@@ -286,13 +286,13 @@ public class NewtonStar : StarBase
                 continue;
             }
 
-            var distance = Math.Sqrt(Math.Pow((double)(xs[j] - x), 2) + Math.Pow((double)(ys[j] - y), 2));
-            var denominator = Math.Max(0.001, Math.Pow((double)distance, 3));
-            sumX += (double)(stars[j].UserMass * (xs[j] - x)) / denominator;
-            sumY += (double)(stars[j].UserMass * (ys[j] - y)) / denominator;
+            var distance = Math.Sqrt(Math.Pow(xs[j] - x, 2) + Math.Pow(ys[j] - y, 2));
+            var denominator = Math.Max(0.001, Math.Pow(distance, 3));
+            sumX += stars[j].UserMass * (xs[j] - x) / denominator;
+            sumY += stars[j].UserMass * (ys[j] - y) / denominator;
         }
 
-        return ((sumX * (double)GravConst), (sumY * (double)GravConst));
+        return (sumX * GravConst, sumY * GravConst);
     }
 }
 

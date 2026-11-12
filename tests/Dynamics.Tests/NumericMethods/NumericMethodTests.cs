@@ -29,7 +29,7 @@ public class NumericMethodTests
         return (ds[1], ds[2]);
     }
 
-    private static double Energy((double U, double V) s) => (double)(s.V * s.V) / 2 - Math.Cos(s.U);
+    private static double Energy((double U, double V) s) => s.V * s.V / 2 - Math.Cos(s.U);
 
     [Fact]
     public void RealThreadPendulumConservesEnergy()
@@ -45,8 +45,8 @@ public class NumericMethodTests
     {
         // Halving h reduces the error by about 2^4 = 16 (with the VB error only by 2).
         var reference = RunThreadPendulum(0.0005, 20000, 0.8).U;
-        var error1 = Math.Abs((double)(RunThreadPendulum(0.02, 500, 0.8).U - reference));
-        var error2 = Math.Abs((double)(RunThreadPendulum(0.01, 1000, 0.8).U - reference));
+        var error1 = Math.Abs(RunThreadPendulum(0.02, 500, 0.8).U - reference);
+        var error2 = Math.Abs(RunThreadPendulum(0.01, 1000, 0.8).U - reference);
         var ratio = error1 / error2;
         Assert.InRange(ratio, 12, 20);
     }

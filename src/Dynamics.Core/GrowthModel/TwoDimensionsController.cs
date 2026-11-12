@@ -93,7 +93,7 @@ public sealed class TwoDimensionsController : GrowthControllerBase
         Transform = new CoordinateTransform(DiagramSize, DiagramSize, range, range);
 
         // VB: CDec(Rastersize / Diagramsize) is a Double division
-        DeltaX = ((double)RasterSize / DiagramSize) * range.IntervalWidth;
+        DeltaX = (double)RasterSize / DiagramSize * range.IntervalWidth;
         Mode = TwoDimensionsMode.Sensitivity;
 
         SetDefaultUserData();
@@ -161,7 +161,7 @@ public sealed class TwoDimensionsController : GrowthControllerBase
         // VB: Do ... Loop Until i · DeltaX >= width; that drew the border line only because DeltaX was rounded down in
         // Decimal. Here the lines up to and including the border.
         var count = (int)Math.Round(range.IntervalWidth / DeltaX);
-        return Enumerable.Range(0, count + 1).Select(i => range.A + (i * DeltaX)).ToList();
+        return Enumerable.Range(0, count + 1).Select(i => range.A + i * DeltaX).ToList();
     }
 
     // SECTOR SET START AND TARGET
@@ -244,8 +244,8 @@ public sealed class TwoDimensionsController : GrowthControllerBase
     public MathPoint CellAt(double pixelX, double pixelY)
     {
         var range = DS.ValueParameter.Range;
-        var x = range.A + (pixelX * range.IntervalWidth / DiagramSize);
-        var y = range.B - (pixelY * range.IntervalWidth / DiagramSize);
+        var x = range.A + pixelX * range.IntervalWidth / DiagramSize;
+        var y = range.B - pixelY * range.IntervalWidth / DiagramSize;
         var cells = (int)Math.Ceiling(range.IntervalWidth / DeltaX) - 1;
         var kx = Math.Clamp((int)Math.Floor((x - range.A) / DeltaX), 0, cells);
         var ky = Math.Clamp((int)Math.Floor((y - range.A) / DeltaX), 0, cells);

@@ -186,7 +186,7 @@ public abstract class JuliaBase : IJulia
     protected (double X, double Y) PixelToComplex(int pixelX, int pixelY)
     {
         var point = Transform.PixelToMathPoint(pixelX, pixelY);
-        return ((double)point.X, (double)point.Y);
+        return (point.X, point.Y);
     }
 
     /// <summary>VB: Math.Pow(2, 1 / (n - 1)).</summary>

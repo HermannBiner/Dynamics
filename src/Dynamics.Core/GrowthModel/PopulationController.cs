@@ -175,10 +175,10 @@ public sealed class PopulationController : GrowthControllerBase
         {
             // Polar coordinates of a random point in the circle
             var rho = radius * _random.NextSingle();
-            var alfa = (2 * Math.PI * _random.NextSingle());
+            var alfa = 2 * Math.PI * _random.NextSingle();
             individuals.Add(new MathPoint(
-                middle + rho * Math.Cos((double)alfa),
-                middle + rho * Math.Sin((double)alfa)));
+                middle + rho * Math.Cos(alfa),
+                middle + rho * Math.Sin(alfa)));
         }
 
         return new PopulationPicture(new MathPoint(middle, middle), radius, individuals);

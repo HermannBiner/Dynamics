@@ -31,7 +31,7 @@ public class ShakedPendulum : PendulumBase
         _valueParameter[2] = new GeneralParameter(3, "x", ShrinkedInterval,
             GeneralParameter.ParameterType.Variable, ShrinkFactor / 2);
         _valueParameter[3] = new GeneralParameter(4, "Phi", new Interval(-Math.PI, Math.PI),
-            GeneralParameter.ParameterType.Variable, (Math.PI / 4));
+            GeneralParameter.ParameterType.Variable, Math.PI / 4);
         MyValueParameterDefinition.AddRange(_valueParameter);
 
         AdditionalParameterValue = 2;
@@ -52,7 +52,7 @@ public class ShakedPendulum : PendulumBase
     public override IPendulum GetCopy() => new ShakedPendulum();
 
     // VB: CDec(AddParameter / 5) is a Double division.
-    public override double GetAddParameterValue(int trackBarValue) => (trackBarValue / 5.0);
+    public override double GetAddParameterValue(int trackBarValue) => trackBarValue / 5.0;
 
     public override IReadOnlyList<PendulumArm> GetArms() =>
     [
@@ -68,8 +68,8 @@ public class ShakedPendulum : PendulumBase
         Position1.X = MyCalculationVariables[0];
         Position1.Y = 0;
 
-        Position2.X = Position1.X + C[1] * Math.Sin((double)MyCalculationVariables[1]);
-        Position2.Y = -C[1] * Math.Cos((double)MyCalculationVariables[1]);
+        Position2.X = Position1.X + C[1] * Math.Sin(MyCalculationVariables[1]);
+        Position2.Y = -C[1] * Math.Cos(MyCalculationVariables[1]);
     }
 
     protected override void SetPhasePortraitParameters()
@@ -97,7 +97,7 @@ public class ShakedPendulum : PendulumBase
 
     public override void SetAdditionalParameters()
     {
-        Omega = ((double)GetAddParameterValue(AdditionalParameterValue) * Math.Sqrt((double)(g / C[1])));
+        Omega = GetAddParameterValue(AdditionalParameterValue) * Math.Sqrt(g / C[1]);
 
         if (IsMainDS)
         {
@@ -113,8 +113,8 @@ public class ShakedPendulum : PendulumBase
 
     public override void SetStartparameter1(MathPoint position)
     {
-        var a = Math.Max((double)ShrinkedInterval.A * 0.6,
-            Math.Min((double)position.X, (double)ShrinkedInterval.B * 0.6));
+        var a = Math.Max(ShrinkedInterval.A * 0.6,
+            Math.Min(position.X, ShrinkedInterval.B * 0.6));
 
         t = 0;
         C[0] = a;
@@ -134,17 +134,17 @@ public class ShakedPendulum : PendulumBase
         var deltaY = position.Y - Position1.Y;
 
         // L at most 0.98 to stay visible, at least 0.1.
-        var l = Math.Max(0.1, Math.Min(0.98 - (double)C[0],
-            Math.Sqrt((double)(deltaX * deltaX + deltaY * deltaY))));
+        var l = Math.Max(0.1, Math.Min(0.98 - C[0],
+            Math.Sqrt(deltaX * deltaX + deltaY * deltaY)));
 
         var phi = MathHelperPendulum.GetAngle(deltaX, deltaY);
         MyCalculationVariables[1] = MathHelperPendulum.AngleInMinusPiAndPi(phi);
 
         // |x + L*sin(Phi)| should be at most ShrinkFactor; critical only if sign(x) = sign(Phi).
-        if (Math.Abs((double)position.X + (double)l * Math.Sin((double)phi)) > ShrinkFactor &&
+        if (Math.Abs(position.X + l * Math.Sin(phi)) > ShrinkFactor &&
             Math.Sign(phi) == Math.Sign(u1))
         {
-            l = Math.Min((double)l, (double)(1 - Math.Abs(u1)) / Math.Sin((double)Math.Abs(phi)));
+            l = Math.Min(l, (1 - Math.Abs(u1)) / Math.Sin(Math.Abs(phi)));
         }
 
         C[1] = l;
@@ -195,8 +195,8 @@ public class ShakedPendulum : PendulumBase
 
         t += d;
 
-        u1 = ((double)C[0] * Math.Cos((double)(Omega * t)));
-        v1 = -((double)C[0] * Math.Sin((double)(Omega * t)));
+        u1 = C[0] * Math.Cos(Omega * t);
+        v1 = -(C[0] * Math.Sin(Omega * t));
         u2 += d * (k2[0] + 2 * k2[1] + 2 * k2[2] + k2[3]) / 6;
         v2 += d * (h2[0] + 2 * h2[1] + 2 * h2[2] + h2[3]) / 6;
 
@@ -221,11 +221,11 @@ public class ShakedPendulum : PendulumBase
     public override double GetEnergy()
     {
         // Increases if this pendulum takes energy from the shaker.
-        var sinOmegaT = Math.Sin((double)(Omega * t));
+        var sinOmegaT = Math.Sin(Omega * t);
 
-        var eKin = Math.Pow((double)(C[0] * Omega) * sinOmegaT, 2);
-        eKin -= ((double)(2 * C[0] * Omega) * sinOmegaT * (double)C[1] * v2 * Math.Cos(u2));
-        eKin += Math.Pow((double)(C[1] * v2), 2);
+        var eKin = Math.Pow(C[0] * Omega * sinOmegaT, 2);
+        eKin -= 2 * C[0] * Omega * sinOmegaT * C[1] * v2 * Math.Cos(u2);
+        eKin += Math.Pow(C[1] * v2, 2);
         eKin /= 2;
 
         var ePot = -g * Math.Cos(u2) * C[1];
@@ -239,12 +239,12 @@ public class ShakedPendulum : PendulumBase
 
     protected override double G2(NTuple x)
     {
-        var temp = ((double)C[0] * Math.Pow(Omega, 2) / (double)C[1]);
-        temp *= (Math.Cos((double)(Omega * t)) * Math.Cos((double)x[2]));
-        temp -= ((double)(g / C[1]) * Math.Sin((double)x[2]));
+        var temp = C[0] * Math.Pow(Omega, 2) / C[1];
+        temp *= Math.Cos(Omega * t) * Math.Cos(x[2]);
+        temp -= g / C[1] * Math.Sin(x[2]);
         return temp;
     }
 
     // Test mode: simple thread pendulum of length l. Corrected: VB divided by A (constant 0) instead of l.
-    protected override double G2Test(NTuple x) => -g * (Math.Sin((double)x[2]) / (double)C[1]);
+    protected override double G2Test(NTuple x) => -g * (Math.Sin(x[2]) / C[1]);
 }

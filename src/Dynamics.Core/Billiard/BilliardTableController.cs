@@ -153,7 +153,7 @@ public sealed class BilliardTableController
     public void SetParameterFromTrackBar(int value)
     {
         ParameterTrackBar = value;
-        ParameterText = ((value * 0.01)).ToString(CultureInfo.CurrentCulture);
+        ParameterText = (value * 0.01).ToString(CultureInfo.CurrentCulture);
         DS.C = UserDataCheck.TryParse(ParameterText, out var c) ? c : DS.C;
         ResetIteration();
     }
@@ -275,8 +275,8 @@ public sealed class BilliardTableController
 
         for (var i = 0; i <= _numberOfBalls; i++)
         {
-            alfa += (Math.PI / _numberOfBalls);
-            if ((double)alfa < Math.PI)
+            alfa += Math.PI / _numberOfBalls;
+            if (alfa < Math.PI)
             {
                 var color = (i % 5) switch
                 {

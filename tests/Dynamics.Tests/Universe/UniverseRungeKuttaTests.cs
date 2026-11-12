@@ -46,8 +46,8 @@ public class UniverseRungeKuttaTests
     {
         var a = universe.ActiveStarCollection[0].State;
         var b = universe.ActiveStarCollection[1].State;
-        var kinetic = (double)(a.V1 * a.V1 + a.V2 * a.V2 + b.V1 * b.V1 + b.V2 * b.V2) / 2;
-        var d = Math.Sqrt(Math.Pow((double)(a.U1 - b.U1), 2) + Math.Pow((double)(a.U2 - b.U2), 2));
+        var kinetic = (a.V1 * a.V1 + a.V2 * a.V2 + b.V1 * b.V1 + b.V2 * b.V2) / 2;
+        var d = Math.Sqrt(Math.Pow(a.U1 - b.U1, 2) + Math.Pow(a.U2 - b.U2, 2));
         return kinetic - 0.0025 / d;
     }
 
@@ -70,7 +70,7 @@ public class UniverseRungeKuttaTests
         var universe = TwoStars(0.5);
         Run(universe, 400);
         var s = universe.ActiveStarCollection[1].State;
-        var r = Math.Sqrt((double)(s.U1 * s.U1 + s.U2 * s.U2));
+        var r = Math.Sqrt(s.U1 * s.U1 + s.U2 * s.U2);
         Assert.Equal(0.5, r, 6);
     }
 

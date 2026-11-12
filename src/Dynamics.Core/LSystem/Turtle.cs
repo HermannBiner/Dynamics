@@ -228,10 +228,10 @@ public sealed class Turtle
     private TurtleMove Move(bool drawing)
     {
         var from = new MathPoint(State.Position.X, State.Position.Y);
-        var radians = (double)(State.Angle * Math.PI / 180);
+        var radians = State.Angle * Math.PI / 180;
         var to = new MathPoint(
-            from.X + ((double)State.StepLength * Math.Cos(radians)),
-            from.Y + ((double)State.StepLength * Math.Sin(radians)));
+            from.X + State.StepLength * Math.Cos(radians),
+            from.Y + State.StepLength * Math.Sin(radians));
 
         var width = Scaling == LSystemScaling.ByIteration ? 1 : Convert.ToInt32(1 + State.StepLength / 2);
         State.Position.X = to.X;

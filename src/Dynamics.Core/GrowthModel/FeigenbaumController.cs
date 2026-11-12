@@ -181,7 +181,7 @@ public sealed class FeigenbaumController : GrowthControllerBase
     /// </summary>
     public FeigenbaumColumn ComputeColumn(int p)
     {
-        DS.ParameterA = ActualParameterRange.A + (ActualParameterRange.IntervalWidth * p / Width);
+        DS.ParameterA = ActualParameterRange.A + ActualParameterRange.IntervalWidth * p / Width;
         var x = DS.CriticalPoint;
         for (var n = 1; n <= RunTimeUntilCycle - 1; n++)
         {

@@ -93,7 +93,7 @@ public class StrangeAttractorReferenceTests(Xunit.Abstractions.ITestOutputHelper
         foreach (var row in rows.Skip(1))
         {
             var p = Int(row[1]);
-            var parameterValue = range.A + (range.IntervalWidth * p / width);
+            var parameterValue = range.A + range.IntervalWidth * p / width;
             Close(row[2], parameterValue);
 
             var cycles = BifurcationController.Compute(ds, points, parameterValue, coordinate, lengthOfCycle);

@@ -26,7 +26,7 @@ public class StrangeAttractorControllerTests
         Assert.Equal(933, controller.DSParameterTrackBar);
         Assert.Equal("28", controller.DSParameterText);
         Assert.Equal(5, controller.StepWidthTrackBar);
-        Assert.Equal((-Math.PI / 15), controller.Phi);
+        Assert.Equal(-Math.PI / 15, controller.Phi);
         Assert.All(controller.AttractorNames, name => Assert.DoesNotContain("Cls", name));
     }
 
@@ -100,9 +100,9 @@ public class StrangeAttractorControllerTests
         Assert.Equal(5.0 + 20 - 10, controller.Project(point).Y);
 
         controller.SetProjection(AttractorProjection.ThreeD);
-        double phi = (double)controller.Phi, theta = (double)controller.Theta;
-        var rotatedX = (3 * Math.Cos(phi) - 4 * Math.Sin(phi) * Math.Cos(theta) - 5 * Math.Sin(phi) * Math.Sin(theta));
-        var rotatedZ = (-4 * Math.Sin(theta) + 5 * Math.Cos(theta));
+        double phi = controller.Phi, theta = controller.Theta;
+        var rotatedX = 3 * Math.Cos(phi) - 4 * Math.Sin(phi) * Math.Cos(theta) - 5 * Math.Sin(phi) * Math.Sin(theta);
+        var rotatedZ = -4 * Math.Sin(theta) + 5 * Math.Cos(theta);
         var plane = controller.Project(point);
         Assert.Equal(-rotatedX + 30, plane.X);
         Assert.Equal(Math.Max(0, rotatedZ + 20 - 10), plane.Y);

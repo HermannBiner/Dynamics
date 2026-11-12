@@ -36,15 +36,15 @@ public sealed class NewtonBasin
 
     public static NewtonBasin Create(int n)
     {
-        var innerRadius = (1 - 1 / Math.Pow(2, 1.0 / n));
+        var innerRadius = 1 - 1 / Math.Pow(2, 1.0 / n);
         var asymptote = new MathPoint(
-            (2 * Math.Cos(Math.PI / (2 * n))),
-            (2 * Math.Sin(Math.PI / (2 * n))));
+            2 * Math.Cos(Math.PI / (2 * n)),
+            2 * Math.Sin(Math.PI / (2 * n)));
 
         var points = new List<MathPoint>();
         var phi = 0.0;
         double r;
-        var limit = Math.Sqrt(Math.Pow((double)XInterval.B, 2) + Math.Pow((double)YInterval.B, 2));
+        var limit = Math.Sqrt(Math.Pow(XInterval.B, 2) + Math.Pow(YInterval.B, 2));
 
         // Draws the real and approximated curve of |N'(z)| < 1
         do
@@ -66,8 +66,8 @@ public sealed class NewtonBasin
         {
             if (radius < limit)
             {
-                points.Add(new MathPoint((radius * Math.Cos(angle)), (radius * Math.Sin(angle))));
-                points.Add(new MathPoint((radius * Math.Cos(angle)), (-radius * Math.Sin(angle))));
+                points.Add(new MathPoint(radius * Math.Cos(angle), radius * Math.Sin(angle)));
+                points.Add(new MathPoint(radius * Math.Cos(angle), -radius * Math.Sin(angle)));
             }
         }
     }

@@ -206,7 +206,7 @@ public sealed class CDiagramController
     public static CDiagramColumn ComputeColumn(IBilliardTable table, IBilliardBall ball, Interval parameterRange,
         int p, int width, int height, int position)
     {
-        table.C = parameterRange.A + (parameterRange.IntervalWidth * p / width);
+        table.C = parameterRange.A + parameterRange.IntervalWidth * p / width;
         ball.A = table.A;
         ball.B = table.B;
 

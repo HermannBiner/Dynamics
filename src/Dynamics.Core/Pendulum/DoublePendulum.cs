@@ -28,9 +28,9 @@ public class DoublePendulum : PendulumBase
         _valueParameter[1] = new GeneralParameter(2, "L2", new Interval(0.1, ShrinkedInterval.B),
             GeneralParameter.ParameterType.Constant, 0.2);
         _valueParameter[2] = new GeneralParameter(3, "Phi 1", new Interval(-Math.PI, Math.PI),
-            GeneralParameter.ParameterType.Variable, (Math.PI / 4));
+            GeneralParameter.ParameterType.Variable, Math.PI / 4);
         _valueParameter[3] = new GeneralParameter(4, "Phi 2", new Interval(-Math.PI, Math.PI),
-            GeneralParameter.ParameterType.Variable, (Math.PI / 6));
+            GeneralParameter.ParameterType.Variable, Math.PI / 6);
         MyValueParameterDefinition.AddRange(_valueParameter);
 
         MyLabelPhasePortrait = Text.Get("PhasePortrait") + ": -- ";
@@ -66,11 +66,11 @@ public class DoublePendulum : PendulumBase
 
     protected override void SetPosition()
     {
-        Position1.X = C[0] * Math.Sin((double)MyCalculationVariables[0]);
-        Position1.Y = -C[0] * Math.Cos((double)MyCalculationVariables[0]);
+        Position1.X = C[0] * Math.Sin(MyCalculationVariables[0]);
+        Position1.Y = -C[0] * Math.Cos(MyCalculationVariables[0]);
 
-        Position2.X = Position1.X + C[1] * Math.Sin((double)MyCalculationVariables[1]);
-        Position2.Y = Position1.Y - C[1] * Math.Cos((double)MyCalculationVariables[1]);
+        Position2.X = Position1.X + C[1] * Math.Sin(MyCalculationVariables[1]);
+        Position2.Y = Position1.Y - C[1] * Math.Cos(MyCalculationVariables[1]);
     }
 
     protected override void SetPhasePortraitParameters()
@@ -137,8 +137,8 @@ public class DoublePendulum : PendulumBase
     {
         // L1 at most Range.B to leave room for L2, at least Range.A because of the divisor in the equations.
         var range = MyValueParameterDefinition[0].Range;
-        var l1 = Math.Max((double)range.A,
-            Math.Min(Math.Sqrt((double)(position.X * position.X + position.Y * position.Y)), (double)range.B));
+        var l1 = Math.Max(range.A,
+            Math.Min(Math.Sqrt(position.X * position.X + position.Y * position.Y), range.B));
 
         var l2 = Math.Min(C[1], ShrinkFactor - l1);
 
@@ -162,8 +162,8 @@ public class DoublePendulum : PendulumBase
 
         // L1 + L2 at most 0.95 to stay visible.
         var range = MyValueParameterDefinition[1].Range;
-        var l2 = Math.Max((double)range.A,
-            Math.Min(Math.Sqrt((double)(deltaX * deltaX + deltaY * deltaY)), 0.95 - (double)C[0]));
+        var l2 = Math.Max(range.A,
+            Math.Min(Math.Sqrt(deltaX * deltaX + deltaY * deltaY), 0.95 - C[0]));
         var phi2 = MathHelperPendulum.GetAngle(deltaX, deltaY);
 
         C[1] = l2;
@@ -212,16 +212,16 @@ public class DoublePendulum : PendulumBase
     {
         // Norm: m1 = 1, m2 = M. Zero level of the potential energy at y = -1.
         // Kinetic energy of m1: L1^2 * v1^2 / 2
-        var eKin = (Math.Pow((double)(C[0] * v1), 2) / 2);
+        var eKin = Math.Pow(C[0] * v1, 2) / 2;
 
         // Kinetic energy of m2
-        eKin += (M * (Math.Pow((double)(C[0] * v1), 2) +
-            (double)(2 * C[0] * v1 * C[1] * v2) * Math.Cos((double)(u1 - u2)) +
-            Math.Pow((double)(C[1] * v2), 2)) / 2);
+        eKin += M * (Math.Pow(C[0] * v1, 2) +
+            2 * C[0] * v1 * C[1] * v2 * Math.Cos(u1 - u2) +
+            Math.Pow(C[1] * v2, 2)) / 2;
 
         // Potential energy of m1 and m2
-        var ePot = g * ((1 - (double)C[0] * Math.Cos(u1)) * (double)(1 + M) -
-            (double)(M * C[1]) * Math.Cos(u2));
+        var ePot = g * ((1 - C[0] * Math.Cos(u1)) * (1 + M) -
+            M * C[1] * Math.Cos(u2));
 
         return eKin + ePot;
     }
@@ -229,17 +229,17 @@ public class DoublePendulum : PendulumBase
     protected override double G1(NTuple x)
     {
         var deltaU = x[0] - x[2];
-        var cos = Math.Cos((double)deltaU);
+        var cos = Math.Cos(deltaU);
 
         // L2*v2^2 + L1*cos(deltaU)*v1^2
-        var temp = ((double)C[1] * Math.Pow((double)x[3], 2) +
-            (double)C[0] * cos * Math.Pow((double)x[1], 2));
+        var temp = C[1] * Math.Pow(x[3], 2) +
+            C[0] * cos * Math.Pow(x[1], 2);
 
         // * -Mu * sin(deltaU)
-        temp *= -Mu * Math.Sin((double)deltaU);
+        temp *= -Mu * Math.Sin(deltaU);
 
         // + g * (Mu*cos(deltaU)*sin(u2) - sin(u1))
-        temp += g * (Mu * cos * Math.Sin((double)x[2]) - Math.Sin((double)x[0]));
+        temp += g * (Mu * cos * Math.Sin(x[2]) - Math.Sin(x[0]));
 
         // / L1*(1 - Mu*cos^2(deltaU))
         temp /= C[0] * (1 - Mu * Math.Pow(cos, 2));
@@ -250,16 +250,16 @@ public class DoublePendulum : PendulumBase
     protected override double G2(NTuple x)
     {
         var deltaU = x[0] - x[2];
-        var cos = Math.Cos((double)deltaU);
+        var cos = Math.Cos(deltaU);
 
         // L1*v1^2 + Mu*L2*cos(deltaU)*v2^2
-        var temp = ((double)C[0] * Math.Pow((double)x[1], 2) +
-            (double)(Mu * C[1]) * cos * Math.Pow((double)x[3], 2));
+        var temp = C[0] * Math.Pow(x[1], 2) +
+            Mu * C[1] * cos * Math.Pow(x[3], 2);
 
-        temp *= Math.Sin((double)deltaU);
+        temp *= Math.Sin(deltaU);
 
         // + g * (cos(deltaU)*sin(u1) - sin(u2))
-        temp += g * (cos * Math.Sin((double)x[0]) - Math.Sin((double)x[2]));
+        temp += g * (cos * Math.Sin(x[0]) - Math.Sin(x[2]));
 
         // / L2*(1 - Mu*cos^2(deltaU))
         temp /= C[1] * (1 - Mu * Math.Pow(cos, 2));
@@ -268,7 +268,7 @@ public class DoublePendulum : PendulumBase
     }
 
     // Test mode: two independent thread pendulums.
-    protected override double G1Test(NTuple x) => -g * (Math.Sin((double)x[0]) / (double)C[0]);
+    protected override double G1Test(NTuple x) => -g * (Math.Sin(x[0]) / C[0]);
 
-    protected override double G2Test(NTuple x) => -g * (Math.Sin((double)x[2]) / (double)C[1]);
+    protected override double G2Test(NTuple x) => -g * (Math.Sin(x[2]) / C[1]);
 }

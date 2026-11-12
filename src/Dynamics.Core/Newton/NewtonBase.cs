@@ -145,7 +145,7 @@ public abstract class NewtonBase : INewton
     {
         // Transform the pixel to a complex number
         var point = Transform.PixelToMathPoint(pixelX, pixelY);
-        var mathStartpoint = new ComplexNumber((double)point.X, (double)point.Y);
+        var mathStartpoint = new ComplexNumber(point.X, point.Y);
 
         var zi = new ComplexNumber(mathStartpoint.X, mathStartpoint.Y);
         int color;
@@ -204,7 +204,7 @@ public abstract class NewtonBase : INewton
 
         for (var k = 2; k <= MyN; k++)
         {
-            UnitRootCollection.Add(new UnitRoot(w.Rotate((double)(2 * Math.PI * (k - 1) / MyN)), k));
+            UnitRootCollection.Add(new UnitRoot(w.Rotate(2 * Math.PI * (k - 1) / MyN), k));
         }
 
         IterationDeepness = 60 * MyN;

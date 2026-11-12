@@ -49,7 +49,7 @@ public class Mandelbrot : JuliaBase
         MyC.X = cx;
         MyC.Y = cy;
 
-        var radius = (double)MinimalRadius;
+        var radius = MinimalRadius;
         var steps = Iterate(0, 0, cx, cy, radius);
 
         int color;

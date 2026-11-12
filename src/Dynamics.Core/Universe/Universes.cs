@@ -223,7 +223,7 @@ public abstract class UniverseBase
     /// <summary>VB: the track bar of the step width (1..72) in four linear sections.</summary>
     public virtual int StepWidthToTrbValue(double stepWidth)
     {
-        var h = (double)stepWidth;
+        var h = stepWidth;
         return h switch
         {
             < 0.01 => Convert.ToInt32(1 + (h - 0.001) / 0.0005),
@@ -235,10 +235,10 @@ public abstract class UniverseBase
 
     public virtual double TrbValueToStepWidth(int value) => value switch
     {
-        < 19 => (0.001 + (value - 1) * 0.0005),
-        < 37 => (0.01 + (value - 19) * 0.005),
-        < 55 => (0.1 + (value - 37) * 0.05),
-        _ => (1 + (value - 55) * 0.5),
+        < 19 => 0.001 + (value - 1) * 0.0005,
+        < 37 => 0.01 + (value - 19) * 0.005,
+        < 55 => 0.1 + (value - 37) * 0.05,
+        _ => 1 + (value - 55) * 0.5,
     };
 
     /// <summary>VB GetNewStar: a copy of the default star of the active constellation.</summary>
@@ -292,7 +292,7 @@ public class NewtonUniverse : UniverseBase
     }
 
     /// <summary>VB: CDec(x · Tau) with Tau = 1, computed in Double.</summary>
-    private static double V(double velocity) => (velocity * 1.0);
+    private static double V(double velocity) => velocity * 1.0;
 
     private static double Angle(double angle) => angle;
 
@@ -413,7 +413,7 @@ public class NormedUniverse : UniverseBase
     }
 
     /// <summary>VB: CDec(factor · velocity · Tau), computed in Double.</summary>
-    private static double V(double velocity) => (velocity * Tau);
+    private static double V(double velocity) => velocity * Tau;
 
     public override void CreateConstellations()
     {

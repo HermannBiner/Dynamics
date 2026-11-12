@@ -337,7 +337,7 @@ public class JuliaControllerTests
         // The Julia set is generated for the last position
         Assert.True(controller.MouseUp(out var error));
         Assert.Null(error);
-        Assert.Equal((double)expected.X, controller.JuliaC.X);
+        Assert.Equal(expected.X, controller.JuliaC.X);
         Assert.False(controller.IsJuliaComplete);
         Assert.False(controller.MouseUp(out _));
 

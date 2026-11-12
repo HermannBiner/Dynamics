@@ -114,8 +114,8 @@ public sealed class StrangeAttractorController
         SetStartPointSet(0);
         Transform = new CoordinateTransform(DiagramSize, DiagramSize, DS.MathInterval, DS.MathInterval);
         Projection = AttractorProjection.ThreeD;
-        Phi = (-Math.PI / 15);
-        Theta = (Math.PI / 8);
+        Phi = -Math.PI / 15;
+        Theta = Math.PI / 8;
     }
 
     /// <summary>VB: SetStartPointSet (CboStartpointSets).</summary>
@@ -307,10 +307,10 @@ public sealed class StrangeAttractorController
         var planeX = Math.Min(interval.B, Math.Max(interval.A, interval.A + (interval.B - interval.A) * mouseX / DiagramSize));
         var planeY = Math.Min(interval.B, Math.Max(interval.A, interval.B - (interval.B - interval.A) * mouseY / DiagramSize));
 
-        Phi = Math.Max((-(Math.PI / 2)),
-            Math.Min((Math.PI / 2), Math.PI * (planeX - interval.A) / (interval.B - interval.A) - (Math.PI / 2)));
+        Phi = Math.Max(-(Math.PI / 2),
+            Math.Min(Math.PI / 2, Math.PI * (planeX - interval.A) / (interval.B - interval.A) - Math.PI / 2));
         Theta = Math.Min(1, Math.Max(0.01,
-            (Math.PI / 2) * ((interval.B + 2 * interval.A - 3 * planeY) / (interval.B - interval.A))));
+            Math.PI / 2 * ((interval.B + 2 * interval.A - 3 * planeY) / (interval.B - interval.A))));
         return true;
     }
 
@@ -328,11 +328,11 @@ public sealed class StrangeAttractorController
     /// <summary>VB: Projection3D, rotation by Phi and Theta in Double, converted with CDec.</summary>
     public MathPoint Projection3D(MathPoint realPoint)
     {
-        double phi = (double)Phi, theta = (double)Theta;
-        double x = (double)realPoint.X, y = (double)realPoint.Y, z = (double)realPoint.Z;
+        double phi = Phi, theta = Theta;
+        double x = realPoint.X, y = realPoint.Y, z = realPoint.Z;
 
-        var rotatedX = (x * Math.Cos(phi) - y * Math.Sin(phi) * Math.Cos(theta) - z * Math.Sin(phi) * Math.Sin(theta));
-        var rotatedZ = ((double)(-realPoint.Y) * Math.Sin(theta) + z * Math.Cos(theta));
+        var rotatedX = x * Math.Cos(phi) - y * Math.Sin(phi) * Math.Cos(theta) - z * Math.Sin(phi) * Math.Sin(theta);
+        var rotatedZ = -realPoint.Y * Math.Sin(theta) + z * Math.Cos(theta);
 
         var interval = DS.MathInterval;
         var planePoint = new MathPoint(-rotatedX, rotatedZ);
@@ -361,7 +361,7 @@ public sealed class StrangeAttractorController
     /// <summary>VB: DrawCoordinateCube; the cube in 3D, only the axes (red) in XY and XZ.</summary>
     public (List<CubeLine> Lines, List<CubePoint> Points) CoordinateCube()
     {
-        var e = ((double)(DS.MathInterval.B - DS.MathInterval.A) / (2 * Math.Sqrt(2)));
+        var e = (DS.MathInterval.B - DS.MathInterval.A) / (2 * Math.Sqrt(2));
         MathPoint[] c =
         [
             new(e, e, 0), new(e, -e, 0), new(-e, -e, 0), new(-e, e, 0), new(e, -e, e), new(-e, -e, e),

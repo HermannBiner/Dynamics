@@ -12,7 +12,7 @@ public class EllipseBilliardTable : BilliardTableBase
         MyA = 0.99;
         MyB = MyA * MyC;
         SetValueParameters(
-            new GeneralParameter(1, "Parameter t", new Interval(0.0, (Math.PI * 2)), GeneralParameter.ParameterType.Variable, (Math.PI / 2)),
+            new GeneralParameter(1, "Parameter t", new Interval(0.0, Math.PI * 2), GeneralParameter.ParameterType.Variable, Math.PI / 2),
             new GeneralParameter(2, "Angle Alfa", new Interval(0.001, 3.13), GeneralParameter.ParameterType.Variable, 0.001));
     }
 
@@ -51,13 +51,13 @@ public class EllipseBilliardTable : BilliardTableBase
         MathPoint f1, f2;
         if (MyA > MyB)
         {
-            f = Math.Sqrt((double)(MyA * MyA - MyB * MyB));
+            f = Math.Sqrt(MyA * MyA - MyB * MyB);
             f1 = new MathPoint(f, 0);
             f2 = new MathPoint(-f, 0);
         }
         else
         {
-            f = Math.Sqrt((double)(MyB * MyB - MyA * MyA));
+            f = Math.Sqrt(MyB * MyB - MyA * MyA);
             f1 = new MathPoint(0, f);
             f2 = new MathPoint(0, -f);
         }
@@ -72,7 +72,7 @@ public class EllipseBilliardTable : BilliardTableBase
 public class EllipseBilliardBall : BilliardBallBase
 {
     public override MathPoint PositionFromT(double t) =>
-        new(((double)A * Math.Cos((double)t)), ((double)B * Math.Sin((double)t)));
+        new(A * Math.Cos(t), B * Math.Sin(t));
 
     public override void SetFirstUserStartposition() => SetUserPositions(new MathPoint(0, B), new MathPoint(A, 0));
 
@@ -86,31 +86,31 @@ public class EllipseBilliardBall : BilliardBallBase
     }
 
     protected override bool IsBallInside(MathPoint p) =>
-        Math.Pow((double)(p.X / A), 2) + Math.Pow((double)(p.Y / B), 2) <= 1;
+        Math.Pow(p.X / A, 2) + Math.Pow(p.Y / B, 2) <= 1;
 
     /// <summary>See mathematical documentation; theta is the parameter of a vector parallel to phi.</summary>
     protected override double ParameterOfNextHitPoint(double t, double phi)
     {
-        var theta = CalculateAngleOfDirection(((double)B * Math.Cos((double)phi)), ((double)A * Math.Sin((double)phi)));
+        var theta = CalculateAngleOfDirection(B * Math.Cos(phi), A * Math.Sin(phi));
 
         // u is the parameter where the straight line of the orbit intersects the ellipse
-        var u = (-2 * Math.Cos((double)(t - theta)));
+        var u = -2 * Math.Cos(t - theta);
 
-        var nextT = Math.Min(1, Math.Cos((double)t) + (double)u * Math.Cos((double)theta));
+        var nextT = Math.Min(1, Math.Cos(t) + u * Math.Cos(theta));
         nextT = Math.Max(-1, nextT);
-        nextT = Math.Acos((double)nextT);
+        nextT = Math.Acos(nextT);
 
         // The solution above is in [0, π]; the other one is in [π, 2π]
-        if (Math.Sin((double)t) + (double)u * Math.Sin((double)theta) <= 0)
+        if (Math.Sin(t) + u * Math.Sin(theta) <= 0)
         {
-            nextT = (2 * Math.PI - (double)nextT);
+            nextT = 2 * Math.PI - nextT;
         }
 
         return AngleInNullTwoPi(nextT);
     }
 
     protected override double CalculatePsi(double t) =>
-        CalculateAngleOfDirection(((double)(-A) * Math.Sin((double)t)), ((double)B * Math.Cos((double)t)));
+        CalculateAngleOfDirection(-A * Math.Sin(t), B * Math.Cos(t));
 }
 
 /// <summary>Oval billiard table: right half circle, left half ellipse. Port of ClsOvalBilliardTable.</summary>
@@ -119,8 +119,8 @@ public class OvalBilliardTable : BilliardTableBase
     public OvalBilliardTable()
     {
         SetValueParameters(
-            new GeneralParameter(1, "Parameter t", new Interval(0.0, (Math.PI * 2)), GeneralParameter.ParameterType.Variable, (Math.PI / 2)),
-            new GeneralParameter(2, "Angle Alfa", new Interval(0.001, 3.13), GeneralParameter.ParameterType.Variable, (Math.PI / 30)));
+            new GeneralParameter(1, "Parameter t", new Interval(0.0, Math.PI * 2), GeneralParameter.ParameterType.Variable, Math.PI / 2),
+            new GeneralParameter(2, "Angle Alfa", new Interval(0.001, 3.13), GeneralParameter.ParameterType.Variable, Math.PI / 30));
         C = 0.5;
     }
 
@@ -131,7 +131,7 @@ public class OvalBilliardTable : BilliardTableBase
         set
         {
             MyC = value;
-            MyA = (1.9 * (double)Math.Min(1 / (1 + MyC), 1 / (2 * MyC)));
+            MyA = 1.9 * Math.Min(1 / (1 + MyC), 1 / (2 * MyC));
             MyB = MyC * MyA;
         }
     }
@@ -143,20 +143,20 @@ public class OvalBilliardTable : BilliardTableBase
         var shapes = CoordinateSystem().ToList();
         var midpoint = new MathPoint((MyA - MyB) / 2, 0);
         var focalpoint = MyA >= MyB
-            ? new MathPoint(midpoint.X - Math.Sqrt((double)(MyA * MyA - MyB * MyB)), 0)
-            : new MathPoint(midpoint.X, Math.Sqrt((double)(MyB * MyB - MyA * MyA)));
+            ? new MathPoint(midpoint.X - Math.Sqrt(MyA * MyA - MyB * MyB), 0)
+            : new MathPoint(midpoint.X, Math.Sqrt(MyB * MyB - MyA * MyA));
 
         shapes.Add(new TablePoint(midpoint, 2, Blue));
         shapes.Add(new TablePoint(focalpoint, 2, Blue));
 
         // right half circle (VB: DrawCircleArc from 3π/2 over π) and left half ellipse (from π/2 over π)
-        shapes.Add(new TableArc(midpoint, MyB, MyB, RadiantToDegree((3 * Math.PI / 2)), RadiantToDegree(Math.PI), Blue));
-        shapes.Add(new TableArc(midpoint, MyA, MyB, RadiantToDegree((Math.PI / 2)), RadiantToDegree(Math.PI), Blue));
+        shapes.Add(new TableArc(midpoint, MyB, MyB, RadiantToDegree(3 * Math.PI / 2), RadiantToDegree(Math.PI), Blue));
+        shapes.Add(new TableArc(midpoint, MyA, MyB, RadiantToDegree(Math.PI / 2), RadiantToDegree(Math.PI), Blue));
         return shapes;
     }
 
     /// <summary>VB ClsGraphicTool.RadiantToDegree: CInt(180 · arc / π).</summary>
-    internal static int RadiantToDegree(double arc) => Convert.ToInt32(180 * (double)arc / Math.PI);
+    internal static int RadiantToDegree(double arc) => Convert.ToInt32(180 * arc / Math.PI);
 }
 
 /// <summary>Ball on the oval table. Port of ClsOvalBilliardball.</summary>
@@ -167,17 +167,17 @@ public class OvalBilliardBall : BilliardBallBase
     /// <summary>VB: (0 ≤ t ≤ π/2) or (3π/2 ≤ t &lt; 2π), the comparisons in Double.</summary>
     private static bool IsRightHalf(double t)
     {
-        var d = (double)t;
-        return (0 <= d && d <= Math.PI / 2) || (3 * Math.PI / 2 <= d && d < 2 * Math.PI);
+        var d = t;
+        return 0 <= d && d <= Math.PI / 2 || 3 * Math.PI / 2 <= d && d < 2 * Math.PI;
     }
 
     public override MathPoint PositionFromT(double t)
     {
         t = AngleInNullTwoPi(t);
         var x = IsRightHalf(t)
-            ? M + B * Math.Cos((double)t)
-            : M + A * Math.Cos((double)t);
-        return new MathPoint(x, B * Math.Sin((double)t));
+            ? M + B * Math.Cos(t)
+            : M + A * Math.Cos(t);
+        return new MathPoint(x, B * Math.Sin(t));
     }
 
     private double TFromPosition(MathPoint point) => point.X >= M
@@ -202,8 +202,8 @@ public class OvalBilliardBall : BilliardBallBase
     {
         var m = M;
         return p.X >= m
-            ? Math.Pow((double)(p.X - m), 2) + Math.Pow((double)p.Y, 2) <= (double)(B * B)
-            : Math.Pow((double)((p.X - m) / A), 2) + Math.Pow((double)(p.Y / B), 2) <= 1;
+            ? Math.Pow(p.X - m, 2) + Math.Pow(p.Y, 2) <= (B * B)
+            : Math.Pow((p.X - m) / A, 2) + Math.Pow(p.Y / B, 2) <= 1;
     }
 
     protected override double ParameterOfNextHitPoint(double t, double phi)
@@ -213,21 +213,21 @@ public class OvalBilliardBall : BilliardBallBase
         var startpoint = PositionFromT(t);
         var p = startpoint.X;
         var q = startpoint.Y;
-        var cos = Math.Cos((double)phi);
-        var sin = Math.Sin((double)phi);
+        var cos = Math.Cos(phi);
+        var sin = Math.Sin(phi);
 
         // Intersection with the half circle (x ≥ m)
         var da = B * B;
-        var db = B * B * ((double)(p - m) * cos + (double)q * sin);
-        var dc = B * B * (Math.Pow((double)(p - m), 2) + q * q - B * B);
+        var db = B * B * ((p - m) * cos + q * sin);
+        var dc = B * B * (Math.Pow(p - m, 2) + q * q - B * B);
         intersection = Candidate(da, db, dc, x => x >= m);
 
         // Intersection with the half ellipse (x < m)
         if (intersection is null)
         {
-            da = (Math.Pow((double)A * sin, 2) + Math.Pow((double)B * cos, 2));
-            db = ((double)(A * A * q) * sin + (double)(B * B * (p - m)) * cos);
-            dc = (Math.Pow((double)(B * (p - m)), 2) + (double)(A * A * (q * q - B * B)));
+            da = Math.Pow(A * sin, 2) + Math.Pow(B * cos, 2);
+            db = A * A * q * sin + B * B * (p - m) * cos;
+            dc = Math.Pow(B * (p - m), 2) + A * A * (q * q - B * B);
             intersection = Candidate(da, db, dc, x => x < m);
         }
 
@@ -248,8 +248,8 @@ public class OvalBilliardBall : BilliardBallBase
 
             foreach (var sign in new[] { 1, -1 })
             {
-                var u = (-b + sign * Math.Sqrt((double)(b * b - a * c))) / a;
-                if ((double)Math.Abs(u) > 0.000001)
+                var u = (-b + sign * Math.Sqrt(b * b - a * c)) / a;
+                if (Math.Abs(u) > 0.000001)
                 {
                     var candidate = new MathPoint(startpoint.X + u * cos, startpoint.Y + u * sin);
                     if (isOnPart(candidate.X))
@@ -267,9 +267,9 @@ public class OvalBilliardBall : BilliardBallBase
     {
         t = AngleInNullTwoPi(t);
         var x = IsRightHalf(t)
-            ? -B * Math.Sin((double)t)
-            : -A * Math.Sin((double)t);
-        return CalculateAngleOfDirection(x, B * Math.Cos((double)t));
+            ? -B * Math.Sin(t)
+            : -A * Math.Sin(t);
+        return CalculateAngleOfDirection(x, B * Math.Cos(t));
     }
 }
 
@@ -280,8 +280,8 @@ public class StadiumBilliardTable : BilliardTableBase
     {
         // VB-compatible: the default of t uses c before it is set (c = 0)
         SetValueParameters(
-            new GeneralParameter(1, "Parameter t", new Interval(0.0, (0.95 * (2 + Math.PI))), GeneralParameter.ParameterType.Variable, 0.95 / (1 + MyC)),
-            new GeneralParameter(2, "Angle Alfa", new Interval(0.01, 3.13), GeneralParameter.ParameterType.Variable, (Math.PI / 30)));
+            new GeneralParameter(1, "Parameter t", new Interval(0.0, 0.95 * (2 + Math.PI)), GeneralParameter.ParameterType.Variable, 0.95 / (1 + MyC)),
+            new GeneralParameter(2, "Angle Alfa", new Interval(0.01, 3.13), GeneralParameter.ParameterType.Variable, Math.PI / 30));
         C = 2;
     }
 
@@ -303,10 +303,10 @@ public class StadiumBilliardTable : BilliardTableBase
         var shapes = CoordinateSystem().ToList();
         shapes.Add(new TableLine(new MathPoint(-MyA, -MyB), new MathPoint(MyA, -MyB), Blue));
         shapes.Add(new TableLine(new MathPoint(-MyA, MyB), new MathPoint(MyA, MyB), Blue));
-        shapes.Add(new TableArc(new MathPoint(-MyA, 0), MyB, MyB, OvalBilliardTable.RadiantToDegree((Math.PI / 2)),
+        shapes.Add(new TableArc(new MathPoint(-MyA, 0), MyB, MyB, OvalBilliardTable.RadiantToDegree(Math.PI / 2),
             OvalBilliardTable.RadiantToDegree(Math.PI), Blue));
         shapes.Add(new TablePoint(new MathPoint(-MyA, 0), 2, Blue));
-        shapes.Add(new TableArc(new MathPoint(MyA, 0), MyB, MyB, OvalBilliardTable.RadiantToDegree((3 * Math.PI / 2)),
+        shapes.Add(new TableArc(new MathPoint(MyA, 0), MyB, MyB, OvalBilliardTable.RadiantToDegree(3 * Math.PI / 2),
             OvalBilliardTable.RadiantToDegree(Math.PI), Blue));
         shapes.Add(new TablePoint(new MathPoint(MyA, 0), 2, Blue));
         return shapes;
@@ -331,7 +331,7 @@ public class StadiumBilliardBall : BilliardBallBase
         if (t > 2 * A && t < 2 * A + B * Pi)
         {
             var angle = (t - 2 * A) / B;
-            return new MathPoint(-A - B * Math.Sin((double)angle), B * Math.Cos((double)angle));
+            return new MathPoint(-A - B * Math.Sin(angle), B * Math.Cos(angle));
         }
 
         if (t >= 2 * A + B * Pi && t <= 4 * A + B * Pi)
@@ -340,7 +340,7 @@ public class StadiumBilliardBall : BilliardBallBase
         }
 
         var angle2 = (t - 4 * A - B * Pi) / B;
-        return new MathPoint(A + B * Math.Sin((double)angle2), -B * Math.Cos((double)angle2));
+        return new MathPoint(A + B * Math.Sin(angle2), -B * Math.Cos(angle2));
     }
 
     private double TFromPosition(MathPoint point)
@@ -354,14 +354,14 @@ public class StadiumBilliardBall : BilliardBallBase
         {
             var sinValue = Math.Min(1, (-point.X - A) / B);
             return point.Y >= 0
-                ? 2 * A + B * Math.Asin((double)sinValue)
-                : 2 * A + B * (Pi - Math.Asin((double)sinValue));
+                ? 2 * A + B * Math.Asin(sinValue)
+                : 2 * A + B * (Pi - Math.Asin(sinValue));
         }
 
         var sinValue2 = Math.Min(1, (point.X - A) / B);
         return point.Y <= 0
-            ? 4 * A + B * (Pi + Math.Asin((double)sinValue2))
-            : 4 * A + B * (2 * Pi - Math.Asin((double)sinValue2));
+            ? 4 * A + B * (Pi + Math.Asin(sinValue2))
+            : 4 * A + B * (2 * Pi - Math.Asin(sinValue2));
     }
 
     public override double SetUserStartposition(MathPoint mouse)
@@ -399,19 +399,19 @@ public class StadiumBilliardBall : BilliardBallBase
     {
         phi = AngleInNullTwoPi(phi);
         var startpoint = PositionFromT(s);
-        var cos = Math.Cos((double)phi);
-        var sin = Math.Sin((double)phi);
+        var cos = Math.Cos(phi);
+        var sin = Math.Sin(phi);
         double x;
         double t;
 
         // the straight lines y = ±b
-        if (phi != 0 && Math.Abs((double)phi - Math.PI) > 0)
+        if (phi != 0 && Math.Abs(phi - Math.PI) > 0)
         {
             foreach (var y in new[] { B, -B })
             {
-                t = ((double)(y - startpoint.Y) / Math.Sin((double)phi));
+                t = (y - startpoint.Y) / Math.Sin(phi);
                 x = startpoint.X + t * cos;
-                if (Math.Abs(x) <= A && (double)Math.Abs(t) > 0.0000001)
+                if (Math.Abs(x) <= A && Math.Abs(t) > 0.0000001)
                 {
                     return TFromPosition(new MathPoint(x, y));
                 }
@@ -421,7 +421,7 @@ public class StadiumBilliardBall : BilliardBallBase
         // the right half circle (x > a), then the left one (x < -a)
         foreach (var center in new[] { A, -A })
         {
-            var tempB = ((double)(startpoint.X - center) * Math.Cos((double)phi) + (double)startpoint.Y * Math.Sin((double)phi));
+            var tempB = (startpoint.X - center) * Math.Cos(phi) + startpoint.Y * Math.Sin(phi);
             var tempC = (startpoint.X - center) * (startpoint.X - center) + startpoint.Y * startpoint.Y - B * B;
             if (tempB * tempB - tempC < 0)
             {
@@ -430,10 +430,10 @@ public class StadiumBilliardBall : BilliardBallBase
 
             foreach (var sign in new[] { 1, -1 })
             {
-                t = -tempB + sign * Math.Sqrt((double)(tempB * tempB - tempC));
+                t = -tempB + sign * Math.Sqrt(tempB * tempB - tempC);
                 x = startpoint.X + t * cos;
                 var isOnPart = center > 0 ? x > A : x < -A;
-                if (isOnPart && (double)Math.Abs(t) > 0.0000001)
+                if (isOnPart && Math.Abs(t) > 0.0000001)
                 {
                     return TFromPosition(new MathPoint(x, startpoint.Y + t * sin));
                 }

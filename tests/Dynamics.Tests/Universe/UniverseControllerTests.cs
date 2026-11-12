@@ -118,10 +118,10 @@ public class UniverseControllerTests
         Assert.NotEmpty(orbit);
 
         var start = earth.UserStartPosition;
-        var nearest = orbit.Min(p => Math.Sqrt(Math.Pow((double)(p.X - start.X), 2) + Math.Pow((double)(p.Y - start.Y), 2)));
+        var nearest = orbit.Min(p => Math.Sqrt(Math.Pow(p.X - start.X, 2) + Math.Pow(p.Y - start.Y, 2)));
         Assert.True(nearest < 0.02, $"nearest orbit point {nearest}");
 
-        var radii = orbit.Select(p => Math.Sqrt((double)(p.X * p.X + p.Y * p.Y))).ToList();
+        var radii = orbit.Select(p => Math.Sqrt(p.X * p.X + p.Y * p.Y)).ToList();
         Assert.InRange(radii.Min(), 0.97, 1.0);
         Assert.InRange(radii.Max(), 1.0, 1.03);
     }

@@ -136,7 +136,7 @@
         var factor => $"{factor}×",
     };
 
-    private double StepsPerSecond => SpeedFactors[_speedIndex] / (double)_controller.MainDS.StepWidthValue;
+    private double StepsPerSecond => SpeedFactors[_speedIndex] / _controller.MainDS.StepWidthValue;
 
     private readonly PendulumController _controller = new();
     private readonly PendulumRenderer _renderer = new();

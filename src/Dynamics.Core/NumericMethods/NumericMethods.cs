@@ -36,7 +36,7 @@ public abstract class NumericMethodBase : INumericMethod
     protected readonly NTuple MyActualParameter = new(2);
 
     // VB: CDec(2 * Math.PI)
-    protected static readonly double TwoPi = (2 * Math.PI);
+    protected static readonly double TwoPi = 2 * Math.PI;
 
     public abstract string ClassName { get; }
 
@@ -97,7 +97,7 @@ public class RealSpringPendulum : NumericMethodBase
     }
 
     protected override void AfterIteration() =>
-        MyActualParameter[1] = MyAmplitude * Math.Cos((double)MyActualParameter[0]);
+        MyActualParameter[1] = MyAmplitude * Math.Cos(MyActualParameter[0]);
 }
 
 /// <summary>Spring pendulum with the forward (explicit) Euler method. Port of ClsForwardEuler.</summary>
@@ -190,18 +190,18 @@ public class RealThreadPendulum : NumericMethodBase
         var v = MyActualParameter[2];
 
         k[0] = MyH * v;
-        l[0] = -MyH * Math.Sin((double)u);
+        l[0] = -MyH * Math.Sin(u);
 
         k[1] = MyH * (v + l[0] / 2);
-        l[1] = MyH * -Math.Sin((double)(u + k[0] / 2));
+        l[1] = MyH * -Math.Sin(u + k[0] / 2);
 
         k[2] = MyH * (v + l[1] / 2);
-        l[2] = MyH * -Math.Sin((double)(u + k[1] / 2));
+        l[2] = MyH * -Math.Sin(u + k[1] / 2);
 
         // Corrected: VB used k[2] / 2 here, which reduced the method to order 1
         // (energy drift 4.5e-3 instead of 1e-10 for h = 0.02 up to t = 10).
         k[3] = MyH * (v + l[2]);
-        l[3] = MyH * -Math.Sin((double)(u + k[2]));
+        l[3] = MyH * -Math.Sin(u + k[2]);
 
         MyActualParameter[1] = u + (k[0] + 2 * k[1] + 2 * k[2] + k[3]) / 6;
         MyActualParameter[2] = v + (l[0] + 2 * l[1] + 2 * l[2] + l[3]) / 6;

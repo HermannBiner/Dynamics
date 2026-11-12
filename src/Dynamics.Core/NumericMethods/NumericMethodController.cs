@@ -179,7 +179,7 @@ public class NumericMethodController
             }
 
             // One pixel corresponds to 0.02 = NumberOfStepsUntilShift · StepWidthA (VB CInt rounds to even).
-            NumberOfStepsUntilShift = Math.Max(1, Convert.ToInt32(0.02 / (double)StepWidthA));
+            NumberOfStepsUntilShift = Math.Max(1, Convert.ToInt32(0.02 / StepWidthA));
 
             Status = IterationStatus.Ready;
         }

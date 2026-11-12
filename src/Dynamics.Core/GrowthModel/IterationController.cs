@@ -296,7 +296,7 @@ public sealed class IterationController : GrowthControllerBase
     {
         var range = DS.ValueParameter.Range;
         _valueList.Add(Format(u));
-        _protocol.Add(_signProtocol * u < _signProtocol * (range.A + ((range.B - range.A) / 2)) ? "0" : "1");
+        _protocol.Add(_signProtocol * u < _signProtocol * (range.A + (range.B - range.A) / 2) ? "0" : "1");
     }
 
     /// <summary>VB: CalculateStartvalueForProtocol. Returns the messages (errors and warnings).</summary>

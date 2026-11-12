@@ -257,7 +257,7 @@ public class GrowthControllerTests
     public void TwoDimensionsDefaultsAndRaster()
     {
         var controller = new TwoDimensionsController(600);
-        Assert.Equal((5.0 / 600), controller.DeltaX);
+        Assert.Equal(5.0 / 600, controller.DeltaX);
         Assert.Equal(121, controller.RasterLines().Count); // 120 cells, including the border lines
         Assert.Equal((F(0.414), F(0.407)), (controller.X, controller.Y));
         controller.SelectSystem(IndexOf(controller, typeof(Parabola)));

@@ -19,7 +19,7 @@ public class PendulumTestModeTests
         var l = p.CalculationConstants![1];
 
         // Thread pendulum of length l: E = v^2/2 - (g/l)·cos(u)
-        double Energy() => (double)(p.State.V2 * p.State.V2) / 2 - (double)(g / l) * Math.Cos(p.State.U2);
+        double Energy() => p.State.V2 * p.State.V2 / 2 - g / l * Math.Cos(p.State.U2);
 
         var e0 = Energy();
         for (var i = 0; i < 2000; i++)
@@ -41,11 +41,11 @@ public class PendulumTestModeTests
         start[0] = 0.7; // length l, rest length L0 = 0.5
         start[1] = 0.6; // angle
         p.CalculationVariables = start;
-        var omega = (double)p.GetAddParameterValue(p.AdditionalParameterValue);
+        var omega = p.GetAddParameterValue(p.AdditionalParameterValue);
 
         // Spring: E1 = v1^2/2 + Omega^2 (l - L0)^2 / 2; thread of length L0: E2 = v2^2/2 - (g/L0)·cos(Phi)
-        double SpringEnergy() => (double)(p.State.V1 * p.State.V1) / 2 + omega * omega * Math.Pow((double)(p.State.U1 - 0.5), 2) / 2;
-        double ThreadEnergy() => (double)(p.State.V2 * p.State.V2) / 2 - (double)(g / 0.5) * Math.Cos(p.State.U2);
+        double SpringEnergy() => p.State.V1 * p.State.V1 / 2 + omega * omega * Math.Pow(p.State.U1 - 0.5, 2) / 2;
+        double ThreadEnergy() => p.State.V2 * p.State.V2 / 2 - g / 0.5 * Math.Cos(p.State.U2);
 
         var spring0 = SpringEnergy();
         var thread0 = ThreadEnergy();
@@ -55,7 +55,7 @@ public class PendulumTestModeTests
         }
 
         // Classical Runge-Kutta loses (Omega·h)^6 / 72 of the energy of a harmonic oscillator per step.
-        var h = (double)p.StepWidthValue;
+        var h = p.StepWidthValue;
         var expectedLoss = 2000 * Math.Pow(omega * h, 6) / 72;
         var springLoss = (spring0 - SpringEnergy()) / spring0;
         Assert.InRange(springLoss, 0.9 * expectedLoss, 1.1 * expectedLoss);

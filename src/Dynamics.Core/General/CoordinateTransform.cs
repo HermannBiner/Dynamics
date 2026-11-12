@@ -30,11 +30,11 @@ public class CoordinateTransform
     public (double X, double Y) MathToPixel(MathPoint point) => MathToPixel(point.X, point.Y);
 
     public (double X, double Y) MathToPixel(double x, double y) => (
-        1 + (double)((x - MathXInterval.A) * _cornerX / MathXInterval.IntervalWidth),
-        1 + (double)((MathYInterval.B - y) * _cornerY / MathYInterval.IntervalWidth));
+        1 + (x - MathXInterval.A) * _cornerX / MathXInterval.IntervalWidth,
+        1 + (MathYInterval.B - y) * _cornerY / MathYInterval.IntervalWidth);
 
     /// <summary>Length in mathematical X units converted to pixels.</summary>
-    public double LengthToPixel(double length) => (double)(length * _cornerX / MathXInterval.IntervalWidth);
+    public double LengthToPixel(double length) => length * _cornerX / MathXInterval.IntervalWidth;
 
     /// <summary>VB DrawPoint/FillCircle only draw points inside the diagram.</summary>
     public bool IsInside(MathPoint point) =>

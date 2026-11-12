@@ -12,13 +12,13 @@ public static class MathHelperAngles
         if (deltaX > 0)
         {
             return deltaY >= 0
-                ? Math.Atan((double)(deltaY / deltaX))
-                : (2 * Math.PI + Math.Atan((double)(deltaY / deltaX)));
+                ? Math.Atan(deltaY / deltaX)
+                : (2 * Math.PI + Math.Atan(deltaY / deltaX));
         }
 
         if (deltaX < 0)
         {
-            return (Math.PI + Math.Atan((double)(deltaY / deltaX)));
+            return Math.PI + Math.Atan(deltaY / deltaX);
         }
 
         return deltaY > 0 ? (Math.PI / 2) : (Math.PI * 3 / 2);
@@ -31,10 +31,10 @@ public static class MathHelperAngles
 
         while (!(tempAngle > 0))
         {
-            tempAngle = ((double)tempAngle + Math.PI * 2);
+            tempAngle = tempAngle + Math.PI * 2;
         }
 
-        return ((double)tempAngle % (Math.PI * 2));
+        return tempAngle % (Math.PI * 2);
     }
 }
 
@@ -76,7 +76,7 @@ public static class MathHelperPendulum
             return x > 0 ? (Math.PI / 2) : -(Math.PI / 2);
         }
 
-        var alfa = -Math.Atan((double)(x / y));
+        var alfa = -Math.Atan(x / y);
 
         if (y < 0)
         {
@@ -93,12 +93,12 @@ public static class MathHelperPendulum
 
         while (!(tempAngle > -Math.PI))
         {
-            tempAngle = ((double)tempAngle + Math.PI * 2);
+            tempAngle = tempAngle + Math.PI * 2;
         }
 
         while (!(tempAngle <= Math.PI))
         {
-            tempAngle = ((double)tempAngle - Math.PI * 2);
+            tempAngle = tempAngle - Math.PI * 2;
         }
 
         return tempAngle;

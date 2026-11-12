@@ -36,7 +36,7 @@ public class BilliardCorrectionTests
     }
 
     private static double Distance(MathPoint a, MathPoint b) =>
-        Math.Sqrt(Math.Pow((double)(a.X - b.X), 2) + Math.Pow((double)(a.Y - b.Y), 2));
+        Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
 
     [Theory]
     [InlineData(0.5, 0.9, 0.1)]
@@ -51,10 +51,10 @@ public class BilliardCorrectionTests
         ball.SetUserEndposition(mouse);
 
         // seen from the center (m, 0), the end position is on the border in the direction of the mouse
-        var m = (double)(table.A - table.B) / 2;
+        var m = (table.A - table.B) / 2;
         var end = ball.UserEndposition;
-        var mouseAngle = Math.Atan2(mouseY, (mouseX - m) * (mouseX >= m ? 1 : (double)(table.B / table.A)));
-        var endAngle = Math.Atan2((double)end.Y, ((double)end.X - m) * ((double)end.X >= m ? 1 : (double)(table.B / table.A)));
+        var mouseAngle = Math.Atan2(mouseY, (mouseX - m) * (mouseX >= m ? 1 : (table.B / table.A)));
+        var endAngle = Math.Atan2(end.Y, (end.X - m) * (end.X >= m ? 1 : (table.B / table.A)));
         Assert.Equal(mouseAngle, endAngle, 8);
     }
 

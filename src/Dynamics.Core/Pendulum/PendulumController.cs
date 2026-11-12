@@ -289,7 +289,7 @@ public class PendulumController
             : energy < StartEnergy - tolerance ? EnergyState.TooLow
             : EnergyState.Ok;
 
-        var fraction = (double)((energy - range.A) / range.IntervalWidth);
+        var fraction = (energy - range.A) / range.IntervalWidth;
         return (state, Math.Clamp(fraction, 0, 1));
     }
 

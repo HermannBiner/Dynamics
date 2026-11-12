@@ -307,3 +307,11 @@ Changes that came with Double:
 
 Speed with `dotnet run` (Debug), Decimal → Double: Feigenbaum diagram 150 s → 13 s, bifurcation diagram (Release 130 s
 with Decimal) → 19 s, C-diagram 43 s → 13 s, Newton (unit roots n = 3) 17 s, Julia set 5 s.
+
+Speed of the Release build (`dotnet publish -c Release`, served statically, interpreted WebAssembly, 2026-11-12):
+Feigenbaum diagram 2.6 s, bifurcation diagram 6.0 s, C-diagram 2.2 s, Newton (unit roots n = 3) 1.3 s, Julia set
+(Seahorse) under 1 s, histogram about 2 million steps per second. **AOT is not used:** it would multiply the download and
+the build time and needs the `wasm-tools` workload, while the longest computation takes 6 s.
+
+The casts that remained from the Decimal port were removed where they change nothing (checked with the compiler: only
+the 10 casts of integer divisions and of the tent map's Decimal remain), as well as the parentheses that became unnecessary.

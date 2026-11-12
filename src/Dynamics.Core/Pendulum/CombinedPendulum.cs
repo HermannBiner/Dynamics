@@ -29,16 +29,16 @@ public class CombinedPendulum : PendulumBase
 
         // Omega has to be bigger than a lower limit, see the documentation.
         var lowerLimitOmega = Convert.ToInt32(Math.Ceiling(Math.Max(
-            Math.Sqrt((double)(g / (1 - L0))), Math.Sqrt((double)(g / L0)))));
+            Math.Sqrt(g / (1 - L0)), Math.Sqrt(g / L0))));
 
         AdditionalParameterValue = lowerLimitOmega + 5;
         MyAdditionalParameter = new GeneralParameter(AdditionalParameterValue, Text.Get("SpringPendulumFrequency"),
-            new Interval(lowerLimitOmega, (lowerLimitOmega + 10)), GeneralParameter.ParameterType.DS);
+            new Interval(lowerLimitOmega, lowerLimitOmega + 10), GeneralParameter.ParameterType.DS);
 
         _valueParameter[0] = new GeneralParameter(1, "L", new Interval(Lmin, 2 - MyY0),
             GeneralParameter.ParameterType.Variable, L0);
         _valueParameter[1] = new GeneralParameter(2, "Phi", new Interval(-Math.PI, Math.PI),
-            GeneralParameter.ParameterType.Variable, (Math.PI / 6));
+            GeneralParameter.ParameterType.Variable, Math.PI / 6);
         MyValueParameterDefinition.AddRange(_valueParameter);
 
         // No constants; variables: L = [0], Phi = [1]
@@ -66,9 +66,9 @@ public class CombinedPendulum : PendulumBase
 
         for (var i = 0; i <= numberOfSteps; i++)
         {
-            var angle = MathHelperPendulum.AngleInMinusPiAndPi((-Math.PI + i * 2 * Math.PI / numberOfSteps));
-            var r = L0 + (g * Math.Cos((double)angle) / Math.Pow(Omega, 2));
-            points.Add(new MathPoint(r * Math.Sin((double)angle), MyY0 - r * Math.Cos((double)angle)));
+            var angle = MathHelperPendulum.AngleInMinusPiAndPi(-Math.PI + i * 2 * Math.PI / numberOfSteps);
+            var r = L0 + g * Math.Cos(angle) / Math.Pow(Omega, 2);
+            points.Add(new MathPoint(r * Math.Sin(angle), MyY0 - r * Math.Cos(angle)));
         }
 
         return points;
@@ -81,8 +81,8 @@ public class CombinedPendulum : PendulumBase
 
     protected override void SetPosition()
     {
-        Position1.X = MyCalculationVariables[0] * Math.Sin((double)MyCalculationVariables[1]);
-        Position1.Y = -MyCalculationVariables[0] * Math.Cos((double)MyCalculationVariables[1]) + MyY0;
+        Position1.X = MyCalculationVariables[0] * Math.Sin(MyCalculationVariables[1]);
+        Position1.Y = -MyCalculationVariables[0] * Math.Cos(MyCalculationVariables[1]) + MyY0;
     }
 
     protected override void SetPhasePortraitParameters()
@@ -111,7 +111,7 @@ public class CombinedPendulum : PendulumBase
     public override void SetAdditionalParameters()
     {
         Omega = GetAddParameterValue(AdditionalParameterValue);
-        MyY0 = (g / Math.Pow(Omega, 2) / (double)(1 - L0));
+        MyY0 = g / Math.Pow(Omega, 2) / (1 - L0);
         _origin = new MathPoint(0, MyY0);
 
         if (IsMainDS)
@@ -125,8 +125,8 @@ public class CombinedPendulum : PendulumBase
 
     protected override void SetStartEnergyRange()
     {
-        var emin = -Math.Pow((double)(g / Omega), 2) / 2;
-        var emax = Math.Pow((double)(Omega * (1 - MyY0 - L0)), 2) / 2 + g * (L0 + 1 - MyY0);
+        var emin = -Math.Pow(g / Omega, 2) / 2;
+        var emax = Math.Pow(Omega * (1 - MyY0 - L0), 2) / 2 + g * (L0 + 1 - MyY0);
         MyStartEnergyRange = new Interval(emin, emax);
     }
 
@@ -136,7 +136,7 @@ public class CombinedPendulum : PendulumBase
         var py = Math.Min(Math.Max(MathInterval.A * ShrinkFactor, position.Y), MathInterval.B * ShrinkFactor);
         py -= MyY0;
 
-        var l = Math.Min(_valueParameter[0].Range.B, Math.Sqrt((double)(px * px + py * py)));
+        var l = Math.Min(_valueParameter[0].Range.B, Math.Sqrt(px * px + py * py));
         MyCalculationVariables[0] = l;
 
         var phi = MathHelperPendulum.AngleInMinusPiAndPi(MathHelperPendulum.GetAngle(px, py));
@@ -193,12 +193,12 @@ public class CombinedPendulum : PendulumBase
     public override double GetEnergy()
     {
         // Norm m = 1. Kinetic: (v1^2 + l^2*v2^2)/2
-        var eKin = (Math.Pow(v1, 2) + Math.Pow((double)(u1 * v2), 2)) / 2;
+        var eKin = (Math.Pow(v1, 2) + Math.Pow(u1 * v2, 2)) / 2;
 
-        var ePot = g * (L0 - (u1 * Math.Cos(u2)));
+        var ePot = g * (L0 - u1 * Math.Cos(u2));
 
         // Spring constant D = Omega^2 (m = 1)
-        var eSpring = Math.Pow((double)(Omega * (u1 - L0)), 2) / 2;
+        var eSpring = Math.Pow(Omega * (u1 - L0), 2) / 2;
 
         return eKin + ePot + eSpring;
     }
@@ -207,18 +207,18 @@ public class CombinedPendulum : PendulumBase
     // Here an overflow propagates; the UI stops the iteration and shows a message.
     protected override double G1(NTuple x)
     {
-        var temp = x[0] * Math.Pow((double)x[3], 2);
-        temp += (-Math.Pow(Omega, 2) * (double)(x[0] - L0) + g * Math.Cos((double)x[2]));
+        var temp = x[0] * Math.Pow(x[3], 2);
+        temp += -Math.Pow(Omega, 2) * (x[0] - L0) + g * Math.Cos(x[2]);
         return temp;
     }
 
     // (-2*v2*v1 - g*sin(u2)) / u1, with u1 = l > 0
     protected override double G2(NTuple x) =>
-        (-2 * x[3] * x[1] - g * Math.Sin((double)x[2])) / x[0];
+        (-2 * x[3] * x[1] - g * Math.Sin(x[2])) / x[0];
 
     // Test mode: u1 = l oscillates as a simple spring pendulum around L0, u2 = Phi as a simple thread pendulum
     // of length L0. Corrected: VB applied the thread equation to l and the spring equation to Phi.
     protected override double G1Test(NTuple x) => -(x[0] - L0) * Math.Pow(Omega, 2);
 
-    protected override double G2Test(NTuple x) => -g * Math.Sin((double)x[2]) / L0;
+    protected override double G2Test(NTuple x) => -g * Math.Sin(x[2]) / L0;
 }

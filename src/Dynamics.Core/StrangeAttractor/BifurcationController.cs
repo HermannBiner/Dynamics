@@ -220,7 +220,7 @@ public sealed class BifurcationController
         }
 
         _p++;
-        var parameterValue = ActualParameterRange.A + (ActualParameterRange.IntervalWidth * _p / Width);
+        var parameterValue = ActualParameterRange.A + ActualParameterRange.IntervalWidth * _p / Width;
         var cycles = Compute(DS, _points, parameterValue, Coordinate, _lengthOfCycle);
         return new BifurcationColumn(_p, parameterValue, cycles);
     }

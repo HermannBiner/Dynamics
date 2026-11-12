@@ -235,7 +235,7 @@ public sealed class JuliaController
             // The selection of a + ib is stored for the Julia samples
             UserDataCheck.TryParse(A, out var a);
             UserDataCheck.TryParse(B, out var b);
-            _storedC = new ComplexNumber((double)a, (double)b);
+            _storedC = new ComplexNumber(a, b);
         }
     }
 

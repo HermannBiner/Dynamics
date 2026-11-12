@@ -67,7 +67,7 @@ public sealed class SingleNewtonController
 
         for (var k = 2; k <= N; k++)
         {
-            w = w.Rotate((double)(2 * Math.PI / N));
+            w = w.Rotate(2 * Math.PI / N);
             _unitRoots.Add(w);
         }
 
@@ -171,7 +171,7 @@ public sealed class SingleNewtonController
     {
         _isMouseDown = true;
         ClearDrawing();
-        _orbit.Add(new ComplexNumber((double)point.X, (double)point.Y));
+        _orbit.Add(new ComplexNumber(point.X, point.Y));
         A = point.X.ToString(CultureInfo.CurrentCulture);
         B = point.Y.ToString(CultureInfo.CurrentCulture);
     }
@@ -185,7 +185,7 @@ public sealed class SingleNewtonController
         }
 
         ClearDrawing();
-        _orbit.Add(new ComplexNumber((double)point.X, (double)point.Y));
+        _orbit.Add(new ComplexNumber(point.X, point.Y));
         A = point.X.ToString("N10", CultureInfo.CurrentCulture);
         B = point.Y.ToString("N10", CultureInfo.CurrentCulture);
         _steps = 0;
