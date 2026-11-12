@@ -7,15 +7,19 @@ structure, the name mappings, the corrected VB errors and the comparison with VB
 
 All systems of Simulator are ported (pendulum, numeric methods, Julia/Mandelbrot, Newton, strange attractors,
 billiards, universe, growth models, L-systems) and compute in `Double` since step 6. AOT was decided against
-(Release build fast enough, see README). Possible next work comes from the user.
+(Release build fast enough, see README). Next (2026-11-12, by the user): optimise the GUI and simplify the user
+actions; then move to VS 2026. The logic is in the controllers of `Dynamics.Core` and covered by the tests, so the pages
+can be changed freely.
 
 ## Working rules
 
 - The user writes in German; answer in German. Code, comments, commit messages and the README are in English.
 - Commit only after the user agreed; then push to `origin` (github.com/HermannBiner/Dynamics) right after the commit.
-- Simulator (https://github.com/HermannBiner/Simulator, local `..\..\Simulator 8.0 GitHubRep\Simulator`) is frozen at
-  `200c300` as reference: never change it. VB errors are corrected in Dynamics only, listed in the README table
-  "Errors of Simulator corrected in Dynamics", and the corrected behaviour is checked mathematically in the tests.
+- Simulator (https://github.com/HermannBiner/Simulator, local `..\..\Simulator 8.0 GitHubRep\Simulator`) is a
+  separate project that the user develops independently (correcting the VB errors found during the port). The
+  reference for the Dynamics tests stays its tag `dynamics-reference` (commit `200c300`); `tools/build-simulator.ps1`
+  builds that tag, not the working tree. Work in Dynamics does not change Simulator. The corrected VB errors are listed
+  in the README table "Errors of Simulator corrected in Dynamics" and checked mathematically in the tests.
 - Models in `Dynamics.Core` return state only, without UI; the pages draw (`Drawing/DrawBatch`, `wwwroot/js/canvas.js`).
 - Tests compare with the VB reference data with tolerance (`tests/Dynamics.Tests/ReferenceData.cs`: `Close`,
   `FollowsVB` for chaotic trajectories, `AssertColumn` for diagram columns). Regenerate the data only with

@@ -483,3 +483,5 @@ $RECYCLE.BIN/
 
 # Build of the frozen VB Simulator (tools/build-simulator.ps1)
 tools/SimulatorBin/
+tools/SimulatorSource/
+tools/SimulatorSource.zip
