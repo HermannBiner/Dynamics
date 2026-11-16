@@ -1712,12 +1712,14 @@
   </data>
   <data name="ClsRungeKutta4Pendulum" xml:space="preserve">
     <value>Runge-Kutta 4</value>
+    <comment>Cls</comment>
   </data>
   <data name="NumericMethodsMouseHint" xml:space="preserve">
     <value>Startposition: im linken Bereich mit der Maus nach oben oder unten ziehen. Grün: reales Federpendel, rot: numerische Methode.</value>
   </data>
   <data name="NumericOverflow" xml:space="preserve">
     <value>Numerischer Überlauf: Das Pendel ist numerisch instabil geworden, die Iteration wurde angehalten. Bitte zurücksetzen und eine kleinere Schrittweite wählen.</value>
+    <comment>Msg</comment>
   </data>
   <data name="AnimationSpeed" xml:space="preserve">
     <value>Geschwindigkeit</value>
@@ -1760,9 +1762,11 @@
   </data>
   <data name="StartPositionIn0to13" xml:space="preserve">
     <value>Die Startposition muss in [0,13] x [0,13] liegen.</value>
+    <comment>Msg</comment>
   </data>
   <data name="SourceOneCharacter" xml:space="preserve">
     <value>Die Quelle einer Regel muss genau ein Zeichen sein.</value>
+    <comment>Msg</comment>
   </data>
   <data name="LSystemsHint" xml:space="preserve">
     <value>Start zeichnet die nächste Generation; Stop unterbricht, Start setzt fort. Eigene Systeme werden in diesem Browser gespeichert.</value>

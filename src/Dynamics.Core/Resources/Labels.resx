@@ -1139,7 +1139,7 @@
   </data>
   <data name="Angular Momentum" xml:space="preserve">
     <value>Total ang. Momentum</value>
-    <comment>Lnl</comment>
+    <comment>Lbl</comment>
   </data>
   <data name="Pulse" xml:space="preserve">
     <value>Total Pulse</value>
@@ -1712,15 +1712,18 @@
   </data>
   <data name="ClsRungeKutta4Pendulum" xml:space="preserve">
     <value>Runge-Kutta 4</value>
+    <comment>Cls</comment>
   </data>
   <data name="NumericMethodsMouseHint" xml:space="preserve">
     <value>Start position: drag up or down in the left area. Green: real spring pendulum, red: numerical method.</value>
   </data>
   <data name="NumericOverflow" xml:space="preserve">
     <value>Numeric overflow: the pendulum became numerically unstable and the iteration was stopped. Please reset and choose a smaller step width.</value>
+    <comment>Msg</comment>
   </data>
   <data name="AnimationSpeed" xml:space="preserve">
     <value>Speed</value>
+    <comment>Lbl</comment>
   </data>
   <data name="RealTime" xml:space="preserve">
     <value>real time</value>
@@ -1760,9 +1763,11 @@
   </data>
   <data name="StartPositionIn0to13" xml:space="preserve">
     <value>The start position has to be in [0,13] x [0,13].</value>
+    <comment>Msg</comment>
   </data>
   <data name="SourceOneCharacter" xml:space="preserve">
     <value>The source of a rule has to be exactly one character.</value>
+    <comment>Msg</comment>
   </data>
   <data name="LSystemsHint" xml:space="preserve">
     <value>Start draws the next generation; Stop interrupts it, Start continues. Your own systems are stored in this browser.</value>
