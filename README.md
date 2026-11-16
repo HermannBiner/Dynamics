@@ -14,8 +14,9 @@ C# / Blazor WebAssembly port of the VB.NET WinForms application **Simulator** (s
 ## Reference data
 
 The reference data come from Simulator (https://github.com/HermannBiner/Simulator) at commit `200c300`, tagged
-`dynamics-reference`. Simulator is developed further independently (its errors listed below are being corrected there),
-so the reference stays this tag. To regenerate the reference data:
+`dynamics-reference`. Simulator is developed further independently: the errors listed below are corrected there since
+commit `9cbc769`. The reference stays the tag, because the tests compare with the uncorrected VB values and check the
+corrected behaviour mathematically. To regenerate the reference data:
 
 ```powershell
 ./tools/build-simulator.ps1 -SimulatorRepo <path of the Simulator repository>   # or set SIMULATOR_REPO
@@ -24,7 +25,7 @@ dotnet run --project tools/ReferenceExport
 
 `build-simulator.ps1` extracts the tag with `git archive` into `tools/SimulatorSource` (the working tree of Simulator
 is neither used nor changed), builds it into `tools/SimulatorBin` and copies `Data/LSystemsEN.json` there. Without
-`-SimulatorRepo` and `SIMULATOR_REPO` it looks for `..\..\Simulator 8.0 GitHubRep\Simulator` relative to this
+`-SimulatorRepo` and `SIMULATOR_REPO` it looks for `..\..\Simulator 10.0 GitHubRep\Simulator` relative to this
 repository; `-Reference <tag or commit>` builds another state.
 
 The first port kept `Decimal` and the VB mixed Decimal/Double arithmetic so results matched exactly; since step 6
@@ -60,8 +61,11 @@ Switching to `Double` is a separate step, because it changes chaotic trajectorie
 
 ## Errors of Simulator corrected in Dynamics
 
-Simulator stays unchanged. The affected values are excluded from the exact VB comparison;
-tests check the corrected behaviour mathematically instead.
+The reference (tag `dynamics-reference`) still contains these errors. The affected values are excluded from the exact
+VB comparison; tests check the corrected behaviour mathematically instead. Simulator corrected all of them in commit
+`9cbc769`. There it also removed the shift of the mouse position for the hand cursor in all controllers (pendulum,
+numeric methods, billiards, universe) and computes the start position of the oval billiard, like the end position, in
+the direction of the mouse seen from the centre of the oval; Dynamics still uses the VB start position there.
 
 | Where | VB error | Check in Dynamics.Tests |
 |---|---|---|

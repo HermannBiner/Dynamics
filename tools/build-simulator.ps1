@@ -8,7 +8,7 @@
 # The Simulator repository is found by, in this order:
 #   -SimulatorRepo <path>
 #   the environment variable SIMULATOR_REPO
-#   ..\..\Simulator 8.0 GitHubRep\Simulator relative to the Dynamics repository (the layout of the author)
+#   ..\..\Simulator 10.0 GitHubRep\Simulator relative to the Dynamics repository (the layout of the author)
 
 param(
     [string]$SimulatorRepo,
@@ -18,7 +18,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 if (-not $SimulatorRepo) { $SimulatorRepo = $env:SIMULATOR_REPO }
-if (-not $SimulatorRepo) { $SimulatorRepo = Join-Path $root '..\..\Simulator 8.0 GitHubRep\Simulator' }
+if (-not $SimulatorRepo) { $SimulatorRepo = Join-Path $root '..\..\Simulator 10.0 GitHubRep\Simulator' }
 if (-not (Test-Path (Join-Path $SimulatorRepo '.git'))) {
     throw "Simulator repository not found: $SimulatorRepo. Pass -SimulatorRepo <path> or set SIMULATOR_REPO."
 }

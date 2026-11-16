@@ -15,11 +15,11 @@ can be changed freely.
 
 - The user writes in German; answer in German. Code, comments, commit messages and the README are in English.
 - Commit only after the user agreed; then push to `origin` (github.com/HermannBiner/Dynamics) right after the commit.
-- Simulator (https://github.com/HermannBiner/Simulator, local `..\..\Simulator 8.0 GitHubRep\Simulator`) is a
-  separate project that the user develops independently (correcting the VB errors found during the port). The
-  reference for the Dynamics tests stays its tag `dynamics-reference` (commit `200c300`); `tools/build-simulator.ps1`
-  builds that tag, not the working tree. Work in Dynamics does not change Simulator. The corrected VB errors are listed
-  in the README table "Errors of Simulator corrected in Dynamics" and checked mathematically in the tests.
+- Simulator (https://github.com/HermannBiner/Simulator, local `..\..\Simulator 10.0 GitHubRep\Simulator`) is a
+  separate project that the user develops independently (the VB errors found during the port are corrected there
+  since commit `9cbc769`). The reference for the Dynamics tests stays its tag `dynamics-reference` (commit `200c300`);
+  `tools/build-simulator.ps1` builds that tag, not the working tree. Work in Dynamics does not change Simulator. The
+  corrected VB errors are listed in the README table "Errors of Simulator corrected in Dynamics" and checked mathematically in the tests.
 - Models in `Dynamics.Core` return state only, without UI; the pages draw (`Drawing/DrawBatch`, `wwwroot/js/canvas.js`).
 - Tests compare with the VB reference data with tolerance (`tests/Dynamics.Tests/ReferenceData.cs`: `Close`,
   `FollowsVB` for chaotic trajectories, `AssertColumn` for diagram columns). Regenerate the data only with
