@@ -68,6 +68,34 @@ public class CorrectedVBErrorsTests
         Assert.Equal(0, product.Y, 12);
     }
 
+    [Theory]
+    [InlineData(-5)]
+    [InlineData(-3)]
+    [InlineData(-2)]
+    [InlineData(-1)]
+    [InlineData(1)]
+    [InlineData(3)]
+    [InlineData(5)]
+    public void PowerEqualsRepeatedProduct(int n)
+    {
+        // z^n · z^(-n) = 1 also holds for a wrong exponent; compare with the explicit product instead.
+        var z = new ComplexNumber(0.7, -1.3);
+        var expected = new ComplexNumber(1, 0);
+        for (var k = 0; k < Math.Abs(n); k++)
+        {
+            expected = expected.Mult(z);
+        }
+
+        if (n < 0)
+        {
+            expected = expected.Invers;
+        }
+
+        var power = z.Power(n);
+        Assert.Equal(expected.X, power.X, 12);
+        Assert.Equal(expected.Y, power.Y, 12);
+    }
+
     [Fact]
     public void PowerZeroIsOne()
     {
